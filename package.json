@@ -24,6 +24,7 @@
     "check:shared": "node scripts/sync-shared.mjs --check"
   },
   "dependencies": {
+    "@emailjs/browser": "^5.0.2",
     "firebase": "^9.14.0"
   },
   "devDependencies": {

@@ -13,8 +13,14 @@ export function normaliseRole(value) {
  */
 export async function currentSession() {
   const auth = authService();
-  await auth.authStateReady();
-  const { currentUser: user } = auth;
+
+  const user = await new Promise((resolve, reject) => {
+    const unsubscribe = auth.onAuthStateChanged((nextUser) => {
+      resolve(nextUser);
+      unsubscribe();
+    }, reject);
+  });
+
   if (!user) return { user: null, role: null };
   const { claims } = await user.getIdTokenResult();
   return { user, role: normaliseRole(claims.role) };

@@ -189,5 +189,13 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        const exploreButton = document.querySelector('.explore-btn');
+        if (exploreButton) {
+            const basePath = location.pathname.startsWith('/CFL/') ? '/CFL' : '';
+            exploreButton.href = `${basePath}/programmes`;
+        }
+    </script>
 </body>
 </html>

@@ -195,6 +195,28 @@
                 <button type="submit" class="btn btn-submit" hidden>Send application</button>
             </div>
         </form>
+
+        <section id="otpVerification" class="otp-verification hidden" aria-live="polite">
+            <div class="otp-header">
+                <h2>Verify your email</h2>
+                <p>We've sent a 6-digit verification code to <strong id="otpEmail"></strong>.</p>
+            </div>
+
+            <div class="otp-input-wrapper">
+                <label class="sr-only" for="otpCode">Verification code</label>
+                <input id="otpCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" aria-label="6-digit verification code">
+            </div>
+
+            <p id="otpError" class="otp-error" role="alert"></p>
+            <button id="verifyOtpButton" type="button" class="btn btn-submit">Verify email</button>
+
+            <div class="otp-resend">
+                <p id="otpCountdown">You can request another code in 60 seconds.</p>
+                <button id="resendOtpButton" type="button" class="btn btn-secondary" disabled>Resend code</button>
+                <button id="changeEmailButton" type="button" class="btn btn-link">Wrong email? Change email</button>
+            </div>
+        </section>
+
         <section id="confirmation" class="confirmation" hidden aria-live="polite">
             <h2 tabindex="-1">Application received</h2>
             <p>Your reference is <strong id="referenceNumber"></strong>. Keep it safe: you will need it to check your application.</p>

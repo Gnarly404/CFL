@@ -11,8 +11,19 @@
 <body>
     <main class="login-container">
         <div class="login-card">
-            <h1>Welcome, <span id="instructorName"></span></h1>
-            <p>Your account is active. Class rosters, grading and materials are being added to this workspace.</p>
+            <h1>Welcome, <span id="instructorName">…</span></h1>
+            <p id="instructorBio">Loading your profile…</p>
+
+            <section class="card mt-4">
+                <h2>Assigned courses</h2>
+                <ul id="assignedCourses"><li>Loading courses…</li></ul>
+            </section>
+
+            <section class="card mt-4">
+                <h2>Assigned students</h2>
+                <ul id="assignedStudents"><li>Loading students…</li></ul>
+            </section>
+
             <p><a href="/login" class="login-button" data-action="sign-out">Sign out</a></p>
         </div>
     </main>

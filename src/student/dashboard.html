@@ -28,7 +28,7 @@
 
     <!-- Main Dashboard Container -->
     <main class="dashboard-container">
-        <p class="form-alert" data-kind="info" role="note">Your name and reference are live. The courses, schedule, materials and fees below are sample content until the student portal update connects them to your records.</p>
+        <p class="form-alert" data-kind="info" role="note">Your account and application information are loaded from the CFL records.</p>
 
     <!-- Hero Section with Profile -->
         <section class="hero-section dashboard-hero">
@@ -45,7 +45,7 @@
                         <img src="/images/profile-placeholder.png" alt="Profile" class="profile-image">
                         <div>
                             <p class="student-name" id="profileName">…</p>
-                            <p>Language Student</p>
+                            <p id="profileStatus">Account active</p>
                         </div>
                     </div>
                     <div class="hero-actions">
@@ -57,88 +57,17 @@
     <!-- Dashboard Content -->
     <main class="registration-container dashboard-container">
         <section class="dashboard-grid">
-            <!-- Enrolled Courses -->
-            <div class="dashboard-card enrolled-courses">
-                <h2>Enrolled Courses</h2>
-                <div class="course-list">
-                    <div class="course-card">
-                        <h3>English Language Programme (Elementary-Beginner 1)</h3>
-                        <div class="progress-container">
-                            <div class="progress-bar">
-                                <div class="progress" style="width: 45%"></div>
-                            </div>
-                            <span class="progress-percentage">45%</span>
-                        </div>
-                        <p>Next Class: Monday, 10:00 AM</p>
-                    </div>
-                    <div class="course-card">
-                        <h3>English Language Programme (Elementary-Beginner 2)</h3>
-                        <div class="progress-container">
-                            <div class="progress-bar">
-                                <div class="progress" style="width: 30%"></div>
-                            </div>
-                            <span class="progress-percentage">30%</span>
-                        </div>
-                        <p>Next Class: Wednesday, 2:00 PM</p>
-                    </div>
-                </div>
+            <div class="dashboard-card">
+                <h2>Application status</h2>
+                <p id="applicationStatus">Loading…</p>
+                <div id="studentDetails" class="materials-list"></div>
             </div>
 
-            <!-- Class Schedule -->
-            <div class="dashboard-card class-schedule">
-                <h2>Class Schedule</h2>
-                <div class="schedule-list">
-                    <div class="schedule-item">
-                        <div class="schedule-date">Mon</div>
-                        <div class="schedule-details">
-                            <h3>Elementary-Beginner 1</h3>
-                            <div class="schedule-time">10:00 AM - 12:00 PM</div>
-                        </div>
-                    </div>
-                    <div class="schedule-item">
-                        <div class="schedule-date">Wed</div>
-                        <div class="schedule-details">
-                            <h3>Elementary-Beginner 2</h3>
-                            <div class="schedule-time">2:00 PM - 4:00 PM</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Study Materials -->
-            <div class="dashboard-card study-materials">
-                <h2>Study Materials</h2>
-                <div class="materials-list">
-                    <a href="#" class="material-item">
-                        Beginner 1 Textbook <span class="material-type">PDF</span>
-                    </a>
-                    <a href="#" class="material-item">
-                        Grammar Exercises <span class="material-type">Worksheet</span>
-                    </a>
-                    <a href="#" class="material-item">
-                        Conversation Guide <span class="material-type">Document</span>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Payments and Fees -->
-            <div class="dashboard-card payments-fees">
-                <h2>Payments & Fees</h2>
-                <div class="payment-summary">
-                    <div class="fee-status">
-                        <h3>Total Fees</h3>
-                        <span>1,500 Kshs</span>
-                    </div>
-                    <div class="fee-status">
-                        <h3>Paid</h3>
-                        <span>750 Kshs</span>
-                    </div>
-                    <div class="fee-status">
-                        <h3>Remaining</h3>
-                        <span>750 Kshs</span>
-                    </div>
-                    <button class="btn btn-complete-profile">Pay Fees</button>
-                </div>
+            <div class="dashboard-card">
+                <h2>Enrolments</h2>
+                <ul id="enrolments" class="materials-list">
+                    <li class="material-item">Loading enrolments…</li>
+                </ul>
             </div>
         </section>
     </main>
