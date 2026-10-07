@@ -1,0 +1,30 @@
+.crumbs{display:flex;flex-wrap:wrap;gap:var(--s2);margin:0 0 var(--s4);padding:0;list-style:none;font-size:.9rem;color:var(--muted)}
+.crumbs a{color:var(--navy)}
+.crumbs li+li::before{content:"/";margin-right:var(--s2)}
+.lesson-list{display:grid;gap:var(--s3);margin:0;padding:0;list-style:none}
+.lesson-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--s3);padding:var(--s4);border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.lesson-row h3{margin:0;font:600 1rem var(--font-head);color:var(--navy)}
+.lesson-row p{margin:2px 0 0;color:var(--muted);font-size:.9rem}
+.skill{text-decoration:none}
+.skill .progress{margin-top:var(--s1)}
+.stage{max-width:720px}
+.stage h1,.stage h2{outline:none}
+.rule-list,.example-list{margin:0 0 var(--s4);padding-left:1.2rem}
+.example-list li{margin-bottom:var(--s2)}
+.example-list em{color:var(--muted);font-style:normal;font-size:.85rem}
+.practice-form fieldset{border:0;margin:0;padding:0}
+.practice-form legend{font:600 1.25rem var(--font-head);color:var(--navy);margin-bottom:var(--s4);padding:0}
+.option{display:flex;align-items:center;gap:var(--s3);min-height:48px;margin-bottom:var(--s3);padding:var(--s3) var(--s4);border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer}
+.option input{width:20px;height:20px;accent-color:var(--navy)}
+.option:has(input:focus-visible){box-shadow:var(--focus)}
+.option.is-correct{border-color:#1a7f4b;background:#eaf7f0}
+.option.is-wrong{border-color:#b3261e;background:#fdeceb}
+.option .tag{margin-left:auto;font-size:.8rem;font-weight:700}
+.feedback{margin:var(--s4) 0;padding:var(--s4);border-radius:12px;background:#eef3f9}
+.feedback strong{display:block;margin-bottom:var(--s1)}
+.form-note{color:#b3261e;margin:var(--s3) 0}
+.step-meta{color:var(--muted);margin:0 0 var(--s3)}
+.actions{display:flex;flex-wrap:wrap;gap:var(--s3);margin-top:var(--s5)}
+.score{font:700 2.2rem var(--font-head);color:var(--navy);margin:0}
+.review-list{display:grid;gap:var(--s3);padding:0;margin:var(--s4) 0 0;list-style:none}
+.review-list li{padding:var(--s4);border:1px solid var(--line);border-radius:12px;background:var(--surface)}

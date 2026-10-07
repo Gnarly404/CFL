@@ -16,20 +16,7 @@
 </head>
 <body class="portal">
 <div class="portal-shell">
-  <aside class="portal-side">
-    <div class="portal-brand"><img src="/images/logo.png" alt=""><span>CFL</span></div>
-    <nav class="portal-nav" aria-label="Student portal">
-      <a href="/student/dashboard" aria-current="page">Dashboard</a>
-      <span aria-disabled="true">English Practice <small>Soon</small></span>
-      <span aria-disabled="true">Schedule <small>Soon</small></span>
-      <span aria-disabled="true">Progress <small>Soon</small></span>
-      <span aria-disabled="true">Messages <small>Soon</small></span>
-    </nav>
-    <div class="portal-spacer"></div>
-    <nav class="portal-nav" aria-label="Account">
-      <a href="/login" data-action="sign-out">Sign out</a>
-    </nav>
-  </aside>
+  <aside class="portal-side" id="portalSide"></aside>
 
   <main class="portal-main">
     <header class="portal-head">
@@ -41,23 +28,15 @@
     <div class="stack">
       <section class="card continue" aria-labelledby="continueTitle">
         <p class="eyebrow">Continue learning</p>
-        <h2 id="continueTitle">No lesson started yet</h2>
-        <p class="muted">Your next lesson will appear here once English Practice opens.</p>
-        <div class="progress" role="progressbar" aria-label="Course progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="--value:0%"><span></span></div>
-        <p class="muted">Progress: not started</p>
+        <h2 id="continueTitle">Loading…</h2>
+        <p id="continueText" class="muted"></p>
+        <div id="continueAction"></div>
       </section>
 
       <section class="card" aria-labelledby="practiceTitle">
         <p class="eyebrow">English Practice</p>
         <h2 id="practiceTitle">Six skills, one place</h2>
-        <div class="skill-grid">
-          <div class="skill" aria-disabled="true">Grammar<small>Coming soon</small></div>
-          <div class="skill" aria-disabled="true">Vocabulary<small>Coming soon</small></div>
-          <div class="skill" aria-disabled="true">Listening<small>Coming soon</small></div>
-          <div class="skill" aria-disabled="true">Speaking<small>Coming soon</small></div>
-          <div class="skill" aria-disabled="true">Reading<small>Coming soon</small></div>
-          <div class="skill" aria-disabled="true">Writing<small>Coming soon</small></div>
-        </div>
+        <div id="skillGrid" class="skill-grid"></div>
       </section>
 
       <div class="two-col">
@@ -76,11 +55,6 @@
     </div>
   </main>
 </div>
-<nav class="portal-bottom" aria-label="Student portal mobile">
-  <a href="/student/dashboard" aria-current="page">Home</a>
-  <span aria-disabled="true">Practice</span>
-  <span aria-disabled="true">Progress</span>
-  <a href="/login" data-action="sign-out">Sign out</a>
-</nav>
+<nav class="portal-bottom" id="portalBottom" aria-label="Student portal mobile"></nav>
 </body>
 </html>

@@ -9,6 +9,8 @@ export const ROUTES = Object.freeze({
   register: '/register',
   activate: '/activate',
   student: '/student/dashboard',
+  practice: '/student/practice',
+  practiceLesson: '/student/practice/lesson',
   instructor: '/instructor/dashboard',
   admin: '/admin/dashboard',
 });

@@ -1,0 +1,95 @@
+{
+  "skill": "grammar",
+  "lessons": [
+    {
+      "id": "grammar-be",
+      "title": "Present simple: am, is, are",
+      "summary": "Say who or what someone is.",
+      "rule": ["Use am with I.", "Use is with he, she and it.", "Use are with we, you and they."],
+      "examples": [
+        { "text": "I am a student.", "note": "I + am" },
+        { "text": "She is at home.", "note": "she + is" },
+        { "text": "They are friends.", "note": "they + are" }
+      ],
+      "questions": [
+        { "id": "be-1", "prompt": "She ___ a teacher.", "options": ["am", "is", "are"], "answer": 1, "why": "With he, she and it we use is." },
+        { "id": "be-2", "prompt": "They ___ at home.", "options": ["is", "am", "are"], "answer": 2, "why": "With we, you and they we use are." },
+        { "id": "be-3", "prompt": "I ___ from Kenya.", "options": ["am", "is", "are"], "answer": 0, "why": "With I we use am." },
+        { "id": "be-4", "prompt": "Which sentence is correct?", "options": ["He are tall.", "He is tall.", "He am tall."], "answer": 1, "why": "He takes is, so \"He is tall.\" is correct." },
+        { "id": "be-5", "prompt": "We ___ students.", "options": ["is", "am", "are"], "answer": 2, "why": "With we we use are." }
+      ]
+    },
+    {
+      "id": "grammar-present-simple",
+      "title": "Present simple: daily routines",
+      "summary": "Talk about things you do regularly.",
+      "rule": ["Use the base verb with I, you, we and they.", "With he, she and it the verb usually takes -s or -es.", "If a verb ends in consonant + y, change y to -ies (study becomes studies)."],
+      "examples": [
+        { "text": "He goes to school every morning.", "note": "he + goes" },
+        { "text": "They play football on Saturdays.", "note": "they + play" },
+        { "text": "My sister studies English.", "note": "study becomes studies" }
+      ],
+      "questions": [
+        { "id": "ps-1", "prompt": "He ___ to school every morning.", "options": ["go", "goes", "going"], "answer": 1, "why": "With he the verb takes -es: goes." },
+        { "id": "ps-2", "prompt": "They ___ football on Saturdays.", "options": ["play", "plays", "playing"], "answer": 0, "why": "With they we use the base verb: play." },
+        { "id": "ps-3", "prompt": "My sister ___ English at university.", "options": ["study", "studies", "studys"], "answer": 1, "why": "Consonant + y changes to -ies: studies." },
+        { "id": "ps-4", "prompt": "Which sentence is correct?", "options": ["She watch TV.", "She watches TV.", "She watchs TV."], "answer": 1, "why": "Verbs ending in -ch add -es: watches." },
+        { "id": "ps-5", "prompt": "I ___ breakfast at seven.", "options": ["eat", "eats", "eating"], "answer": 0, "why": "With I we use the base verb: eat." }
+      ]
+    },
+    {
+      "id": "grammar-questions-negatives",
+      "title": "Present simple: questions and negatives",
+      "summary": "Ask questions and say what is not true.",
+      "rule": ["Use do/does to make questions: Do you like tea? Does she work here?", "Use do not (don't) or does not (doesn't) to make negatives.", "After do/does the main verb stays in its base form: She doesn't like coffee."],
+      "examples": [
+        { "text": "Do you like tea?", "note": "do + you" },
+        { "text": "She doesn't like coffee.", "note": "does not + base verb" },
+        { "text": "Does he work here?", "note": "does + he, base verb work" }
+      ],
+      "questions": [
+        { "id": "qn-1", "prompt": "___ you like tea?", "options": ["Do", "Does", "Are"], "answer": 0, "why": "With you we use Do." },
+        { "id": "qn-2", "prompt": "She ___ not like coffee.", "options": ["do", "does", "is"], "answer": 1, "why": "With she we use does not." },
+        { "id": "qn-3", "prompt": "___ he work here?", "options": ["Do", "Is", "Does"], "answer": 2, "why": "With he we use Does." },
+        { "id": "qn-4", "prompt": "He doesn't ___ meat.", "options": ["eats", "eat", "eating"], "answer": 1, "why": "After doesn't the verb stays in the base form: eat." },
+        { "id": "qn-5", "prompt": "They ___ not live in Nairobi.", "options": ["does", "is", "do"], "answer": 2, "why": "With they we use do not." }
+      ]
+    },
+    {
+      "id": "grammar-articles",
+      "title": "Articles: a, an, the",
+      "summary": "Choose the right small word before a noun.",
+      "rule": ["Use a before a consonant sound and an before a vowel sound.", "Use the when we already know which one, or when there is only one.", "It is the sound that matters: an honest man (the h is silent)."],
+      "examples": [
+        { "text": "I have an apple.", "note": "an + vowel sound" },
+        { "text": "She is a teacher.", "note": "a + consonant sound" },
+        { "text": "The sun is hot.", "note": "there is only one sun" }
+      ],
+      "questions": [
+        { "id": "ar-1", "prompt": "I have ___ apple.", "options": ["a", "an", "the"], "answer": 1, "why": "Apple starts with a vowel sound, so we use an." },
+        { "id": "ar-2", "prompt": "She is ___ teacher.", "options": ["a", "an", "the"], "answer": 0, "why": "Teacher starts with a consonant sound, so we use a." },
+        { "id": "ar-3", "prompt": "I bought a book. ___ book is interesting.", "options": ["A", "An", "The"], "answer": 2, "why": "We already mentioned the book, so we use the." },
+        { "id": "ar-4", "prompt": "He is ___ honest man.", "options": ["a", "an", "the"], "answer": 1, "why": "Honest starts with a vowel sound because the h is silent, so we use an." },
+        { "id": "ar-5", "prompt": "___ sun rises in the east.", "options": ["A", "An", "The"], "answer": 2, "why": "There is only one sun, so we use the." }
+      ]
+    },
+    {
+      "id": "grammar-plurals",
+      "title": "Plural nouns",
+      "summary": "Make nouns plural, including irregular ones.",
+      "rule": ["Most nouns add -s: book becomes books.", "Nouns ending in -s, -x, -ch or -sh add -es: box becomes boxes.", "Consonant + y changes to -ies: baby becomes babies.", "Some nouns are irregular: child becomes children, man becomes men."],
+      "examples": [
+        { "text": "one box, two boxes", "note": "ends in -x, add -es" },
+        { "text": "one baby, two babies", "note": "y becomes -ies" },
+        { "text": "one child, three children", "note": "irregular" }
+      ],
+      "questions": [
+        { "id": "pl-1", "prompt": "One box, two ___.", "options": ["boxes", "boxs", "boxies"], "answer": 0, "why": "Nouns ending in -x add -es." },
+        { "id": "pl-2", "prompt": "One child, three ___.", "options": ["childs", "children", "childrens"], "answer": 1, "why": "Child has an irregular plural: children." },
+        { "id": "pl-3", "prompt": "One baby, two ___.", "options": ["babys", "babies", "babyes"], "answer": 1, "why": "Consonant + y changes to -ies." },
+        { "id": "pl-4", "prompt": "One bus, five ___.", "options": ["buss", "busies", "buses"], "answer": 2, "why": "Nouns ending in -s add -es." },
+        { "id": "pl-5", "prompt": "One man, ten ___.", "options": ["mans", "men", "mens"], "answer": 1, "why": "Man has an irregular plural: men." }
+      ]
+    }
+  ]
+}

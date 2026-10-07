@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" data-auth="pending">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>English Practice - CFL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/foundation.css">
+<link rel="stylesheet" href="/css/tokens.css">
+<link rel="stylesheet" href="/css/components.css">
+<link rel="stylesheet" href="/css/portal.css">
+<link rel="stylesheet" href="/css/practice.css">
+<link rel="icon" type="image/png" href="/images/logo.png">
+<script type="module" src="/js/pages/practice-hub.js"></script>
+</head>
+<body class="portal">
+<div class="portal-shell">
+  <aside class="portal-side" id="portalSide"></aside>
+  <main class="portal-main">
+    <header class="portal-head">
+      <h1>English Practice</h1>
+      <p class="muted">Improve your English one skill at a time.</p>
+    </header>
+    <div class="stack">
+      <section class="card continue" aria-labelledby="hubContinueTitle">
+        <p class="eyebrow">Continue learning</p>
+        <h2 id="hubContinueTitle">Loading…</h2>
+        <p id="hubContinueText" class="muted"></p>
+        <div id="hubContinueAction"></div>
+      </section>
+      <section class="card" aria-labelledby="skillsTitle">
+        <p class="eyebrow">Practice skills</p>
+        <h2 id="skillsTitle">Choose a skill</h2>
+        <div id="skillGrid" class="skill-grid"></div>
+      </section>
+      <section class="card" aria-labelledby="grammarTitle">
+        <p class="eyebrow">Grammar</p>
+        <h2 id="grammarTitle">Grammar lessons</h2>
+        <p id="hubNote" class="form-note" role="alert" hidden></p>
+        <ol id="lessonList" class="lesson-list"></ol>
+      </section>
+    </div>
+  </main>
+</div>
+<nav class="portal-bottom" id="portalBottom" aria-label="Student portal mobile"></nav>
+</body>
+</html>
