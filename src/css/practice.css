@@ -28,3 +28,6 @@
 .score{font:700 2.2rem var(--font-head);color:var(--navy);margin:0}
 .review-list{display:grid;gap:var(--s3);padding:0;margin:var(--s4) 0 0;list-style:none}
 .review-list li{padding:var(--s4);border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.word-list{display:grid;gap:var(--s3);margin:0 0 var(--s4);padding:0;list-style:none}
+.word-list li{padding:var(--s3) var(--s4);border:1px solid var(--line);border-radius:12px}
+.word-list strong{color:var(--navy)}

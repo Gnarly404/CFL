@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import grammar from '../../src/data/practice/grammar.json';
-import { lessonStatus, nextLesson, scoreAttempt, skillPercent, validateLesson } from '@/practice/engine.js';
+import vocabulary from '../../src/data/practice/vocabulary.json';
+import { lessonStatus, nextLesson, pickContinue, scoreAttempt, skillPercent, validateLesson } from '@/practice/engine.js';
 
 const lessons = [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
 const questions = [{ id: 'q1', answer: 1 }, { id: 'q2', answer: 0 }, { id: 'q3', answer: 2 }, { id: 'q4', answer: 1 }];
@@ -36,11 +37,24 @@ describe('progress helpers', () => {
   });
 });
 
-describe('grammar content', () => {
+describe('pickContinue', () => {
+  const entry = (id, done, next) => ({ skill: { id }, done, next });
+  it('prefers a skill already started, then the first with a lesson left', () => {
+    expect(pickContinue([entry('a', 0, {}), entry('b', 2, {})]).skill.id).toBe('b');
+    expect(pickContinue([entry('a', 0, {}), entry('b', 0, {})]).skill.id).toBe('a');
+  });
+  it('skips finished skills and returns null when all are finished', () => {
+    expect(pickContinue([entry('a', 5, null), entry('b', 0, {})]).skill.id).toBe('b');
+    expect(pickContinue([entry('a', 5, null)])).toBeNull();
+    expect(pickContinue([])).toBeNull();
+  });
+});
+
+describe.each([['grammar', grammar], ['vocabulary', vocabulary]])('%s content', (_name, content) => {
   it('has valid lessons with unique ids', () => {
-    const problems = grammar.lessons.flatMap(validateLesson);
+    const problems = content.lessons.flatMap(validateLesson);
     expect(problems).toEqual([]);
-    const ids = grammar.lessons.flatMap((l) => [l.id, ...l.questions.map((q) => q.id)]);
+    const ids = content.lessons.flatMap((l) => [l.id, ...l.questions.map((q) => q.id)]);
     expect(new Set(ids).size).toBe(ids.length);
   });
   it('flags a broken question', () => {

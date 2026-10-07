@@ -2,11 +2,11 @@ import { collection, doc, getDoc, getDocs, limit, orderBy, query, where } from '
 import { guardPage } from '@/auth/guards.js';
 import { dbService } from '@/services/firebase-db.js';
 import { el } from '@/utils/dom.js';
-import grammar from '../../data/practice/grammar.json';
 import { ROUTES } from '@/core/routes.js';
-import { lessonStatus, nextLesson, skillPercent } from '@/practice/engine.js';
+import { lessonUrl } from '@/practice/content.js';
+import { pickContinue } from '@/practice/engine.js';
+import { loadOverview } from '@/practice/overview.js';
 import { SKILLS } from '@/practice/skills.js';
-import { loadLessonProgress } from '@/services/practice-service.js';
 import { h } from '@/ui/h.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
 
@@ -76,28 +76,23 @@ try {
 
 // Continue Learning and the practice skill cards come from real lesson progress.
 {
-  let progress = {};
-  try {
-    progress = await loadLessonProgress(session.user.uid, 'grammar');
-  } catch (error) {
-    console.warn('Could not load practice progress', error?.code ?? error);
-  }
-  const lessons = grammar.lessons;
-  const next = nextLesson(lessons, progress);
-  const percent = skillPercent(lessons, progress);
-  const done = lessons.filter((lesson) => lessonStatus(progress, lesson.id) === 'completed').length;
+  const { entries } = await loadOverview(session.user.uid);
+  const pick = pickContinue(entries);
   const titleEl = document.getElementById('continueTitle');
   const textEl = document.getElementById('continueText');
   const actionEl = document.getElementById('continueAction');
   const gridEl = document.getElementById('skillGrid');
-  if (titleEl) titleEl.textContent = next ? next.title : 'Grammar complete';
-  if (textEl) textEl.textContent = next ? `Grammar: ${done} of ${lessons.length} lessons completed. ${next.summary}` : 'You have finished every grammar lesson.';
+  if (titleEl) titleEl.textContent = pick ? pick.next.title : 'All available lessons complete';
+  if (textEl) textEl.textContent = pick ? `${pick.skill.label}: ${pick.done} of ${pick.lessons.length} lessons completed. ${pick.next.summary}` : 'You can review any lesson in English Practice.';
   if (actionEl) {
-    actionEl.replaceChildren(h('a', { class: 'btn btn-primary', href: next ? `${ROUTES.practiceLesson}?skill=grammar&id=${encodeURIComponent(next.id)}` : ROUTES.practice }, next ? (done ? 'Continue' : 'Start lesson') : 'Open English Practice'));
+    actionEl.replaceChildren(h('a', { class: 'btn btn-primary', href: pick ? lessonUrl(pick.skill.id, pick.next.id) : ROUTES.practice }, pick ? (pick.done ? 'Continue' : 'Start lesson') : 'Open English Practice'));
   }
   if (gridEl) {
-    gridEl.replaceChildren(...SKILLS.map((skill) => (skill.available
-      ? h('a', { class: 'skill', href: ROUTES.practice }, skill.label, h('small', {}, `${percent}% complete`))
-      : h('div', { class: 'skill', 'aria-disabled': 'true' }, skill.label, h('small', {}, 'Coming soon')))));
+    gridEl.replaceChildren(...SKILLS.map((skill) => {
+      const entry = entries.find((e) => e.skill.id === skill.id);
+      return entry
+        ? h('a', { class: 'skill', href: ROUTES.practice }, skill.label, h('small', {}, `${entry.percent}% complete`))
+        : h('div', { class: 'skill', 'aria-disabled': 'true' }, skill.label, h('small', {}, 'Coming soon'));
+    }));
   }
 }

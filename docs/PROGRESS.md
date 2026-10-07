@@ -10,7 +10,7 @@ upload the latest zip and say "continue with session N"; this file is the handof
 | 1 | Foundation: clean repo, auth and roles, admissions backend, rules, tests | **Done (this checkpoint)** |
 | 2 | Design system and app shell | **Partly done**: tokens, components, student portal shell. Still open: self-hosted fonts and icons, CSP, shared public header/footer, admin and instructor shells |
 | 3 | Student portal and dashboard | **Started**: Continue Learning and skill cards use real lesson progress. Still open: schedule, materials, fees from real data, profile and settings pages, email change |
-| 4 | English Practice (hub, engine, six skills, results, mistake review) | **Started**: hub, lesson shell and Grammar (5 starter lessons) work end to end. Still open: Vocabulary, Listening, Speaking, Reading, Writing, a cross-lesson mistake review page, daily goal, recommendations |
+| 4 | English Practice (hub, engine, six skills, results, mistake review) | **Started**: hub, lesson shell, Grammar (5 starter lessons) work end to end. Vocabulary also works (4 starter lessons). Still open: Listening, Speaking, Reading, Writing, a cross-lesson mistake review page, daily goal, recommendations |
 | 5 | Public site, programmes, admissions pages | Planned |
 | 6 | Admin and instructor tools, messaging and notifications | Planned |
 | 7 | Personalisation, hardening (CI deploy, accessibility, performance, monitoring), final release zip | Planned |
@@ -106,8 +106,14 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 - Shared pieces: `js/practice/engine.js` (pure logic), `js/ui/portal-shell.js` (sidebar and mobile nav), `js/ui/h.js` (safe DOM builder).
 - Tests: 21 files, 195 pass, including a jsdom run through the whole lesson page. **Still not run:** the Firestore rules tests (need the emulators) and any real-browser check of the new pages.
 
+### Vocabulary (second slice)
+
+- 4 lessons (`src/data/practice/vocabulary.json`, 24 words, 20 questions): Family and friends, Food and drink, Around town, Time and routine. Same Learn, Practice, Results flow; the Learn step shows a word list with definitions and example sentences, and the results review repeats the example for each missed word. **Also written by the assistant; needs curriculum review.**
+- The runner, hub and dashboard are now skill-agnostic: add a skill by adding its JSON, registering it in `js/practice/content.js` and marking it `available` in `js/practice/skills.js`.
+- Not built yet: flashcard flip mode and true spaced repetition (words are not scheduled for review over time; a missed word is only shown again on that lesson's results).
+
 ### Next up
 1. Run `npm run test:rules` and fix any rules bug (the lessonProgress rules are now used for real).
-2. Vocabulary skill (flashcards and spaced review), then Reading and Listening, then Speaking (record and playback) and Writing (drafts).
+2. Reading and Listening, then Speaking (record and playback) and Writing (drafts).
 3. Mistake review page and daily goal; weak-area recommendations.
 4. Remaining session 2 items (self-hosted fonts and icons, CSP, shared public header and footer).

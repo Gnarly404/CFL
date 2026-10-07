@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import grammar from '../../src/data/practice/grammar.json';
+import vocabulary from '../../src/data/practice/vocabulary.json';
 import { loadPage, tick } from '../helpers.js';
 
 const save = vi.fn();
@@ -76,5 +77,24 @@ describe('practice lesson page', () => {
     }
     expect(stageText()).toContain('could not be saved');
     expect(document.getElementById('retrySave')).not.toBeNull();
+  });
+
+  it('runs a vocabulary lesson with the word list and saves under the vocabulary skill', async () => {
+    const vocab = vocabulary.lessons[0];
+    await open(`?skill=vocabulary&id=${vocab.id}`);
+    expect(stageText()).toContain(vocab.words[0].definition);
+    click('#startBtn');
+    for (const q of vocab.questions) {
+      await answer(q.answer);
+      document.querySelector('form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      await tick();
+    }
+    expect(stageText()).toContain('No mistakes');
+    expect(save.mock.calls[0][1]).toBe('vocabulary');
+  });
+
+  it('does not open a skill that has no content yet', async () => {
+    await open('?skill=speaking&id=x');
+    expect(stageText()).toContain('Lesson not found');
   });
 });

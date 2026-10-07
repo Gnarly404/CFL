@@ -1,0 +1,85 @@
+{
+  "skill": "vocabulary",
+  "lessons": [
+    {
+      "id": "vocab-family",
+      "title": "Family and friends",
+      "summary": "Words for the people around you.",
+      "words": [
+        { "word": "mother", "definition": "a female parent", "example": "My mother cooks dinner every evening." },
+        { "word": "father", "definition": "a male parent", "example": "My father drives to work." },
+        { "word": "sister", "definition": "a girl or woman with the same parents as you", "example": "My sister is two years older than me." },
+        { "word": "brother", "definition": "a boy or man with the same parents as you", "example": "My brother plays football." },
+        { "word": "cousin", "definition": "the child of your aunt or uncle", "example": "My cousin lives in another town." },
+        { "word": "neighbour", "definition": "a person who lives near you", "example": "Our neighbour says hello every morning." }
+      ],
+      "questions": [
+        { "id": "vf-1", "word": "neighbour", "prompt": "A person who lives near you is your ___.", "options": ["cousin", "neighbour", "brother"], "answer": 1, "why": "A neighbour is a person who lives near you." },
+        { "id": "vf-2", "word": "cousin", "prompt": "Your mother's sister's daughter is your ___.", "options": ["cousin", "sister", "mother"], "answer": 0, "why": "A cousin is the child of your aunt or uncle." },
+        { "id": "vf-3", "word": "father", "prompt": "Which word means \"a male parent\"?", "options": ["father", "brother", "cousin"], "answer": 0, "why": "A father is a male parent." },
+        { "id": "vf-4", "word": "sister", "prompt": "My ___ and I have the same parents. She is two years older than me.", "options": ["sister", "neighbour", "cousin"], "answer": 0, "why": "A sister has the same parents as you." },
+        { "id": "vf-5", "word": "mother", "prompt": "Which word means \"a female parent\"?", "options": ["sister", "mother", "neighbour"], "answer": 1, "why": "A mother is a female parent." }
+      ]
+    },
+    {
+      "id": "vocab-food",
+      "title": "Food and drink",
+      "summary": "Meals and words about eating.",
+      "words": [
+        { "word": "breakfast", "definition": "the first meal of the day", "example": "I eat breakfast at seven." },
+        { "word": "lunch", "definition": "the meal in the middle of the day", "example": "We have lunch at school." },
+        { "word": "dinner", "definition": "the main meal in the evening", "example": "Dinner is ready at eight." },
+        { "word": "hungry", "definition": "wanting to eat", "example": "I am hungry after the long walk." },
+        { "word": "thirsty", "definition": "wanting to drink", "example": "The children are thirsty on a hot day." },
+        { "word": "recipe", "definition": "instructions for cooking a dish", "example": "She follows a recipe to bake a cake." }
+      ],
+      "questions": [
+        { "id": "vd-1", "word": "breakfast", "prompt": "Which word means \"the first meal of the day\"?", "options": ["lunch", "breakfast", "dinner"], "answer": 1, "why": "Breakfast is the first meal of the day." },
+        { "id": "vd-2", "word": "thirsty", "prompt": "I am ___. I want a glass of water.", "options": ["hungry", "thirsty", "recipe"], "answer": 1, "why": "Thirsty means wanting to drink." },
+        { "id": "vd-3", "word": "recipe", "prompt": "She follows a ___ to bake a cake.", "options": ["recipe", "lunch", "dinner"], "answer": 0, "why": "A recipe is a set of instructions for cooking a dish." },
+        { "id": "vd-4", "word": "dinner", "prompt": "We eat ___ in the evening.", "options": ["breakfast", "lunch", "dinner"], "answer": 2, "why": "Dinner is the main meal in the evening." },
+        { "id": "vd-5", "word": "hungry", "prompt": "I have not eaten all day. I am very ___.", "options": ["thirsty", "hungry", "recipe"], "answer": 1, "why": "Hungry means wanting to eat." }
+      ]
+    },
+    {
+      "id": "vocab-town",
+      "title": "Around town",
+      "summary": "Places you go every week.",
+      "words": [
+        { "word": "market", "definition": "a place where people buy and sell things", "example": "We buy vegetables at the market." },
+        { "word": "hospital", "definition": "a place where doctors treat sick people", "example": "The hospital is near the bus station." },
+        { "word": "bank", "definition": "a place where people keep money", "example": "He goes to the bank on Friday." },
+        { "word": "station", "definition": "a place where buses or trains stop", "example": "I wait at the station for the train." },
+        { "word": "street", "definition": "a road in a town with buildings on it", "example": "Our school is on this street." },
+        { "word": "library", "definition": "a place where you can borrow books", "example": "She reads at the library after class." }
+      ],
+      "questions": [
+        { "id": "vt-1", "word": "library", "prompt": "You can borrow books at a ___.", "options": ["library", "bank", "station"], "answer": 0, "why": "A library is a place where you can borrow books." },
+        { "id": "vt-2", "word": "hospital", "prompt": "Doctors treat sick people in a ___.", "options": ["market", "hospital", "street"], "answer": 1, "why": "A hospital is a place where doctors treat sick people." },
+        { "id": "vt-3", "word": "bank", "prompt": "He keeps his money in a ___.", "options": ["bank", "library", "station"], "answer": 0, "why": "A bank is a place where people keep money." },
+        { "id": "vt-4", "word": "station", "prompt": "We wait at the ___ for the train.", "options": ["hospital", "station", "market"], "answer": 1, "why": "A station is a place where buses or trains stop." },
+        { "id": "vt-5", "word": "market", "prompt": "Which word means \"a place where people buy and sell things\"?", "options": ["market", "bank", "hospital"], "answer": 0, "why": "A market is a place where people buy and sell things." }
+      ]
+    },
+    {
+      "id": "vocab-time",
+      "title": "Time and routine",
+      "summary": "Parts of the day and how often things happen.",
+      "words": [
+        { "word": "morning", "definition": "the first part of the day", "example": "I study in the morning." },
+        { "word": "afternoon", "definition": "the part of the day after noon and before evening", "example": "We play football in the afternoon." },
+        { "word": "evening", "definition": "the part of the day before night", "example": "We watch the news in the evening." },
+        { "word": "early", "definition": "before the usual or expected time", "example": "I wake up early on school days." },
+        { "word": "late", "definition": "after the usual or expected time", "example": "He was late for the lesson." },
+        { "word": "always", "definition": "every time", "example": "She always says thank you." }
+      ],
+      "questions": [
+        { "id": "vm-1", "word": "morning", "prompt": "The first part of the day is the ___.", "options": ["evening", "morning", "afternoon"], "answer": 1, "why": "The morning is the first part of the day." },
+        { "id": "vm-2", "word": "early", "prompt": "The bus comes at six. I wake up at five, so I am ___.", "options": ["early", "late", "always"], "answer": 0, "why": "Early means before the usual or expected time." },
+        { "id": "vm-3", "word": "late", "prompt": "He arrived after the lesson started, so he was ___.", "options": ["early", "late", "morning"], "answer": 1, "why": "Late means after the usual or expected time." },
+        { "id": "vm-4", "word": "always", "prompt": "I ___ brush my teeth before bed. I never forget.", "options": ["always", "early", "afternoon"], "answer": 0, "why": "Always means every time." },
+        { "id": "vm-5", "word": "afternoon", "prompt": "The part of the day after noon and before evening is the ___.", "options": ["morning", "afternoon", "late"], "answer": 1, "why": "The afternoon is the part of the day after noon and before evening." }
+      ]
+    }
+  ]
+}
