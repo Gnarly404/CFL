@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" data-auth="pending">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CFL Student Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@400;600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/foundation.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="icon" type="image/png" href="/images/logo.png">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo-section">
+                <img src="/images/logo.png" alt="CFL Logo" class="logo">
+                <h1 class="motto gradient-text">Knowledge to Empower</h1>
+            </div>
+            <div class="nav-links">
+                <a href="#" class="nav-link">Dashboard</a>
+                <a href="#" class="nav-link">Courses</a>
+                <a href="#" class="nav-link">Messages</a>
+                <a href="/login" class="nav-link join-us" data-action="sign-out">Sign out</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Dashboard Container -->
+    <main class="dashboard-container">
+        <p class="form-alert" data-kind="info" role="note">Your name and reference are live. The courses, schedule, materials and fees below are sample content until the student portal update connects them to your records.</p>
+
+    <!-- Hero Section with Profile -->
+        <section class="hero-section dashboard-hero">
+            <div class="hero-content">
+                <div class="hero-left">
+                    <div id="dayMessage" class="day-message"></div>
+                    <h1>Welcome, <span id="studentName">…</span></h1>
+                    <div class="registration-number-display">
+                        Reg No: <span id="registrationNumber">…</span>
+                    </div>
+                </div>
+                <div class="hero-right">
+                    <div class="profile-section">
+                        <img src="/images/profile-placeholder.png" alt="Profile" class="profile-image">
+                        <div>
+                            <p class="student-name" id="profileName">…</p>
+                            <p>Language Student</p>
+                        </div>
+                    </div>
+                    <div class="hero-actions">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    <!-- Dashboard Content -->
+    <main class="registration-container dashboard-container">
+        <section class="dashboard-grid">
+            <!-- Enrolled Courses -->
+            <div class="dashboard-card enrolled-courses">
+                <h2>Enrolled Courses</h2>
+                <div class="course-list">
+                    <div class="course-card">
+                        <h3>English Language Programme (Elementary-Beginner 1)</h3>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 45%"></div>
+                            </div>
+                            <span class="progress-percentage">45%</span>
+                        </div>
+                        <p>Next Class: Monday, 10:00 AM</p>
+                    </div>
+                    <div class="course-card">
+                        <h3>English Language Programme (Elementary-Beginner 2)</h3>
+                        <div class="progress-container">
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 30%"></div>
+                            </div>
+                            <span class="progress-percentage">30%</span>
+                        </div>
+                        <p>Next Class: Wednesday, 2:00 PM</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Class Schedule -->
+            <div class="dashboard-card class-schedule">
+                <h2>Class Schedule</h2>
+                <div class="schedule-list">
+                    <div class="schedule-item">
+                        <div class="schedule-date">Mon</div>
+                        <div class="schedule-details">
+                            <h3>Elementary-Beginner 1</h3>
+                            <div class="schedule-time">10:00 AM - 12:00 PM</div>
+                        </div>
+                    </div>
+                    <div class="schedule-item">
+                        <div class="schedule-date">Wed</div>
+                        <div class="schedule-details">
+                            <h3>Elementary-Beginner 2</h3>
+                            <div class="schedule-time">2:00 PM - 4:00 PM</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Study Materials -->
+            <div class="dashboard-card study-materials">
+                <h2>Study Materials</h2>
+                <div class="materials-list">
+                    <a href="#" class="material-item">
+                        Beginner 1 Textbook <span class="material-type">PDF</span>
+                    </a>
+                    <a href="#" class="material-item">
+                        Grammar Exercises <span class="material-type">Worksheet</span>
+                    </a>
+                    <a href="#" class="material-item">
+                        Conversation Guide <span class="material-type">Document</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Payments and Fees -->
+            <div class="dashboard-card payments-fees">
+                <h2>Payments & Fees</h2>
+                <div class="payment-summary">
+                    <div class="fee-status">
+                        <h3>Total Fees</h3>
+                        <span>1,500 Kshs</span>
+                    </div>
+                    <div class="fee-status">
+                        <h3>Paid</h3>
+                        <span>750 Kshs</span>
+                    </div>
+                    <div class="fee-status">
+                        <h3>Remaining</h3>
+                        <span>750 Kshs</span>
+                    </div>
+                    <button class="btn btn-complete-profile">Pay Fees</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-container">
+                <!-- Contact Form Section -->
+                <div class="footer-section">
+                    <h2>Contact Us</h2>
+                    <form class="contact-form">
+                        <div class="form-group">
+                            <input type="text" placeholder="Your Name" required />
+                        </div>
+                        <div class="form-group">
+                            <input type="email" placeholder="Your Email" required />
+                        </div>
+                        <div class="form-group">
+                            <textarea placeholder="Your Message" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-button">Send Message</button>
+                    </form>
+                </div>
+  
+                <!-- Quick Links Section -->
+                <div class="footer-section">
+                    <h2>Quick Links</h2>
+                    <ul class="footer-links">
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#courses">Our Courses</a></li>
+                        <li><a href="#gallery">Gallery</a></li>
+                        <li><a href="#intakes">Upcoming Intakes</a></li>
+                    </ul>
+                    
+                    <h2 class="mt-6">Connect With Us</h2>
+                    <div class="social-links">
+                        <a href="#" class="social-icon" aria-label="Facebook">
+                            <img src="/images/facebook.svg" alt="Facebook" />
+                        </a>
+                        <a href="#" class="social-icon" aria-label="Twitter">
+                            <img src="/images/twitter.svg" alt="Twitter" />
+                        </a>
+                        <a href="#" class="social-icon" aria-label="Instagram">
+                            <img src="/images/instagram.svg" alt="Instagram" />
+                        </a>
+                        <a href="#" class="social-icon" aria-label="LinkedIn">
+                            <img src="/images/linkedin.svg" alt="LinkedIn" />
+                        </a>
+                    </div>
+                </div>
+  
+                <!-- Get in Touch Section -->
+                <div class="footer-section">
+                    <h2>Get in Touch</h2>
+                    <div class="contact-info">
+                        <div class="info-item">
+                            <img src="/images/email.svg" class="info-icon" alt="Email" />
+                            <div>
+                                <h3>Email Us</h3>
+                                <p>cfllearning33@gmail.com</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <img src="/images/location.svg" class="info-icon" alt="Location" />
+                            <div>
+                                <h3>Visit Us</h3>
+                                <p>Centre of Foreign Languages</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <img src="/images/phone.svg" class="info-icon" alt="Phone" />
+                            <div>
+                                <h3>Call Us</h3>
+                                <p>0722840989</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="map-section">
+                        <div class="map-header">
+                            <img src="/images/location.svg" alt="Location Icon" class="map-icon">
+                            <h3 class="map-title">Find Us On Map</h3>
+                        </div>
+                        <div class="map-container">
+                            <iframe 
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.818309899662!2d36.815943314754804!3d-1.2826624359827428!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f10d22f42bf35%3A0x449d7ec7b378dfdb!2sCentre%20for%20Foreign%20Languages!5e0!3m2!1sen!2ske!4v1644830239041!5m2!1sen!2ske" 
+                                allowfullscreen="" 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade"
+                                title="CFL Location Map"
+                            ></iframe>
+                            <div class="map-overlay"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="footer-container">
+                <p>© 2024 Centre of Foreign Languages. All rights reserved.</p>
+                <div class="footer-legal">
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+  
+
+    <script type="module" src="/js/pages/student-dashboard.js"></script>
+</body>
+</html>

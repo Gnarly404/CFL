@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in · Centre of Foreign Learning</title>
+    <link rel="icon" type="image/png" href="/images/logo.png">
+    <link rel="stylesheet" href="/css/foundation.css">
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+    <main class="login-container">
+        <form id="loginForm" class="login-card" novalidate>
+            <h1>Sign in</h1>
+            <p id="loginNotice" class="form-alert" role="status" hidden></p>
+            <p id="loginError" class="form-alert" role="alert" hidden></p>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required autocomplete="username" inputmode="email">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" required autocomplete="current-password">
+                    <button type="button" class="password-toggle" aria-label="Show password">👁️</button>
+                </div>
+            </div>
+            <div class="remember-me">
+                <input type="checkbox" id="rememberMe" name="rememberMe">
+                <label for="rememberMe">Keep me signed in on this device</label>
+            </div>
+            <button type="submit" class="login-button">Sign in</button>
+            <div class="login-links">
+                <button type="button" id="forgotPasswordLink" class="link-button">Forgot password?</button>
+            </div>
+            <p class="login-help">
+                New here? <a href="/register">Apply to study at CFL</a>.
+                Accounts are created once an application is approved. Use the link in your invitation email to choose a password.
+            </p>
+        </form>
+    </main>
+    <script type="module" src="/js/pages/login.js"></script>
+</body>
+</html>

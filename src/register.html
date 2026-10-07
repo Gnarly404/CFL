@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apply · Centre of Foreign Learning</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@400;600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="/css/foundation.css">
+    <link rel="stylesheet" href="/css/registration.css">
+    <link rel="stylesheet" href="/css/multi-step-form.css">
+    <link rel="icon" type="image/png" href="/images/logo.png">
+</head>
+<body>
+    <div class="hero-section">
+        <div class="hero-image-container">
+            <img src="/images/hero-section.jpeg" alt="">
+        </div>
+        <div class="hero-content">
+            <div class="hero-left">
+                <h1>Apply to study at CFL</h1>
+                <p>Tell us about the student. It takes about five minutes.</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="registration-container">
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div id="profileProgress" class="progress"></div>
+            </div>
+            <div class="progress-percentage">0%</div>
+        </div>
+
+        <p id="draftNotice" class="form-alert" role="status" hidden></p>
+        <form id="registrationForm" class="multi-step-form" novalidate>
+            <input type="hidden" name="programmeId" value="">
+            <div class="hp-field" aria-hidden="true"><label for="website">Leave this field empty</label><input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></div>
+            <p id="formError" class="form-alert" role="alert" hidden></p>
+            <div class="form-steps">
+                <!-- Step 1: Personal Details -->
+                <div class="step active" data-step="1">
+                    <h2>Personal Details</h2>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="firstName">First Name <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <input type="text" id="firstName" name="firstName" required autocomplete="given-name">
+                                <span class="input-icon">👤</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="middleName">Middle Name</label>
+                            <div class="input-wrapper">
+                                <input type="text" id="middleName" name="middleName" autocomplete="additional-name">
+                                <span class="input-icon">👤</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="surname">Surname <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <input type="text" id="surname" name="surname" required autocomplete="family-name">
+                                <span class="input-icon">👤</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="dateOfBirth">Date of Birth <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <input type="date" id="dateOfBirth" name="dateOfBirth" required autocomplete="bday">
+                                <span class="input-icon">📅</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Contact & Location -->
+                <div class="step" data-step="2">
+                    <h2>Contact & Location</h2>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Gender <span class="required">*</span></label>
+                            <div class="gender-options">
+                                <label class="radio-container">
+                                    <input type="radio" name="gender" value="male" required>
+                                    Male
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label class="radio-container">
+                                    <input type="radio" name="gender" value="female">
+                                    Female
+                                    <span class="checkmark"></span>
+                                </label>
+                                <label class="radio-container">
+                                    <input type="radio" name="gender" value="other">
+                                    Other
+                                    <span class="checkmark"></span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email <span class="required">*</span></label>
+                            <div class="email-input">
+                                <div class="input-wrapper">
+                                    <input type="email" id="email" name="email" required autocomplete="email">
+                                    <span class="input-icon">✉️</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phoneNumber">Phone Number <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <input type="tel" id="phoneNumber" name="phoneNumber" required autocomplete="tel">
+                                <span class="input-icon">📱</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="nationality">Nationality <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <select id="nationality" name="nationality" required>
+                                    <option value="">Select Nationality</option>
+                                    <option value="kenyan">Kenyan</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <span class="input-icon">🌍</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Guardian & Emergency Details -->
+                <div class="step" data-step="3">
+                    <h2>Guardian & Emergency Details</h2>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="guardianName">Guardian Name <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <input type="text" id="guardianName" name="guardianName" required>
+                                <span class="input-icon">👥</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="relationship">Relationship <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <select id="relationship" name="relationship" required>
+                                    <option value="">Select Relationship</option>
+                                    <option value="parent">Parent</option>
+                                    <option value="guardian">Guardian</option>
+                                    <option value="sibling">Sibling</option>
+                                    <option value="other">Other</option>
+                                </select>
+                                <span class="input-icon">🤝</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="guardianPhone">Guardian's Phone Number <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <input type="tel" id="guardianPhone" name="guardianPhone" required>
+                                <span class="input-icon">📱</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="emergencyContact">Emergency Contact Name <span class="required">*</span></label>
+                            <div class="input-wrapper">
+                                <input type="text" id="emergencyContact" name="emergencyContact" required>
+                                <span class="input-icon">☎️</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Step 4: Review and consent -->
+                <div class="step" data-step="4">
+                    <h2>Review &amp; send</h2>
+                    <dl id="reviewList" class="review-list"></dl>
+                    <div class="form-group">
+                        <label class="consent" for="consent">
+                            <input type="checkbox" id="consent" name="consent" required>
+                            <span>I confirm these details are correct, and I agree that the Centre of Foreign Learning may use them to process this application and contact me and the guardian about it.</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-navigation">
+                <button type="button" class="btn btn-prev" disabled>Back</button>
+                <button type="button" class="btn btn-next">Next</button>
+                <button type="submit" class="btn btn-submit" hidden>Send application</button>
+            </div>
+        </form>
+        <section id="confirmation" class="confirmation" hidden aria-live="polite">
+            <h2 tabindex="-1">Application received</h2>
+            <p>Your reference is <strong id="referenceNumber"></strong>. Keep it safe: you will need it to check your application.</p>
+            <p>We have emailed you a confirmation. Our admissions team will review the application and email you the outcome.</p>
+            <p><a class="btn btn-next" href="/">Back to the home page</a></p>
+        </section>
+    </div>
+    <script type="module" src="/js/pages/register.js"></script>
+</body>
+</html>

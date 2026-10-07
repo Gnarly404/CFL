@@ -1,0 +1,191 @@
+rules_version = '2';
+
+// CFL Firestore rules. Principles (see docs/SECURITY.md):
+//  - deny by default, then allow explicitly;
+//  - the role comes from a server-set custom claim, never from a document the browser can write;
+//  - privileged lifecycle changes (users, applications, enrolments, payments) are server-only.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- helpers ----------
+    function signedIn() {
+      return request.auth != null;
+    }
+    function role() {
+      return (signedIn() && ('role' in request.auth.token)) ? request.auth.token.role : null;
+    }
+    function isAdmin()      { return role() == 'admin'; }
+    function isInstructor() { return role() == 'instructor'; }
+    function isStudent()    { return role() == 'student'; }
+    function isStaff()      { return isAdmin() || isInstructor(); }
+    function isUser(uid)    { return signedIn() && request.auth.uid == uid; }
+
+    // The write touches only the listed top-level fields.
+    function changesOnly(fields) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(fields);
+    }
+    function isPublished() {
+      return resource.data.get('published', false) == true;
+    }
+    function assignedToMe() {
+      return request.auth.uid in resource.data.get('instructorIds', []);
+    }
+
+    // ---------- identity (written by Cloud Functions only) ----------
+    match /users/{uid} {
+      allow read: if isUser(uid) || isAdmin();
+      allow write: if false;
+    }
+
+    match /students/{uid} {
+      allow read: if isUser(uid) || isAdmin() || (isInstructor() && assignedToMe());
+      allow update: if isAdmin()
+                    || (isUser(uid) && changesOnly(['profile', 'preferences', 'updatedAt']));
+      allow create, delete: if false;
+    }
+
+    match /instructors/{uid} {
+      allow read: if signedIn();
+      allow update: if isAdmin()
+                    || (isUser(uid) && changesOnly(['bio', 'photoURL', 'displayName', 'updatedAt']));
+      allow create, delete: if false;
+    }
+
+    // ---------- admissions (Cloud Functions only; admins read) ----------
+    match /applications/{applicationId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // ---------- catalogue and curriculum ----------
+    match /programmes/{programmeId} {
+      allow read: if resource.data.get('active', false) == true || isStaff();
+      allow write: if isAdmin();
+    }
+
+    match /enrolments/{enrolmentId} {
+      allow read: if isUser(resource.data.studentId) || isAdmin()
+                  || (isInstructor() && assignedToMe());
+      allow write: if false;
+    }
+
+    match /courses/{courseId} {
+      allow read: if signedIn() && (isPublished() || isStaff());
+      allow write: if isAdmin();
+    }
+    match /units/{unitId} {
+      allow read: if signedIn() && (isPublished() || isStaff());
+      allow write: if isAdmin();
+    }
+    match /lessons/{lessonId} {
+      allow read: if signedIn() && (isPublished() || isStaff());
+      allow write: if isAdmin();
+    }
+    // Practice questions include answer keys: fine for ungraded practice,
+    // graded assessments must be marked server-side (see docs/SECURITY.md).
+    match /questions/{questionId} {
+      allow read: if signedIn() && (isPublished() || isStaff());
+      allow write: if isAdmin();
+    }
+    match /assignments/{assignmentId} {
+      allow read: if signedIn() && (isPublished() || isStaff());
+      allow write: if isAdmin();
+    }
+
+    // ---------- learning state (owned by the student) ----------
+    match /practiceSessions/{sessionId} {
+      allow read: if isUser(resource.data.studentId) || isAdmin();
+      allow create: if isStudent() && isUser(request.resource.data.studentId);
+      allow update: if isStudent() && isUser(resource.data.studentId)
+                    && request.resource.data.studentId == resource.data.studentId;
+      allow delete: if false;
+    }
+    match /questionAttempts/{attemptId} {
+      allow read: if isUser(resource.data.studentId) || isAdmin();
+      allow create: if isStudent() && isUser(request.resource.data.studentId);
+      allow update, delete: if false;
+    }
+    match /lessonProgress/{progressId} {
+      allow read: if isUser(resource.data.studentId) || isAdmin();
+      allow create: if isStudent() && isUser(request.resource.data.studentId);
+      allow update: if isStudent() && isUser(resource.data.studentId)
+                    && request.resource.data.studentId == resource.data.studentId;
+      allow delete: if false;
+    }
+    match /skillProgress/{progressId} {
+      allow read: if isUser(resource.data.studentId) || isAdmin();
+      allow create: if isStudent() && isUser(request.resource.data.studentId);
+      allow update: if isStudent() && isUser(resource.data.studentId)
+                    && request.resource.data.studentId == resource.data.studentId;
+      allow delete: if false;
+    }
+    match /mistakes/{mistakeId} {
+      allow read: if isUser(resource.data.studentId) || isAdmin();
+      allow create: if isStudent() && isUser(request.resource.data.studentId);
+      allow update: if isStudent() && isUser(resource.data.studentId)
+                    && request.resource.data.studentId == resource.data.studentId;
+      allow delete: if false;
+    }
+
+    match /submissions/{submissionId} {
+      allow read: if isUser(resource.data.studentId) || isAdmin();
+      allow create: if isStudent() && isUser(request.resource.data.studentId)
+                    && request.resource.data.get('status', 'draft') == 'draft';
+      allow update: if isAdmin()
+                    || (isStudent() && isUser(resource.data.studentId)
+                        && resource.data.status == 'draft'
+                        && request.resource.data.studentId == resource.data.studentId
+                        && request.resource.data.status in ['draft', 'submitted']
+                        && changesOnly(['content', 'attachments', 'status', 'updatedAt', 'submittedAt']));
+      allow delete: if false;
+    }
+
+    // ---------- operations ----------
+    match /schedules/{scheduleId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+    match /attendance/{recordId} {
+      allow read: if isUser(resource.data.studentId) || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Messages: participants read; the recipient may mark as read.
+    // Creating messages is enabled with recipient scoping in the messaging session.
+    match /messages/{messageId} {
+      allow read: if isUser(resource.data.senderId) || isUser(resource.data.recipientId);
+      allow update: if isUser(resource.data.recipientId) && changesOnly(['readAt']);
+      allow create, delete: if false;
+    }
+    match /notifications/{notificationId} {
+      allow read: if isUser(resource.data.userId);
+      allow update: if isUser(resource.data.userId) && changesOnly(['readAt']);
+      allow create, delete: if false;
+    }
+
+    match /payments/{paymentId} {
+      allow read: if isUser(resource.data.studentId) || isAdmin();
+      allow write: if false;
+    }
+    match /certificates/{certificateId} {
+      allow read: if isUser(resource.data.studentId) || isAdmin();
+      allow write: if false;
+    }
+
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    match /analyticsEvents/{eventId} {
+      allow create: if signedIn() && isUser(request.resource.data.get('userId', null))
+                    && request.resource.data.keys().size() <= 8;
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    // Everything else (counters, rateLimits, ...) is server-only.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

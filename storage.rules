@@ -1,0 +1,52 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+    function role() {
+      return (signedIn() && ('role' in request.auth.token)) ? request.auth.token.role : null;
+    }
+    function isAdmin() { return role() == 'admin'; }
+    function isStaff() { return role() == 'admin' || role() == 'instructor'; }
+    function isUser(uid) { return signedIn() && request.auth.uid == uid; }
+    function underMb(n) { return request.resource.size < n * 1024 * 1024; }
+    function isImage() { return request.resource.contentType.matches('image/(png|jpeg|webp)'); }
+
+    // Public marketing assets (gallery, brochure): world-readable, admin-managed.
+    match /public/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if isAdmin() && underMb(15);
+      allow delete: if isAdmin();
+    }
+
+    // Profile photos: private to the owner and staff.
+    match /users/{uid}/avatar/{fileName} {
+      allow read: if isUser(uid) || isStaff();
+      allow create, update: if isUser(uid) && isImage() && underMb(2);
+      allow delete: if isUser(uid) || isAdmin();
+    }
+
+    // Student submissions (writing, recordings, documents): private to the student and staff.
+    match /submissions/{uid}/{allPaths=**} {
+      allow read: if isUser(uid) || isStaff();
+      allow create, update: if isUser(uid)
+                            && request.resource.contentType.matches('(image/.*|audio/.*|application/pdf)')
+                            && underMb(20);
+      allow delete: if isUser(uid) || isAdmin();
+    }
+
+    // Learning content (audio, images, documents) for signed-in users.
+    match /content/{allPaths=**} {
+      allow read: if signedIn();
+      allow create, update: if isAdmin() && underMb(50);
+      allow delete: if isAdmin();
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

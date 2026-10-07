@@ -1,0 +1,18 @@
+node_modules/
+dist/
+coverage/
+.firebase/
+*.log
+.DS_Store
+
+# Local env and secrets: never commit
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+functions/.env.local
+functions/.env.*.local
+functions/.secret.local
+*.pem
+serviceAccount*.json

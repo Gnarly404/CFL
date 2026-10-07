@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account link · Centre of Foreign Learning</title>
+    <link rel="icon" type="image/png" href="/images/logo.png">
+    <link rel="stylesheet" href="/css/foundation.css">
+    <link rel="stylesheet" href="/css/login.css">
+    <link rel="stylesheet" href="/css/activation-reset.css">
+</head>
+<body>
+    <main class="login-container">
+        <div class="login-card">
+            <h1 id="activateHeading">Account link</h1>
+            <p id="activateError" class="form-alert" role="alert" hidden></p>
+
+            <section data-state="loading" aria-live="polite">
+                <p>Checking your link…</p>
+            </section>
+
+            <form id="passwordForm" data-state="password" hidden novalidate>
+                <p>Account: <strong id="accountEmail"></strong></p>
+                <div class="form-group">
+                    <label for="newPassword">New password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="newPassword" name="newPassword" required autocomplete="new-password">
+                        <button type="button" class="password-toggle" aria-label="Show password">👁️</button>
+                    </div>
+                    <div class="password-strength-container" aria-hidden="true"><div class="password-strength-bar"></div></div>
+                    <p class="login-help">At least 8 characters, with a letter and a number.</p>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm new password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="confirmPassword" name="confirmPassword" required autocomplete="new-password">
+                        <button type="button" class="password-toggle" aria-label="Show password">👁️</button>
+                    </div>
+                </div>
+                <button type="submit" class="activate-button">Save password</button>
+            </form>
+
+            <form id="requestForm" data-state="request" hidden novalidate>
+                <p>Enter your email address and we will send you a new link to set or reset your password.</p>
+                <p id="requestNotice" class="form-alert" role="status" hidden></p>
+                <div class="form-group">
+                    <label for="requestEmail">Email</label>
+                    <input type="email" id="requestEmail" name="requestEmail" required autocomplete="email" inputmode="email">
+                </div>
+                <button type="submit" class="reset-button">Send link</button>
+                <p class="login-help"><a href="/login">Back to sign in</a></p>
+            </form>
+
+            <section data-state="done" hidden aria-live="polite">
+                <p id="doneMessage"></p>
+                <p><a class="login-button" href="/login?activated=1">Go to sign in</a></p>
+            </section>
+        </div>
+    </main>
+    <script type="module" src="/js/pages/activate.js"></script>
+</body>
+</html>

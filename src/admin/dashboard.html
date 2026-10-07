@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" data-auth="pending">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin console · Centre of Foreign Learning</title>
+    <link rel="icon" type="image/png" href="/images/logo.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/foundation.css">
+    <link rel="stylesheet" href="/css/admin-dashboard.css">
+</head>
+<body>
+    <header class="admin-header">
+        <h1>Admin console</h1>
+        <div>
+            <button type="button" id="refreshAll" class="btn btn-sm btn-outline-light">Refresh</button>
+            <a href="/login" class="btn btn-sm btn-outline-light" data-action="sign-out">Sign out</a>
+        </div>
+    </header>
+    <noscript><p class="form-alert" data-kind="error">The admin console needs JavaScript.</p></noscript>
+    <main class="container dashboard-container">
+        <p id="adminMessage" class="form-alert" role="status" hidden></p>
+
+        <section class="card admin-section" aria-labelledby="applicationsHeading">
+            <div class="card-header d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                <h2 id="applicationsHeading">Applications</h2>
+                <div>
+                    <label for="applicationFilter" class="visually-hidden">Filter by status</label>
+                    <select id="applicationFilter" class="form-select form-select-sm">
+                        <option value="">All statuses</option>
+                        <option value="submitted">Submitted</option>
+                        <option value="under_review">Under review</option>
+                        <option value="info_requested">Information requested</option>
+                        <option value="waitlisted">Waitlisted</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Not accepted</option>
+                    </select>
+                </div>
+            </div>
+            <div class="card-body table-wrap">
+                <table class="table table-hover align-middle">
+                    <thead><tr><th>Reference</th><th>Applicant</th><th>Programme</th><th>Submitted</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="applicationsBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="card admin-section" aria-labelledby="createHeading">
+            <div class="card-header"><h2 id="createHeading">Create an account</h2></div>
+            <div class="card-body">
+                <form id="createUserForm" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-4 form-group">
+                            <label for="newName" class="form-label">Full name</label>
+                            <input type="text" class="form-control" id="newName" autocomplete="off" required>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label for="newEmail" class="form-label">Email address</label>
+                            <input type="email" class="form-control" id="newEmail" autocomplete="off" required>
+                        </div>
+                        <div class="col-md-2 form-group">
+                            <label for="newRole" class="form-label">Role</label>
+                            <select class="form-select" id="newRole">
+                                <option value="student">Student</option>
+                                <option value="instructor">Instructor</option>
+                                <option value="admin">Administrator</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">Create and invite</button>
+                        </div>
+                    </div>
+                    <p class="login-help">The person receives an email with a link to choose their own password.</p>
+                </form>
+            </div>
+        </section>
+
+        <section class="card admin-section" aria-labelledby="accountsHeading">
+            <div class="card-header"><h2 id="accountsHeading">Accounts</h2></div>
+            <div class="card-body table-wrap">
+                <table class="table table-hover align-middle">
+                    <thead><tr><th>Person</th><th>Role</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+                    <tbody id="usersBody"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    <script type="module" src="/js/pages/admin-dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+{
+  "hosting": {
+    "public": "dist",
+    "predeploy": [
+      "npm run build"
+    ],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "cleanUrls": true,
+    "trailingSlash": false,
+    "redirects": [
+      {
+        "source": "/admin",
+        "destination": "/admin/dashboard",
+        "type": 302
+      },
+      {
+        "source": "/student",
+        "destination": "/student/dashboard",
+        "type": 302
+      },
+      {
+        "source": "/instructor",
+        "destination": "/instructor/dashboard",
+        "type": 302
+      },
+      {
+        "source": "/Homepage.html",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/public/Homepage.html",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/programs",
+        "destination": "/programmes",
+        "type": 301
+      },
+      {
+        "source": "/Programs.html",
+        "destination": "/programmes",
+        "type": 301
+      },
+      {
+        "source": "/public/Programs.html",
+        "destination": "/programmes",
+        "type": 301
+      },
+      {
+        "source": "/Gallery.html",
+        "destination": "/gallery",
+        "type": 301
+      },
+      {
+        "source": "/public/Gallery.html",
+        "destination": "/gallery",
+        "type": 301
+      },
+      {
+        "source": "/Login.html",
+        "destination": "/login",
+        "type": 301
+      },
+      {
+        "source": "/public/Login.html",
+        "destination": "/login",
+        "type": 301
+      },
+      {
+        "source": "/Registration.html",
+        "destination": "/register",
+        "type": 301
+      },
+      {
+        "source": "/registration.html",
+        "destination": "/register",
+        "type": 301
+      },
+      {
+        "source": "/public/Registration.html",
+        "destination": "/register",
+        "type": 301
+      },
+      {
+        "source": "/Dashboard.html",
+        "destination": "/student/dashboard",
+        "type": 301
+      },
+      {
+        "source": "/public/Dashboard.html",
+        "destination": "/student/dashboard",
+        "type": 301
+      },
+      {
+        "source": "/student-dashboard.html",
+        "destination": "/student/dashboard",
+        "type": 301
+      },
+      {
+        "source": "/admin-dashboard.html",
+        "destination": "/admin/dashboard",
+        "type": 301
+      }
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "strict-origin-when-cross-origin"
+          },
+          {
+            "key": "X-Frame-Options",
+            "value": "DENY"
+          },
+          {
+            "key": "Permissions-Policy",
+            "value": "camera=(), geolocation=(), microphone=(self)"
+          }
+        ]
+      },
+      {
+        "source": "/assets/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          }
+        ]
+      },
+      {
+        "source": "/images/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=86400"
+          }
+        ]
+      }
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "node scripts/sync-shared.mjs",
+        "npm --prefix \"$RESOURCE_DIR\" run lint"
+      ]
+    }
+  ],
+  "emulators": {
+    "auth": {
+      "port": 9099
+    },
+    "functions": {
+      "port": 5001
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "storage": {
+      "port": 9199
+    },
+    "hosting": {
+      "port": 5000
+    },
+    "ui": {
+      "enabled": true,
+      "port": 4000
+    },
+    "singleProjectMode": true
+  }
+}

@@ -1,0 +1,204 @@
+/* Activation and Password Reset Specific Styles */
+:root {
+    --primary-color: #1E3A5F;
+    --secondary-color: #2ecc71;
+    --background-color: #f4f7f6;
+    --text-color: #333;
+    --error-color: #e74c3c;
+    --success-color: #2ecc71;
+    --input-border-color: #ddd;
+}
+
+body {
+    background-color: var(--background-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
+}
+
+.login-card {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.login-card h2 {
+    color: var(--primary-color);
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-color);
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(30, 58, 95, 0.1);
+}
+
+.password-wrapper {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.password-toggle:hover {
+    opacity: 1;
+}
+
+.password-strength-container {
+    height: 4px;
+    background-color: #eee;
+    margin-top: 5px;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.password-strength-bar {
+    height: 100%;
+    width: 0;
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.password-strength-bar.weak {
+    background-color: var(--error-color);
+}
+
+.password-strength-bar.medium {
+    background-color: orange;
+}
+
+.password-strength-bar.strong {
+    background-color: var(--success-color);
+}
+
+.activate-button,
+.reset-button {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.activate-button:hover,
+.reset-button:hover {
+    background-color: #2c3e50;
+    transform: translateY(-2px);
+}
+
+.activate-button:active,
+.reset-button:active {
+    transform: translateY(1px);
+}
+
+.error-message,
+.success-message {
+    margin: 15px 0;
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.error-message {
+    background-color: #fff0f0;
+    color: var(--error-color);
+    border-left: 4px solid var(--error-color);
+}
+
+.success-message {
+    background-color: #f0fff0;
+    color: var(--success-color);
+    border-left: 4px solid var(--success-color);
+}
+
+.d-none {
+    display: none !important;
+}
+
+/* Form Switching */
+.login-card .reset-password-form {
+    display: none;
+}
+
+.switch-form {
+    margin-top: 15px;
+    font-size: 14px;
+    color: var(--text-color);
+}
+
+.switch-form a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.switch-form a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 480px) {
+    .login-container {
+        padding: 10px;
+    }
+
+    .login-card {
+        padding: 20px;
+    }
+}
+
+/* Subtle Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out;
+}
