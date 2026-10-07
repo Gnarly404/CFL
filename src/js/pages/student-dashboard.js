@@ -3,20 +3,11 @@ import { guardPage } from '@/auth/guards.js';
 import { dbService } from '@/services/firebase-db.js';
 import { el } from '@/utils/dom.js';
 
-const MESSAGES = {
-  Monday: 'Wishing you a productive start to the week!',
-  Tuesday: 'Keep pushing forward and stay motivated!',
-  Wednesday: "You're halfway through the week. Stay strong!",
-  Thursday: 'Almost there! Keep up the great work!',
-  Friday: 'Congratulations on making it through the week!',
-  Saturday: 'Enjoy your weekend and take some time to relax!',
-  Sunday: 'Rest, recharge, and prepare for a new week!',
-};
-
 const session = await guardPage({ roles: ['student'] });
-const day = new Date().toLocaleDateString('en-KE', { weekday: 'long' });
+const hour = new Date().getHours();
+const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 const dayMessage = document.getElementById('dayMessage');
-if (dayMessage) dayMessage.textContent = `Have a wonderful ${day}! ${MESSAGES[day] ?? ''}`.trim();
+if (dayMessage) dayMessage.textContent = `${greeting}. Here is what you can work on today.`;
 
 const nameEl = document.getElementById('studentName');
 const regEl = document.getElementById('registrationNumber');
@@ -65,8 +56,8 @@ try {
   if (enrolmentsEl) {
     const enrolments = enrolmentSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     enrolmentsEl.replaceChildren(...(enrolments.length
-      ? enrolments.map((enrolment) => el('li', { class: 'material-item' }, `${enrolment.programmeId ?? 'Programme'} · ${enrolment.status ?? 'Pending'}`))
-      : [el('li', { class: 'material-item' }, 'No enrolments recorded yet.')])
+      ? enrolments.map((enrolment) => el('li', {}, `${enrolment.programmeId ?? 'Programme'} · ${enrolment.status ?? 'Pending'}`))
+      : [el('li', {}, 'No enrolments recorded yet.')])
     );
   }
 } catch (error) {

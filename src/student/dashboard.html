@@ -1,183 +1,86 @@
 <!DOCTYPE html>
 <html lang="en" data-auth="pending">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CFL Student Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@400;600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/foundation.css">
-    <link rel="stylesheet" href="/css/dashboard.css">
-    <link rel="icon" type="image/png" href="/images/logo.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dashboard - CFL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/foundation.css">
+<link rel="stylesheet" href="/css/tokens.css">
+<link rel="stylesheet" href="/css/components.css">
+<link rel="stylesheet" href="/css/portal.css">
+<link rel="icon" type="image/png" href="/images/logo.png">
+<script type="module" src="/js/pages/student-dashboard.js"></script>
 </head>
-<body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo-section">
-                <img src="/images/logo.png" alt="CFL Logo" class="logo">
-                <h1 class="motto gradient-text">Knowledge to Empower</h1>
-            </div>
-            <div class="nav-links">
-                <a href="#" class="nav-link">Dashboard</a>
-                <a href="#" class="nav-link">Courses</a>
-                <a href="#" class="nav-link">Messages</a>
-                <a href="/login" class="nav-link join-us" data-action="sign-out">Sign out</a>
-            </div>
-        </div>
+<body class="portal">
+<div class="portal-shell">
+  <aside class="portal-side">
+    <div class="portal-brand"><img src="/images/logo.png" alt=""><span>CFL</span></div>
+    <nav class="portal-nav" aria-label="Student portal">
+      <a href="/student/dashboard" aria-current="page">Dashboard</a>
+      <span aria-disabled="true">English Practice <small>Soon</small></span>
+      <span aria-disabled="true">Schedule <small>Soon</small></span>
+      <span aria-disabled="true">Progress <small>Soon</small></span>
+      <span aria-disabled="true">Messages <small>Soon</small></span>
     </nav>
+    <div class="portal-spacer"></div>
+    <nav class="portal-nav" aria-label="Account">
+      <a href="/login" data-action="sign-out">Sign out</a>
+    </nav>
+  </aside>
 
-    <!-- Main Dashboard Container -->
-    <main class="dashboard-container">
-        <p class="form-alert" data-kind="info" role="note">Your account and application information are loaded from the CFL records.</p>
+  <main class="portal-main">
+    <header class="portal-head">
+      <p id="dayMessage" class="muted"></p>
+      <h1>Welcome, <span id="studentName">…</span></h1>
+      <p class="muted">Reg no: <span id="registrationNumber">…</span> · <span id="profileName">…</span> · <span id="profileStatus">Account active</span></p>
+    </header>
 
-    <!-- Hero Section with Profile -->
-        <section class="hero-section dashboard-hero">
-            <div class="hero-content">
-                <div class="hero-left">
-                    <div id="dayMessage" class="day-message"></div>
-                    <h1>Welcome, <span id="studentName">…</span></h1>
-                    <div class="registration-number-display">
-                        Reg No: <span id="registrationNumber">…</span>
-                    </div>
-                </div>
-                <div class="hero-right">
-                    <div class="profile-section">
-                        <img src="/images/profile-placeholder.png" alt="Profile" class="profile-image">
-                        <div>
-                            <p class="student-name" id="profileName">…</p>
-                            <p id="profileStatus">Account active</p>
-                        </div>
-                    </div>
-                    <div class="hero-actions">
-                    </div>
-                </div>
-            </div>
-        </section>
+    <div class="stack">
+      <section class="card continue" aria-labelledby="continueTitle">
+        <p class="eyebrow">Continue learning</p>
+        <h2 id="continueTitle">No lesson started yet</h2>
+        <p class="muted">Your next lesson will appear here once English Practice opens.</p>
+        <div class="progress" role="progressbar" aria-label="Course progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="--value:0%"><span></span></div>
+        <p class="muted">Progress: not started</p>
+      </section>
 
-    <!-- Dashboard Content -->
-    <main class="registration-container dashboard-container">
-        <section class="dashboard-grid">
-            <div class="dashboard-card">
-                <h2>Application status</h2>
-                <p id="applicationStatus">Loading…</p>
-                <div id="studentDetails" class="materials-list"></div>
-            </div>
-
-            <div class="dashboard-card">
-                <h2>Enrolments</h2>
-                <ul id="enrolments" class="materials-list">
-                    <li class="material-item">Loading enrolments…</li>
-                </ul>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <div class="footer-content">
-            <div class="footer-container">
-                <!-- Contact Form Section -->
-                <div class="footer-section">
-                    <h2>Contact Us</h2>
-                    <form class="contact-form">
-                        <div class="form-group">
-                            <input type="text" placeholder="Your Name" required />
-                        </div>
-                        <div class="form-group">
-                            <input type="email" placeholder="Your Email" required />
-                        </div>
-                        <div class="form-group">
-                            <textarea placeholder="Your Message" rows="4" required></textarea>
-                        </div>
-                        <button type="submit" class="submit-button">Send Message</button>
-                    </form>
-                </div>
-  
-                <!-- Quick Links Section -->
-                <div class="footer-section">
-                    <h2>Quick Links</h2>
-                    <ul class="footer-links">
-                        <li><a href="#about">About Us</a></li>
-                        <li><a href="#courses">Our Courses</a></li>
-                        <li><a href="#gallery">Gallery</a></li>
-                        <li><a href="#intakes">Upcoming Intakes</a></li>
-                    </ul>
-                    
-                    <h2 class="mt-6">Connect With Us</h2>
-                    <div class="social-links">
-                        <a href="#" class="social-icon" aria-label="Facebook">
-                            <img src="/images/facebook.svg" alt="Facebook" />
-                        </a>
-                        <a href="#" class="social-icon" aria-label="Twitter">
-                            <img src="/images/twitter.svg" alt="Twitter" />
-                        </a>
-                        <a href="#" class="social-icon" aria-label="Instagram">
-                            <img src="/images/instagram.svg" alt="Instagram" />
-                        </a>
-                        <a href="#" class="social-icon" aria-label="LinkedIn">
-                            <img src="/images/linkedin.svg" alt="LinkedIn" />
-                        </a>
-                    </div>
-                </div>
-  
-                <!-- Get in Touch Section -->
-                <div class="footer-section">
-                    <h2>Get in Touch</h2>
-                    <div class="contact-info">
-                        <div class="info-item">
-                            <img src="/images/email.svg" class="info-icon" alt="Email" />
-                            <div>
-                                <h3>Email Us</h3>
-                                <p>cfllearning33@gmail.com</p>
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <img src="/images/location.svg" class="info-icon" alt="Location" />
-                            <div>
-                                <h3>Visit Us</h3>
-                                <p>Centre of Foreign Languages</p>
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <img src="/images/phone.svg" class="info-icon" alt="Phone" />
-                            <div>
-                                <h3>Call Us</h3>
-                                <p>0722840989</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="map-section">
-                        <div class="map-header">
-                            <img src="/images/location.svg" alt="Location Icon" class="map-icon">
-                            <h3 class="map-title">Find Us On Map</h3>
-                        </div>
-                        <div class="map-container">
-                            <iframe 
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.818309899662!2d36.815943314754804!3d-1.2826624359827428!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f10d22f42bf35%3A0x449d7ec7b378dfdb!2sCentre%20for%20Foreign%20Languages!5e0!3m2!1sen!2ske!4v1644830239041!5m2!1sen!2ske" 
-                                allowfullscreen="" 
-                                loading="lazy" 
-                                referrerpolicy="no-referrer-when-downgrade"
-                                title="CFL Location Map"
-                            ></iframe>
-                            <div class="map-overlay"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <section class="card" aria-labelledby="practiceTitle">
+        <p class="eyebrow">English Practice</p>
+        <h2 id="practiceTitle">Six skills, one place</h2>
+        <div class="skill-grid">
+          <div class="skill" aria-disabled="true">Grammar<small>Coming soon</small></div>
+          <div class="skill" aria-disabled="true">Vocabulary<small>Coming soon</small></div>
+          <div class="skill" aria-disabled="true">Listening<small>Coming soon</small></div>
+          <div class="skill" aria-disabled="true">Speaking<small>Coming soon</small></div>
+          <div class="skill" aria-disabled="true">Reading<small>Coming soon</small></div>
+          <div class="skill" aria-disabled="true">Writing<small>Coming soon</small></div>
         </div>
-        
-        <div class="footer-bottom">
-            <div class="footer-container">
-                <p>© 2024 Centre of Foreign Languages. All rights reserved.</p>
-                <div class="footer-legal">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-  
+      </section>
 
-    <script type="module" src="/js/pages/student-dashboard.js"></script>
+      <div class="two-col">
+        <section class="card">
+          <h2>Application status</h2>
+          <p id="applicationStatus">Loading…</p>
+          <div id="studentDetails" class="muted"></div>
+        </section>
+        <section class="card">
+          <h2>Enrolments</h2>
+          <ul id="enrolments" class="muted" style="margin:0;padding-left:1.1rem">
+            <li>Loading enrolments…</li>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+<nav class="portal-bottom" aria-label="Student portal mobile">
+  <a href="/student/dashboard" aria-current="page">Home</a>
+  <span aria-disabled="true">Practice</span>
+  <span aria-disabled="true">Progress</span>
+  <a href="/login" data-action="sign-out">Sign out</a>
+</nav>
 </body>
 </html>

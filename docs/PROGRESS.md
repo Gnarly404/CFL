@@ -8,7 +8,7 @@ upload the latest zip and say "continue with session N"; this file is the handof
 | # | Session | Status |
 | --- | --- | --- |
 | 1 | Foundation: clean repo, auth and roles, admissions backend, rules, tests | **Done (this checkpoint)** |
-| 2 | Design system and app shell | Next |
+| 2 | Design system and app shell | **Partly done**: tokens, components, student portal shell. Still open: self-hosted fonts and icons, CSP, shared public header/footer, admin and instructor shells |
 | 3 | Student portal and dashboard | Planned |
 | 4 | English Practice (hub, engine, six skills, results, mistake review) | Planned |
 | 5 | Public site, programmes, admissions pages | Planned |
@@ -91,3 +91,9 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 2. Which email provider will send production mail (Gmail/Workspace SMTP is fine for a pilot).
 3. Logo and brand files in vector form, if they exist (session 2).
 4. Who supplies the real programme list, fees and photos (session 5), and who will write or review English practice content (session 4); starter content can be generated meanwhile.
+
+## Update after session 1
+
+- Programmes page now renders the five real programmes from `src/data/programmes.json` (names from the live site; durations, fees and eligibility carried over from the old page and still to be confirmed).
+- Student dashboard rebuilt on `tokens.css`, `components.css`, `portal.css`: sidebar, mobile bottom nav, Continue Learning empty state, six practice skills shown as Coming soon. No sample data is shown as real.
+- 19 test files, 183 tests pass (install `functions/` dependencies first). Rules tests still not run.

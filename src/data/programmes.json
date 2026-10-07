@@ -1,0 +1,7 @@
+[
+  { "id": "english-intake", "name": "English Language (Intake)", "category": "English Language", "group": "intake", "duration": "2 months" },
+  { "id": "english-beginner-1", "name": "English Language Programme (Elementary-Beginner 1)", "category": "English Language", "group": "beginner", "duration": "4 months" },
+  { "id": "english-beginner-2", "name": "English Language Programme (Elementary-Beginner 2)", "category": "English Language", "group": "beginner", "duration": "4 months" },
+  { "id": "english-intermediate", "name": "English Language Programme (Intermediate)", "category": "English Language", "group": "intermediate", "duration": "4 months" },
+  { "id": "english-advanced", "name": "English Language Programme (Advanced)", "category": "English Language", "group": "advanced", "duration": "4 months" }
+]

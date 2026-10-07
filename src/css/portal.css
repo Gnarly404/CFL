@@ -1,0 +1,31 @@
+body.portal{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-body)}
+.portal-shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.portal-side{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:var(--s2);padding:var(--s5) var(--s4);background:var(--navy);color:#fff}
+.portal-brand{display:flex;align-items:center;gap:var(--s3);margin-bottom:var(--s5);font:700 1.1rem var(--font-head)}
+.portal-brand img{width:36px;height:36px;object-fit:contain}
+.portal-nav{display:flex;flex-direction:column;gap:var(--s1)}
+.portal-nav a,.portal-nav span{display:flex;justify-content:space-between;align-items:center;min-height:44px;padding:0 var(--s4);border-radius:12px;color:#dbe6f3;text-decoration:none}
+.portal-nav a:hover{background:rgba(255,255,255,.1)}
+.portal-nav [aria-current="page"]{background:rgba(255,255,255,.16);color:#fff;font-weight:700}
+.portal-nav [aria-disabled="true"]{opacity:.55}
+.portal-nav small{font-size:.7rem;opacity:.8}
+.portal-spacer{flex:1}
+.portal-main{max-width:1120px;width:100%;padding:var(--s7) var(--s6) var(--s8);box-sizing:border-box}
+.portal-head{margin-bottom:var(--s6)}
+.portal-head h1{margin:0 0 var(--s2);font:600 1.7rem var(--font-head);color:var(--navy)}
+.stack{display:grid;gap:var(--s5)}
+.continue{display:grid;gap:var(--s3)}
+.skill-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:var(--s4)}
+.skill{display:grid;gap:var(--s2);padding:var(--s4);border:1px solid var(--line);border-radius:12px;background:var(--surface);font:600 .95rem var(--font-head);color:var(--navy)}
+.skill small{font:400 .78rem var(--font-body);color:var(--muted)}
+.two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:var(--s5)}
+.portal-bottom{display:none}
+@media (max-width:820px){
+  .portal-shell{grid-template-columns:1fr}
+  .portal-side{display:none}
+  .portal-main{padding:var(--s5) var(--s4) 96px}
+  .portal-bottom{position:fixed;inset:auto 0 0 0;display:flex;justify-content:space-around;padding:var(--s2) var(--s2) calc(var(--s2) + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line)}
+  .portal-bottom a,.portal-bottom span{display:flex;align-items:center;justify-content:center;min-width:64px;min-height:44px;color:var(--navy);text-decoration:none;font:600 .8rem var(--font-head)}
+  .portal-bottom [aria-current="page"]{color:var(--coral)}
+  .portal-bottom [aria-disabled="true"]{opacity:.5}
+}

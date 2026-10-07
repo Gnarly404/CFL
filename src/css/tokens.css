@@ -1,0 +1,13 @@
+:root{
+  --navy:#1E3A5F;--coral:#FF6F61;--blue:#56CCF2;--yellow:#F4C430;
+  --bg:#F5F7FA;--surface:#fff;--text:#24323F;--muted:#5b6b7a;--line:#e3e9f0;
+  --font-head:'Poppins',system-ui,sans-serif;--font-body:'Lato',system-ui,sans-serif;
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:72px;
+  --radius:16px;--shadow:0 1px 3px rgba(30,58,95,.08);
+  --t-fast:150ms;--t-card:220ms;--t-progress:700ms;
+  --focus:0 0 0 3px rgba(86,204,242,.8);
+}
+@media (prefers-reduced-motion:reduce){
+  :root{--t-fast:0ms;--t-card:0ms;--t-progress:0ms}
+  *{scroll-behavior:auto!important}
+}
