@@ -15,7 +15,7 @@ Status key: **Done**, **Partial**, **Not started**.
 | 9 Grammar | Partial | 5 lessons (assistant-written, need review), explained feedback, retry. Missing: more lessons, levels |
 | 10 Vocabulary | Partial | 4 lessons, word list with Listen buttons (browser speech), quiz, spaced review of missed words. Missing: flashcard flip mode |
 | 11 Listening | Partial | 3 lessons played with browser text-to-speech (play, stop, slow speed, unsupported and error states, transcript after the questions). Missing: real recordings, accents, longer dialogues, replay limits |
-| 12 Speaking | Not started | Phase 1 is record and playback |
+| 12 Speaking | Partial | Phase 1 done: 3 lessons, 9 prompts with listen-to-question, record, playback, record again, self-check. Recordings stay in the browser and are never uploaded. Missing: Phase 2 teacher review (needs Storage upload rules and an instructor review tool), Phase 3 scoring. The v2 spec mock-up shows pronunciation, fluency and vocabulary percentages; none are shown because no reliable scoring exists |
 | 13 Reading | Partial | 3 passages (assistant-written, need review) with the passage on screen while answering. Missing: more passages, vocabulary help, timed mode |
 | 14 Writing | Not started | Drafts and checklist feedback first; instructor feedback later |
 | 15 Results, mistakes, feedback | Partial | Result screen with review, mistake bank, spaced review (1, 3, 7 days), My mistakes page. Missing: time spent, per-question attempts, skill-level mistake filters |

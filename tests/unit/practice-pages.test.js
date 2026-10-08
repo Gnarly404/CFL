@@ -30,7 +30,7 @@ describe('practice hub page', () => {
     await open('student/practice/index.html', '@/pages/practice-hub.js');
     expect(text('hubContinueTitle')).toBe(grammar.lessons[0].title);
     expect(document.querySelectorAll('#skillGrid .skill')).toHaveLength(6);
-    expect(document.querySelectorAll('#skillGrid [aria-disabled="true"]')).toHaveLength(2);
+    expect(document.querySelectorAll('#skillGrid [aria-disabled="true"]')).toHaveLength(1);
     expect(text('skillSections')).toContain('Vocabulary lessons');
     expect(text('skillSections')).toContain('Nothing to review yet.');
   });

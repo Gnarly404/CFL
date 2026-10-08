@@ -18,9 +18,10 @@ export async function saveLessonResult(uid, skill, lessonId, result, previous) {
     lessonId,
     status: 'completed',
     attempts: (previous?.attempts ?? 0) + 1,
-    bestPercent: Math.max(previous?.bestPercent ?? 0, result.percent),
+    bestPercent: result.percent == null ? null : Math.max(previous?.bestPercent ?? 0, result.percent),
     lastPercent: result.percent,
     mistakes: result.mistakes,
+    ...(result.extra ?? {}),
   };
   await setDoc(doc(dbService(), 'lessonProgress', `${uid}_${lessonId}`), { ...record, updatedAt: serverTimestamp() });
   return record;

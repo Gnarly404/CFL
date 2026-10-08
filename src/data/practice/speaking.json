@@ -1,0 +1,80 @@
+{
+  "skill": "speaking",
+  "lessons": [
+    {
+      "id": "speaking-routine",
+      "title": "My daily routine",
+      "summary": "Talk about what you do every day.",
+      "phrases": [
+        "I wake up at …",
+        "Then I …",
+        "After that, I …",
+        "In the evening, I …"
+      ],
+      "prompts": [
+        {
+          "id": "sr-1",
+          "text": "Tell me about your daily routine."
+        },
+        {
+          "id": "sr-2",
+          "text": "What time do you wake up, and what do you do first?"
+        },
+        {
+          "id": "sr-3",
+          "text": "What do you usually do in the evening?"
+        }
+      ]
+    },
+    {
+      "id": "speaking-about-me",
+      "title": "About me",
+      "summary": "Introduce yourself and your interests.",
+      "phrases": [
+        "My name is …",
+        "I live in …",
+        "I live with …",
+        "In my free time, I like …"
+      ],
+      "prompts": [
+        {
+          "id": "sa-1",
+          "text": "Introduce yourself: your name, where you live and who you live with."
+        },
+        {
+          "id": "sa-2",
+          "text": "What do you do, or what do you study?"
+        },
+        {
+          "id": "sa-3",
+          "text": "What do you like doing in your free time?"
+        }
+      ]
+    },
+    {
+      "id": "speaking-food",
+      "title": "Food and shopping",
+      "summary": "Describe food and places to buy it.",
+      "phrases": [
+        "My favourite food is …",
+        "I like it because …",
+        "For breakfast, I usually have …",
+        "I buy food at …"
+      ],
+      "prompts": [
+        {
+          "id": "sf-1",
+          "text": "What is your favourite food, and why do you like it?"
+        },
+        {
+          "id": "sf-2",
+          "text": "Describe what you usually eat for breakfast."
+        },
+        {
+          "id": "sf-3",
+          "text": "Tell me about a place where you buy food."
+        }
+      ]
+    }
+  ]
+}

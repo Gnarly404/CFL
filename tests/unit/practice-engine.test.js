@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import grammar from '../../src/data/practice/grammar.json';
 import listening from '../../src/data/practice/listening.json';
 import reading from '../../src/data/practice/reading.json';
+import speaking from '../../src/data/practice/speaking.json';
 import vocabulary from '../../src/data/practice/vocabulary.json';
 import { dueMistakes, lessonStatus, nextLesson, pickContinue, scoreAttempt, skillPercent, updateMistake, validateLesson } from '@/practice/engine.js';
 
@@ -85,11 +86,11 @@ describe('pickContinue', () => {
   });
 });
 
-describe.each([['grammar', grammar], ['vocabulary', vocabulary], ['reading', reading], ['listening', listening]])('%s content', (_name, content) => {
+describe.each([['grammar', grammar], ['vocabulary', vocabulary], ['reading', reading], ['listening', listening], ['speaking', speaking]])('%s content', (_name, content) => {
   it('has valid lessons with unique ids', () => {
     const problems = content.lessons.flatMap(validateLesson);
     expect(problems).toEqual([]);
-    const ids = content.lessons.flatMap((l) => [l.id, ...l.questions.map((q) => q.id)]);
+    const ids = content.lessons.flatMap((l) => [l.id, ...(l.questions ?? []).map((q) => q.id), ...(l.prompts ?? []).map((p) => p.id)]);
     expect(new Set(ids).size).toBe(ids.length);
   });
   it('flags a broken question', () => {

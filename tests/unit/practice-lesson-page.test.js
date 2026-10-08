@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import grammar from '../../src/data/practice/grammar.json';
 import listening from '../../src/data/practice/listening.json';
 import reading from '../../src/data/practice/reading.json';
+import speaking from '../../src/data/practice/speaking.json';
 import vocabulary from '../../src/data/practice/vocabulary.json';
 import { loadPage, tick } from '../helpers.js';
 
@@ -158,5 +159,69 @@ describe('practice lesson page', () => {
     }
     expect(stageText()).toContain('Show transcript');
     expect(save.mock.calls[0][1]).toBe('listening');
+  });
+
+  describe('speaking lessons', () => {
+    const lessonS = speaking.lessons[0];
+    const flush = () => new Promise((resolve) => { setTimeout(resolve, 0); });
+
+    function installRecorder() {
+      window.MediaRecorder = class {
+        static isTypeSupported() { return true; }
+        constructor() { this.state = 'inactive'; }
+        start() { this.state = 'recording'; }
+        stop() { this.ondataavailable?.({ data: new Blob(['a']) }); this.onstop?.(); }
+      };
+      Object.defineProperty(window.navigator, 'mediaDevices', { configurable: true, value: { getUserMedia: vi.fn().mockResolvedValue({ getTracks: () => [{ stop() {} }] }) } });
+      URL.createObjectURL = vi.fn(() => 'blob:x');
+      URL.revokeObjectURL = vi.fn();
+    }
+    afterEach(() => {
+      delete window.MediaRecorder;
+      delete window.navigator.mediaDevices;
+    });
+
+    it('explains that recording is unavailable and offers no start button', async () => {
+      await open(`?skill=speaking&id=${lessonS.id}`);
+      expect(stageText()).toContain('Recording is not available');
+      expect(document.getElementById('startBtn')).toBeNull();
+    });
+
+    it('records each prompt, saves completion without a score, and never uploads audio', async () => {
+      installRecorder();
+      await open(`?skill=speaking&id=${lessonS.id}`);
+      expect(stageText()).toContain(lessonS.phrases[0]);
+      expect(stageText()).toContain('not uploaded');
+      click('#startBtn');
+      for (const prompt of lessonS.prompts) {
+        expect(document.getElementById('stageHeading').textContent).toBe(prompt.text);
+        const nextBtn = [...document.querySelectorAll('.actions button')].find((b) => b.textContent === 'Next prompt' || b.textContent === 'Finish');
+        expect(nextBtn.disabled).toBe(true);
+        const [startRec] = document.querySelectorAll('.player button');
+        startRec.click(); await flush(); startRec.click();
+        expect(nextBtn.disabled).toBe(false);
+        document.getElementById('check-0').click();
+        nextBtn.click();
+        await tick();
+      }
+      expect(stageText()).toContain(`${lessonS.prompts.length} of ${lessonS.prompts.length} answers recorded`);
+      expect(stageText()).toContain(`Self-check: ${lessonS.prompts.length} of ${lessonS.prompts.length * 3} ticked.`);
+      const [, skillId, lessonId, result] = save.mock.calls[0];
+      expect([skillId, lessonId]).toEqual(['speaking', lessonS.id]);
+      expect(result.percent).toBeNull();
+      expect(result.extra.recordedPrompts).toBe(lessonS.prompts.length);
+    });
+
+    it('does not mark the lesson done when nothing was recorded', async () => {
+      installRecorder();
+      await open(`?skill=speaking&id=${lessonS.id}`);
+      click('#startBtn');
+      for (let i = 0; i < lessonS.prompts.length; i += 1) {
+        [...document.querySelectorAll('.actions button')].find((b) => b.textContent === 'Skip this prompt').click();
+        await tick();
+      }
+      expect(stageText()).toContain('not marked as done');
+      expect(save).not.toHaveBeenCalled();
+    });
   });
 });

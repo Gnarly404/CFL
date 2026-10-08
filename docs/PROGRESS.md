@@ -126,8 +126,16 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 - Vocabulary word lists now have a Listen button for pronunciation.
 - Content again written by the assistant and needs review. 23 test files, 227 tests pass; speech tested against a fake `speechSynthesis` only, not real devices.
 
+### Speaking (fifth slice)
+
+- Phase 1 only (per spec): prompt, listen to the question (browser speech), record, play back, record again, self-check. 3 lessons in `src/data/practice/speaking.json`, 9 prompts.
+- Recordings live in memory (`js/ui/recorder.js`) and are discarded when the student moves on. Nothing is uploaded, so no Storage rules are needed yet. Teacher review (Phase 2) will need an upload path, rules, retention and consent text.
+- No automatic scores are shown. A lesson is marked completed only if at least one answer was recorded; the saved record holds how many were recorded and the self-check count, with `bestPercent: null`.
+- Microphone permission denied, no microphone, microphone busy, unsupported browser and a 60-second limit are handled with clear messages. Tested with a fake `MediaRecorder` only; real Android and iOS browsers still need a hands-on check (Safari records mp4, Chrome webm).
+- 24 test files, 241 tests pass.
+
 ### Next up
 1. Run `npm run test:rules` and fix any rules bug (the lessonProgress rules are now used for real).
-2. Speaking (record and playback) and Writing (drafts), then daily goals and recommendations, flashcard mode.
+2. Writing (drafts), then daily goals and recommendations, flashcard mode.
 3. Mistake review page and daily goal; weak-area recommendations.
 4. Remaining session 2 items (self-hosted fonts and icons, CSP, shared public header and footer).

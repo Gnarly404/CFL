@@ -1,10 +1,11 @@
 import grammar from '../../data/practice/grammar.json';
 import listening from '../../data/practice/listening.json';
 import reading from '../../data/practice/reading.json';
+import speaking from '../../data/practice/speaking.json';
 import vocabulary from '../../data/practice/vocabulary.json';
 import { ROUTES } from '@/core/routes.js';
 
-const CONTENT = { grammar, vocabulary, reading, listening };
+const CONTENT = { grammar, vocabulary, reading, listening, speaking };
 
 export function getSkillContent(skillId) {
   return CONTENT[skillId] ?? { lessons: [] };
@@ -19,7 +20,7 @@ export function questionIndex() {
   cached = {};
   for (const [skillId, content] of Object.entries(CONTENT)) {
     for (const lesson of content.lessons) {
-      for (const question of lesson.questions) cached[question.id] = { skillId, lessonId: lesson.id, question };
+      for (const question of lesson.questions ?? []) cached[question.id] = { skillId, lessonId: lesson.id, question };
     }
   }
   return cached;

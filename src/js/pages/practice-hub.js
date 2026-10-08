@@ -52,6 +52,6 @@ document.getElementById('skillSections').replaceChildren(
   h('ol', { class: 'lesson-list' }, ...entry.lessons.map((lesson) => {
     const completed = lessonStatus(entry.progress, lesson.id) === 'completed';
     return h('li', { class: 'lesson-row' },
-      h('div', {}, h('h3', {}, lesson.title), h('p', {}, completed ? `Completed · best score ${entry.progress[lesson.id].bestPercent}%` : lesson.summary)),
+      h('div', {}, h('h3', {}, lesson.title), h('p', {}, completed ? (entry.progress[lesson.id].bestPercent == null ? 'Completed' : `Completed · best score ${entry.progress[lesson.id].bestPercent}%`) : lesson.summary)),
       h('a', { class: completed ? 'btn' : 'btn btn-primary', href: lessonUrl(entry.skill.id, lesson.id) }, completed ? 'Review' : 'Start'));
   })))));

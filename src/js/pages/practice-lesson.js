@@ -4,6 +4,7 @@ import { getSkillContent, lessonUrl, questionIndex } from '@/practice/content.js
 import { dueMistakes, scoreAttempt, updateMistake } from '@/practice/engine.js';
 import { SKILLS } from '@/practice/skills.js';
 import { loadLessonProgress, loadMistakes, saveLessonResult, saveMistakes } from '@/services/practice-service.js';
+import { runSpeaking } from '@/practice/speaking-runner.js';
 import { h } from '@/ui/h.js';
 import { createAudioPlayer, speak, speechSupported } from '@/ui/speech.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
@@ -45,7 +46,8 @@ if (!lesson) {
   );
 } else {
   document.title = `${lesson.title} - CFL English Practice`;
-  await runLesson();
+  if (lesson.prompts) await runSpeaking({ stage, lesson, skill, uid: session.user.uid, following: lessons[lessonIndex + 1] });
+  else await runLesson();
 }
 
 async function runLesson() {

@@ -39,3 +39,7 @@
 .player{margin:0 0 var(--s4);padding:var(--s4);border:1px solid var(--line);border-radius:12px;background:#f3f8fc}
 .player .actions{margin-top:0;margin-bottom:var(--s3)}
 .link-btn{margin-left:var(--s3);border:0;background:none;color:var(--navy);text-decoration:underline;cursor:pointer;font:inherit;min-height:32px}
+.timer{font:600 1.4rem var(--font-head);color:var(--navy);margin:0 0 var(--s2)}
+.player audio{width:100%;margin-top:var(--s3)}
+.checklist{border:0;margin:var(--s4) 0 0;padding:0}
+.checklist legend{font:600 1rem var(--font-head);color:var(--navy);margin-bottom:var(--s3);padding:0}

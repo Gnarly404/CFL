@@ -65,6 +65,10 @@ export function validateLesson(lesson) {
   if (lesson.words) {
     if (!lesson.words.length) problems.push(`${lesson.id}: empty word list`);
     for (const w of lesson.words) if (!w.word || !w.definition || !w.example) problems.push(`${lesson.id}: word needs word, definition and example`);
+  } else if (lesson.prompts) {
+    if (!lesson.prompts.length) problems.push(`${lesson.id}: needs prompts`);
+    for (const p of lesson.prompts) if (!p.id || !p.text) problems.push(`${lesson.id}: prompt needs id and text`);
+    if (!lesson.phrases?.length) problems.push(`${lesson.id}: needs useful phrases`);
   } else if (lesson.passage) {
     if (!lesson.passage.paragraphs?.length) problems.push(`${lesson.id}: passage needs paragraphs`);
   } else if (lesson.listening) {
@@ -73,7 +77,7 @@ export function validateLesson(lesson) {
     if (!Array.isArray(lesson.rule) || !lesson.rule.length) problems.push(`${lesson.id}: missing rule`);
     if (!Array.isArray(lesson.examples) || !lesson.examples.length) problems.push(`${lesson.id}: missing examples`);
   }
-  if (!Array.isArray(lesson.questions) || !lesson.questions.length) problems.push(`${lesson.id}: missing questions`);
+  if (!lesson.prompts && (!Array.isArray(lesson.questions) || !lesson.questions.length)) problems.push(`${lesson.id}: missing questions`);
   for (const q of lesson.questions ?? []) {
     if (!Array.isArray(q.options) || q.options.length < 2) problems.push(`${q.id}: needs at least two options`);
     else if (!Number.isInteger(q.answer) || q.answer < 0 || q.answer >= q.options.length) problems.push(`${q.id}: answer index out of range`);
