@@ -134,8 +134,17 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 - Microphone permission denied, no microphone, microphone busy, unsupported browser and a 60-second limit are handled with clear messages. Tested with a fake `MediaRecorder` only; real Android and iOS browsers still need a hands-on check (Safari records mp4, Chrome webm).
 - 24 test files, 241 tests pass.
 
+### Writing (sixth slice)
+
+- 3 writing tasks in `src/data/practice/writing.json`. Word targets follow the spec example (100 to 150) for the first task and are shorter for beginners on the others.
+- Drafts autosave 2 seconds after typing stops (and on Save draft) to `submissions/{uid}_{promptId}` as `status: draft`. Submitting needs the minimum word count and a second confirming click; the rules then lock the document, so submitted work cannot be edited or silently rewritten.
+- Basic checks (`js/practice/writing.js`): capital letters at sentence starts, closing punctuation, a lowercase "I", repeated words. They are labelled as not a grammar review and never change the student's text.
+- The client writes only the fields the existing rules allow on a draft update (content, status, timestamps). Saves are serialised so the create never runs twice. The submission is read with a query, not a direct read, because the rules would reject a read of a missing document.
+- If saved writing cannot be loaded, editing is turned off so a draft is never overwritten.
+- 25 test files, 258 tests pass. The Firestore rules tests (which cover submissions) still have not been run.
+
 ### Next up
 1. Run `npm run test:rules` and fix any rules bug (the lessonProgress rules are now used for real).
-2. Writing (drafts), then daily goals and recommendations, flashcard mode.
+2. Daily goals and recommendations, flashcard mode, then the instructor tools (teacher review for Writing and Speaking).
 3. Mistake review page and daily goal; weak-area recommendations.
 4. Remaining session 2 items (self-hosted fonts and icons, CSP, shared public header and footer).

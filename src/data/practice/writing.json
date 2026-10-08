@@ -1,0 +1,74 @@
+{
+  "skill": "writing",
+  "lessons": [
+    {
+      "id": "writing-favourite-place",
+      "title": "My favourite place",
+      "summary": "Describe a place you like (100 to 150 words).",
+      "writing": {
+        "promptId": "wf-1",
+        "topic": "Describe your favourite place.",
+        "minWords": 100,
+        "maxWords": 150,
+        "structure": [
+          "Say where the place is.",
+          "Say what you can see and do there.",
+          "Say who you go with.",
+          "Say why you like it."
+        ],
+        "phrases": [
+          "My favourite place is …",
+          "It is in …",
+          "There is / There are …",
+          "I like it because …"
+        ]
+      }
+    },
+    {
+      "id": "writing-typical-day",
+      "title": "A typical day",
+      "summary": "Write about your day (60 to 100 words).",
+      "writing": {
+        "promptId": "wt-1",
+        "topic": "Write about what you do on a typical day.",
+        "minWords": 60,
+        "maxWords": 100,
+        "structure": [
+          "Start with the morning.",
+          "Then write about the afternoon.",
+          "End with the evening."
+        ],
+        "phrases": [
+          "In the morning, I …",
+          "At lunchtime, …",
+          "After that, …",
+          "In the evening, I usually …"
+        ]
+      }
+    },
+    {
+      "id": "writing-invitation",
+      "title": "A message to a friend",
+      "summary": "Invite a friend to lunch (40 to 80 words).",
+      "writing": {
+        "promptId": "wm-1",
+        "topic": "Write a short message to a friend. Invite your friend to your home for lunch.",
+        "minWords": 40,
+        "maxWords": 80,
+        "structure": [
+          "Greet your friend.",
+          "Say when and where.",
+          "Say what you will cook.",
+          "End politely."
+        ],
+        "phrases": [
+          "Dear …,",
+          "Would you like to come to …?",
+          "I will cook …",
+          "Please tell me if you can come.",
+          "Best wishes,"
+        ]
+      }
+    }
+  ]
+}

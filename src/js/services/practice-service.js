@@ -1,4 +1,4 @@
-import { collection, doc, getDocs, query, serverTimestamp, setDoc, where } from 'firebase/firestore';
+import { collection, doc, getDocs, query, serverTimestamp, setDoc, updateDoc, where } from 'firebase/firestore';
 import { dbService } from './firebase-db.js';
 
 /** Progress for one skill as { [lessonId]: record }. Security rules let a student read only their own records. */
@@ -38,4 +38,31 @@ export async function saveMistakes(uid, updates) {
     doc(dbService(), 'mistakes', `${uid}_${update.questionId}`),
     { ...update, studentId: uid, updatedAt: serverTimestamp() },
   )));
+}
+
+const submissionRef = (uid, promptId) => doc(dbService(), 'submissions', `${uid}_${promptId}`);
+
+/** The student's submission for a prompt, or null. Uses a query so security rules never evaluate a missing document. */
+export async function loadSubmission(uid, promptId) {
+  const snap = await getDocs(query(
+    collection(dbService(), 'submissions'),
+    where('studentId', '==', uid),
+    where('promptId', '==', promptId),
+  ));
+  return snap.empty ? null : snap.docs[0].data();
+}
+
+export async function createDraft(uid, { skill, lessonId, promptId, content }) {
+  await setDoc(submissionRef(uid, promptId), {
+    studentId: uid, skill, lessonId, promptId, status: 'draft', content, createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
+  });
+}
+
+/** Rules allow a draft to change only content, status and timestamps, so nothing else is written here. */
+export async function updateDraft(uid, promptId, content) {
+  await updateDoc(submissionRef(uid, promptId), { content, updatedAt: serverTimestamp() });
+}
+
+export async function submitDraft(uid, promptId, content) {
+  await updateDoc(submissionRef(uid, promptId), { content, status: 'submitted', submittedAt: serverTimestamp(), updatedAt: serverTimestamp() });
 }

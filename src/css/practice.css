@@ -43,3 +43,8 @@
 .player audio{width:100%;margin-top:var(--s3)}
 .checklist{border:0;margin:var(--s4) 0 0;padding:0}
 .checklist legend{font:600 1rem var(--font-head);color:var(--navy);margin-bottom:var(--s3);padding:0}
+.writing-box{width:100%;box-sizing:border-box;padding:var(--s4);border:1px solid var(--line);border-radius:12px;font:inherit;line-height:1.6;resize:vertical}
+.writing-box:focus-visible{outline:none;box-shadow:var(--focus)}
+.check-list{margin:0;padding-left:0;list-style:none}
+.check-list li{margin-bottom:var(--s2)}
+.submitted-text{margin:0 0 var(--s4);padding:var(--s4);border-left:4px solid var(--navy);background:#f7f9fb;white-space:pre-wrap;line-height:1.7}

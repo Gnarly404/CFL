@@ -5,5 +5,5 @@ export const SKILLS = Object.freeze([
   { id: 'listening', label: 'Listening', blurb: 'Understand spoken English.', available: true },
   { id: 'speaking', label: 'Speaking', blurb: 'Practise saying it out loud.', available: true },
   { id: 'reading', label: 'Reading', blurb: 'Short passages and questions.', available: true },
-  { id: 'writing', label: 'Writing', blurb: 'Put your ideas on the page.', available: false },
+  { id: 'writing', label: 'Writing', blurb: 'Put your ideas on the page.', available: true },
 ]);

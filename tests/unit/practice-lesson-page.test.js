@@ -4,18 +4,27 @@ import grammar from '../../src/data/practice/grammar.json';
 import listening from '../../src/data/practice/listening.json';
 import reading from '../../src/data/practice/reading.json';
 import speaking from '../../src/data/practice/speaking.json';
+import writing from '../../src/data/practice/writing.json';
 import vocabulary from '../../src/data/practice/vocabulary.json';
 import { loadPage, tick } from '../helpers.js';
 
 const save = vi.fn();
 vi.mock('@/auth/guards.js', () => ({ guardPage: vi.fn().mockResolvedValue({ user: { uid: 'u1' } }) }));
 const saveMistakes = vi.fn();
+const loadSubmission = vi.fn();
+const createDraft = vi.fn();
+const updateDraft = vi.fn();
+const submitDraft = vi.fn();
 const loadMistakes = vi.fn();
 vi.mock('@/services/practice-service.js', () => ({
   loadLessonProgress: vi.fn().mockResolvedValue({}),
   saveLessonResult: (...args) => save(...args),
   loadMistakes: (...args) => loadMistakes(...args),
   saveMistakes: (...args) => saveMistakes(...args),
+  loadSubmission: (...args) => loadSubmission(...args),
+  createDraft: (...args) => createDraft(...args),
+  updateDraft: (...args) => updateDraft(...args),
+  submitDraft: (...args) => submitDraft(...args),
 }));
 
 const lesson = grammar.lessons[0];
@@ -39,6 +48,10 @@ async function answer(optionIndex) {
 describe('practice lesson page', () => {
   beforeEach(() => {
     saveMistakes.mockReset().mockResolvedValue();
+    loadSubmission.mockReset().mockResolvedValue(null);
+    createDraft.mockReset().mockResolvedValue();
+    updateDraft.mockReset().mockResolvedValue();
+    submitDraft.mockReset().mockResolvedValue();
     loadMistakes.mockReset().mockResolvedValue({});
     save.mockReset().mockImplementation(async (_u, _s, _id, result) => ({ ...result, attempts: 1, bestPercent: result.percent }));
   });
@@ -103,7 +116,7 @@ describe('practice lesson page', () => {
   });
 
   it('does not open a skill that has no content yet', async () => {
-    await open('?skill=writing&id=x');
+    await open('?skill=nope&id=x');
     expect(stageText()).toContain('Lesson not found');
   });
 
@@ -224,4 +237,93 @@ describe('practice lesson page', () => {
       expect(save).not.toHaveBeenCalled();
     });
   });
+
+  describe('writing lessons', () => {
+    const lessonW = writing.lessons[2];
+    const cfg = lessonW.writing;
+    const words = (n) => `${Array.from({ length: n }, () => 'word').join(' ')}.`.replace(/^word/, 'Word');
+    const box = () => document.getElementById('writingText');
+    const type = (text) => { box().value = text; box().dispatchEvent(new Event('input', { bubbles: true })); };
+    const btn = (label) => [...document.querySelectorAll('.actions button')].find((b) => b.textContent === label);
+    const flushAll = () => new Promise((resolve) => { setTimeout(resolve, 0); });
+
+    it('shows the topic, target and plan, and keeps submit disabled until the minimum', async () => {
+      await open(`?skill=writing&id=${lessonW.id}`);
+      expect(stageText()).toContain(cfg.topic);
+      expect(stageText()).toContain(`${cfg.minWords} to ${cfg.maxWords} words`);
+      expect(stageText()).toContain(cfg.phrases[0]);
+      type(words(cfg.minWords - 1));
+      expect(document.getElementById('wordCount').textContent).toContain(`${cfg.minWords - 1} / ${cfg.minWords} words`);
+      expect(btn('Submit').disabled).toBe(true);
+      type(words(cfg.minWords));
+      expect(btn('Submit').disabled).toBe(false);
+    });
+
+    it('creates the draft once, then updates it, without changing the text', async () => {
+      await open(`?skill=writing&id=${lessonW.id}`);
+      type('Dear Anna, come for lunch.');
+      btn('Save draft').click(); await flushAll();
+      expect(createDraft).toHaveBeenCalledTimes(1);
+      expect(createDraft.mock.calls[0][1]).toMatchObject({ skill: 'writing', lessonId: lessonW.id, promptId: cfg.promptId, content: 'Dear Anna, come for lunch.' });
+      expect(document.getElementById('saveStatus').textContent).toContain('Draft saved');
+      type('Dear Anna, come for lunch on Saturday.');
+      btn('Save draft').click(); await flushAll();
+      expect(createDraft).toHaveBeenCalledTimes(1);
+      expect(updateDraft).toHaveBeenCalledWith('u1', cfg.promptId, 'Dear Anna, come for lunch on Saturday.');
+      expect(box().value).toBe('Dear Anna, come for lunch on Saturday.');
+    });
+
+    it('autosaves after the student stops typing', async () => {
+      await open(`?skill=writing&id=${lessonW.id}`);
+      vi.useFakeTimers();
+      type('A short draft.');
+      await vi.advanceTimersByTimeAsync(2100);
+      vi.useRealTimers();
+      expect(createDraft).toHaveBeenCalledTimes(1);
+    });
+
+    it('loads an existing draft into the editor', async () => {
+      loadSubmission.mockResolvedValue({ status: 'draft', content: 'My saved draft.' });
+      await open(`?skill=writing&id=${lessonW.id}`);
+      expect(box().value).toBe('My saved draft.');
+    });
+
+    it('needs a second click to submit, then locks the writing and records progress', async () => {
+      loadSubmission.mockResolvedValue({ status: 'draft', content: words(cfg.minWords) });
+      await open(`?skill=writing&id=${lessonW.id}`);
+      btn('Submit').click(); await flushAll();
+      expect(submitDraft).not.toHaveBeenCalled();
+      expect(stageText()).toContain('cannot edit');
+      btn('Confirm submit').click(); await flushAll(); await flushAll();
+      expect(submitDraft).toHaveBeenCalledWith('u1', cfg.promptId, words(cfg.minWords));
+      expect(document.getElementById('writingText')).toBeNull();
+      expect(stageText()).toContain('can no longer be edited');
+      expect(save.mock.calls[0][3]).toMatchObject({ percent: null, extra: { wordCount: cfg.minWords } });
+    });
+
+    it('shows submitted work read-only', async () => {
+      loadSubmission.mockResolvedValue({ status: 'submitted', content: 'Dear Anna, i like lunch.' });
+      await open(`?skill=writing&id=${lessonW.id}`);
+      expect(document.getElementById('writingText')).toBeNull();
+      expect(stageText()).toContain('Dear Anna, i like lunch.');
+      expect(stageText()).toContain('Write the word "I" with a capital letter.');
+    });
+
+    it('keeps the text and says so when a save fails', async () => {
+      createDraft.mockRejectedValue(new Error('offline'));
+      await open(`?skill=writing&id=${lessonW.id}`);
+      type('Hello friend.');
+      btn('Save draft').click(); await flushAll();
+      expect(document.getElementById('saveStatus').textContent).toContain('could not be saved');
+      expect(box().value).toBe('Hello friend.');
+    });
+
+    it('turns editing off when the saved writing cannot be loaded', async () => {
+      loadSubmission.mockRejectedValue(new Error('offline'));
+      await open(`?skill=writing&id=${lessonW.id}`);
+      expect(stageText()).toContain('editing is turned off');
+      expect(document.getElementById('writingText')).toBeNull();
+    });
+  });
 });
+
