@@ -31,3 +31,11 @@
 .word-list{display:grid;gap:var(--s3);margin:0 0 var(--s4);padding:0;list-style:none}
 .word-list li{padding:var(--s3) var(--s4);border:1px solid var(--line);border-radius:12px}
 .word-list strong{color:var(--navy)}
+.passage{margin:0 0 var(--s4);padding:var(--s4) var(--s5);border-left:4px solid var(--blue);background:#f3f8fc;border-radius:0 12px 12px 0}
+.passage h2{margin:0 0 var(--s3);font-size:1.05rem}
+.passage p{margin:0 0 var(--s3);line-height:1.7}
+.context{margin:0 0 var(--s4)}
+.context summary{cursor:pointer;font-weight:700;color:var(--navy);margin-bottom:var(--s3)}
+.player{margin:0 0 var(--s4);padding:var(--s4);border:1px solid var(--line);border-radius:12px;background:#f3f8fc}
+.player .actions{margin-top:0;margin-bottom:var(--s3)}
+.link-btn{margin-left:var(--s3);border:0;background:none;color:var(--navy);text-decoration:underline;cursor:pointer;font:inherit;min-height:32px}

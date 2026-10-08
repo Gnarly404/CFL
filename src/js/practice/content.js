@@ -1,8 +1,10 @@
 import grammar from '../../data/practice/grammar.json';
+import listening from '../../data/practice/listening.json';
+import reading from '../../data/practice/reading.json';
 import vocabulary from '../../data/practice/vocabulary.json';
 import { ROUTES } from '@/core/routes.js';
 
-const CONTENT = { grammar, vocabulary };
+const CONTENT = { grammar, vocabulary, reading, listening };
 
 export function getSkillContent(skillId) {
   return CONTENT[skillId] ?? { lessons: [] };

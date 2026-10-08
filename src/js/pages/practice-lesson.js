@@ -5,6 +5,7 @@ import { dueMistakes, scoreAttempt, updateMistake } from '@/practice/engine.js';
 import { SKILLS } from '@/practice/skills.js';
 import { loadLessonProgress, loadMistakes, saveLessonResult, saveMistakes } from '@/services/practice-service.js';
 import { h } from '@/ui/h.js';
+import { createAudioPlayer, speak, speechSupported } from '@/ui/speech.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
 
 mountPortalShell('practice');
@@ -66,25 +67,48 @@ async function runLesson() {
   let pending = [];
   let progressSaved = false;
   let mistakesSaved = false;
+  const player = lesson.listening ? createAudioPlayer(lesson.listening.text, { lang: lesson.listening.lang }) : null;
 
   const focusHeading = () => document.getElementById('stageHeading')?.focus();
   const show = (...nodes) => { stage.replaceChildren(...nodes); focusHeading(); };
 
-  const learnBody = () => (lesson.words
-    ? [h('h2', {}, 'Words'), h('ul', { class: 'word-list' }, ...lesson.words.map((w) => h('li', {}, h('strong', {}, w.word), ` — ${w.definition}`, h('div', { class: 'muted' }, w.example))))]
-    : [
+  const passageNode = () => h('section', { class: 'passage' }, h('h2', {}, lesson.passage.title), ...lesson.passage.paragraphs.map((p) => h('p', {}, p)));
+  const transcriptNode = () => h('details', { class: 'context' }, h('summary', {}, 'Show transcript'), h('p', {}, lesson.listening.text));
+  const contextNode = () => {
+    if (lesson.passage) return h('details', { class: 'context', open: true }, h('summary', {}, 'Passage'), passageNode());
+    return player ? player.element : '';
+  };
+  const wordItem = (w) => {
+    const item = h('li', {}, h('strong', {}, w.word), ` — ${w.definition}`, h('div', { class: 'muted' }, w.example));
+    if (speechSupported()) {
+      const listen = h('button', { type: 'button', class: 'link-btn', 'aria-label': `Listen to ${w.word}` }, 'Listen');
+      listen.addEventListener('click', () => speak(w.word));
+      item.append(listen);
+    }
+    return item;
+  };
+  const learnBody = () => {
+    if (lesson.words) return [h('h2', {}, 'Words'), h('ul', { class: 'word-list' }, ...lesson.words.map(wordItem))];
+    if (lesson.passage) return [h('p', { class: 'muted' }, 'Read the passage. It stays on screen while you answer the questions.'), passageNode()];
+    if (lesson.listening) {
+      return [h('p', { class: 'muted' }, 'Listen as many times as you like, then answer the questions.'), player.element,
+        player.supported ? '' : h('section', { class: 'passage' }, h('h2', {}, 'Transcript'), h('p', {}, lesson.listening.text))];
+    }
+    return [
       h('h2', {}, 'The rule'),
       h('ul', { class: 'rule-list' }, ...lesson.rule.map((line) => h('li', {}, line))),
       h('h2', {}, 'Examples'),
       h('ul', { class: 'example-list' }, ...lesson.examples.map((ex) => h('li', {}, ex.text, ' ', h('em', {}, `(${ex.note})`)))),
-    ]);
+    ];
+  };
+  const learnLabel = lesson.passage ? 'Read' : lesson.listening ? 'Listen' : 'Learn';
 
   function renderLearn() {
     show(
-      h('p', { class: 'step-meta' }, 'Step 1 of 2: Learn'),
+      h('p', { class: 'step-meta' }, `Step 1 of 2: ${learnLabel}`),
       h('h1', { id: 'stageHeading', tabindex: '-1' }, lesson.title),
       ...learnBody(),
-      h('div', { class: 'actions' }, h('button', { class: 'btn btn-primary', type: 'button', id: 'startBtn' }, 'Start practice')),
+      h('div', { class: 'actions' }, h('button', { class: 'btn btn-primary', type: 'button', id: 'startBtn' }, lesson.passage || lesson.listening ? 'Start questions' : 'Start practice')),
     );
     document.getElementById('startBtn').addEventListener('click', () => { step = 'question'; render(); });
   }
@@ -117,7 +141,7 @@ async function runLesson() {
       if (!last) { current += 1; picked = null; checked = false; render(); return; }
       finish();
     });
-    show(h('p', { class: 'step-meta' }, `${lesson.skipLearn ? '' : 'Step 2 of 2: Practice · '}Question ${current + 1} of ${questions.length}`), form);
+    show(h('p', { class: 'step-meta' }, `${lesson.skipLearn ? '' : 'Step 2 of 2: Practice · '}Question ${current + 1} of ${questions.length}`), contextNode(), form);
   }
 
   async function persist() {
@@ -143,6 +167,7 @@ async function runLesson() {
   }
 
   function finish() {
+    player?.stop();
     result = scoreAttempt(questions, answers);
     const now = new Date();
     pending = questions.flatMap((q, i) => {
@@ -166,6 +191,7 @@ async function runLesson() {
       h('h1', { id: 'stageHeading', tabindex: '-1' }, lesson.title),
       h('p', { class: 'score' }, `${result.correct} of ${result.total}`),
       h('p', { class: 'muted', role: 'status' }, saveNote),
+      lesson.listening ? transcriptNode() : '',
       missed.length
         ? h('div', {}, h('h2', {}, 'Review your mistakes'), h('ul', { class: 'review-list' }, ...missed.map((q) => h('li', {},
           h('strong', {}, q.prompt), h('div', {}, `Correct answer: ${q.options[q.answer]}`), h('div', { class: 'muted' }, q.why),

@@ -1,0 +1,212 @@
+{
+  "skill": "reading",
+  "lessons": [
+    {
+      "id": "reading-saturday",
+      "title": "Amina's Saturday",
+      "summary": "A short text about a weekend routine.",
+      "passage": {
+        "title": "Amina's Saturday",
+        "paragraphs": [
+          "Amina lives in Eldoret. On Saturday morning she goes to the market with her mother. They buy tomatoes, onions and fish. Amina carries the bag because her mother's hands are full.",
+          "At noon they walk home and cook lunch together. In the afternoon Amina studies English for two hours. In the evening she calls her cousin, who lives in Nairobi."
+        ]
+      },
+      "questions": [
+        {
+          "id": "rs-1",
+          "prompt": "Where does Amina go on Saturday morning?",
+          "options": [
+            "To school",
+            "To the market",
+            "To the hospital"
+          ],
+          "answer": 1,
+          "why": "The text says she goes to the market with her mother."
+        },
+        {
+          "id": "rs-2",
+          "prompt": "Who goes with her?",
+          "options": [
+            "Her cousin",
+            "Her mother",
+            "Her teacher"
+          ],
+          "answer": 1,
+          "why": "She goes with her mother."
+        },
+        {
+          "id": "rs-3",
+          "prompt": "What does Amina do in the afternoon?",
+          "options": [
+            "She studies English",
+            "She cooks lunch",
+            "She calls her cousin"
+          ],
+          "answer": 0,
+          "why": "In the afternoon Amina studies English for two hours."
+        },
+        {
+          "id": "rs-4",
+          "prompt": "Where does Amina's cousin live?",
+          "options": [
+            "In Eldoret",
+            "In Nairobi",
+            "At the market"
+          ],
+          "answer": 1,
+          "why": "Her cousin lives in Nairobi."
+        },
+        {
+          "id": "rs-5",
+          "prompt": "Why does Amina carry the bag?",
+          "options": [
+            "Her mother's hands are full",
+            "She is hungry",
+            "The bag is small"
+          ],
+          "answer": 0,
+          "why": "She carries the bag because her mother's hands are full."
+        }
+      ]
+    },
+    {
+      "id": "reading-new-school",
+      "title": "A new school",
+      "summary": "Brian's first day.",
+      "passage": {
+        "title": "A new school",
+        "paragraphs": [
+          "Brian starts at a new school on Monday. He is nervous because he does not know anyone. The teacher, Mrs Otieno, introduces him to the class. A girl called Faith shows him where to sit.",
+          "At break time, Faith and her friends invite Brian to play football. By the end of the day, Brian is happy. He tells his father, \"I think I will like this school.\""
+        ]
+      },
+      "questions": [
+        {
+          "id": "rn-1",
+          "prompt": "Why is Brian nervous?",
+          "options": [
+            "He does not know anyone",
+            "He is late",
+            "He dislikes football"
+          ],
+          "answer": 0,
+          "why": "He is nervous because he does not know anyone."
+        },
+        {
+          "id": "rn-2",
+          "prompt": "Who introduces Brian to the class?",
+          "options": [
+            "Faith",
+            "Mrs Otieno",
+            "His father"
+          ],
+          "answer": 1,
+          "why": "The teacher, Mrs Otieno, introduces him."
+        },
+        {
+          "id": "rn-3",
+          "prompt": "What do Faith and her friends invite Brian to do at break time?",
+          "options": [
+            "Play football",
+            "Study",
+            "Go home"
+          ],
+          "answer": 0,
+          "why": "They invite him to play football."
+        },
+        {
+          "id": "rn-4",
+          "prompt": "How does Brian feel at the end of the day?",
+          "options": [
+            "Nervous",
+            "Happy",
+            "Tired"
+          ],
+          "answer": 1,
+          "why": "By the end of the day, Brian is happy."
+        },
+        {
+          "id": "rn-5",
+          "prompt": "Which word is closest in meaning to \"nervous\"?",
+          "options": [
+            "worried",
+            "hungry",
+            "angry"
+          ],
+          "answer": 0,
+          "why": "Nervous means worried or a little afraid."
+        }
+      ]
+    },
+    {
+      "id": "reading-library",
+      "title": "The town library",
+      "summary": "Opening hours and rules.",
+      "passage": {
+        "title": "The town library",
+        "paragraphs": [
+          "The town library opens at eight o'clock and closes at five o'clock from Monday to Friday. On Saturday it closes at one o'clock. It is closed on Sunday.",
+          "Members can borrow three books at a time for two weeks. If a book is late, the member pays a small fine. Students can also use the quiet room to study for free."
+        ]
+      },
+      "questions": [
+        {
+          "id": "rl-1",
+          "prompt": "What time does the library close on Saturday?",
+          "options": [
+            "Five o'clock",
+            "One o'clock",
+            "Eight o'clock"
+          ],
+          "answer": 1,
+          "why": "On Saturday it closes at one o'clock."
+        },
+        {
+          "id": "rl-2",
+          "prompt": "How many books can a member borrow at a time?",
+          "options": [
+            "Two",
+            "Three",
+            "Five"
+          ],
+          "answer": 1,
+          "why": "Members can borrow three books at a time."
+        },
+        {
+          "id": "rl-3",
+          "prompt": "What happens if a book is late?",
+          "options": [
+            "The member pays a small fine",
+            "The member cannot enter",
+            "Nothing happens"
+          ],
+          "answer": 0,
+          "why": "If a book is late, the member pays a small fine."
+        },
+        {
+          "id": "rl-4",
+          "prompt": "When is the library closed?",
+          "options": [
+            "On Saturday",
+            "On Sunday",
+            "On Friday"
+          ],
+          "answer": 1,
+          "why": "It is closed on Sunday."
+        },
+        {
+          "id": "rl-5",
+          "prompt": "What can students do in the quiet room?",
+          "options": [
+            "Borrow books",
+            "Study for free",
+            "Buy books"
+          ],
+          "answer": 1,
+          "why": "Students can use the quiet room to study for free."
+        }
+      ]
+    }
+  ]
+}

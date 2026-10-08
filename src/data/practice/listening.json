@@ -1,0 +1,170 @@
+{
+  "skill": "listening",
+  "lessons": [
+    {
+      "id": "listening-shop",
+      "title": "At the shop",
+      "summary": "Understand a customer buying food.",
+      "listening": {
+        "lang": "en-GB",
+        "text": "Good morning. I would like two kilos of rice and one litre of milk, please. Of course. That will be four hundred and fifty shillings. Here you are. Thank you, and have a nice day."
+      },
+      "questions": [
+        {
+          "id": "ls-1",
+          "prompt": "What does the customer want to buy?",
+          "options": [
+            "Rice and milk",
+            "Bread and tea",
+            "Sugar and eggs"
+          ],
+          "answer": 0,
+          "why": "The customer asks for rice and milk."
+        },
+        {
+          "id": "ls-2",
+          "prompt": "How much rice does the customer want?",
+          "options": [
+            "One kilo",
+            "Two kilos",
+            "Five kilos"
+          ],
+          "answer": 1,
+          "why": "The customer wants two kilos of rice."
+        },
+        {
+          "id": "ls-3",
+          "prompt": "How much milk does the customer want?",
+          "options": [
+            "One litre",
+            "Two litres",
+            "Half a litre"
+          ],
+          "answer": 0,
+          "why": "The customer wants one litre of milk."
+        },
+        {
+          "id": "ls-4",
+          "prompt": "How much does it cost?",
+          "options": [
+            "Four hundred shillings",
+            "Four hundred and fifty shillings",
+            "Five hundred shillings"
+          ],
+          "answer": 1,
+          "why": "The total is four hundred and fifty shillings."
+        }
+      ]
+    },
+    {
+      "id": "listening-message",
+      "title": "A phone message",
+      "summary": "Understand a spoken message.",
+      "listening": {
+        "lang": "en-GB",
+        "text": "Hello Sara, this is Peter. I cannot come to class on Tuesday because I have a doctor's appointment. I will come on Wednesday at ten o'clock instead. Please tell the teacher. Thank you. Goodbye."
+      },
+      "questions": [
+        {
+          "id": "lm-1",
+          "prompt": "Who is leaving the message?",
+          "options": [
+            "Sara",
+            "Peter",
+            "The teacher"
+          ],
+          "answer": 1,
+          "why": "The speaker says, this is Peter."
+        },
+        {
+          "id": "lm-2",
+          "prompt": "Why can't he come on Tuesday?",
+          "options": [
+            "He has a doctor's appointment",
+            "He is on holiday",
+            "He is late"
+          ],
+          "answer": 0,
+          "why": "He has a doctor's appointment."
+        },
+        {
+          "id": "lm-3",
+          "prompt": "When will he come?",
+          "options": [
+            "Wednesday at ten o'clock",
+            "Tuesday at ten o'clock",
+            "Wednesday at two o'clock"
+          ],
+          "answer": 0,
+          "why": "He will come on Wednesday at ten o'clock."
+        },
+        {
+          "id": "lm-4",
+          "prompt": "What should Sara do?",
+          "options": [
+            "Call the doctor",
+            "Tell the teacher",
+            "Come on Wednesday"
+          ],
+          "answer": 1,
+          "why": "He asks her to tell the teacher."
+        }
+      ]
+    },
+    {
+      "id": "listening-directions",
+      "title": "Directions",
+      "summary": "Follow directions to a place.",
+      "listening": {
+        "lang": "en-GB",
+        "text": "To get to the hospital, walk straight along this street for two hundred metres. Turn left at the bank. The hospital is next to the library, on the right. It takes about five minutes."
+      },
+      "questions": [
+        {
+          "id": "ld-1",
+          "prompt": "How far should you walk straight?",
+          "options": [
+            "Two hundred metres",
+            "Five hundred metres",
+            "Two kilometres"
+          ],
+          "answer": 0,
+          "why": "You walk straight for two hundred metres."
+        },
+        {
+          "id": "ld-2",
+          "prompt": "Where do you turn left?",
+          "options": [
+            "At the bank",
+            "At the market",
+            "At the station"
+          ],
+          "answer": 0,
+          "why": "You turn left at the bank."
+        },
+        {
+          "id": "ld-3",
+          "prompt": "What is the hospital next to?",
+          "options": [
+            "The bank",
+            "The library",
+            "The market"
+          ],
+          "answer": 1,
+          "why": "The hospital is next to the library."
+        },
+        {
+          "id": "ld-4",
+          "prompt": "How long does it take?",
+          "options": [
+            "About five minutes",
+            "About fifteen minutes",
+            "About an hour"
+          ],
+          "answer": 0,
+          "why": "It takes about five minutes."
+        }
+      ]
+    }
+  ]
+}

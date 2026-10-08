@@ -1,6 +1,8 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import grammar from '../../src/data/practice/grammar.json';
+import listening from '../../src/data/practice/listening.json';
+import reading from '../../src/data/practice/reading.json';
 import vocabulary from '../../src/data/practice/vocabulary.json';
 import { loadPage, tick } from '../helpers.js';
 
@@ -100,7 +102,7 @@ describe('practice lesson page', () => {
   });
 
   it('does not open a skill that has no content yet', async () => {
-    await open('?skill=speaking&id=x');
+    await open('?skill=writing&id=x');
     expect(stageText()).toContain('Lesson not found');
   });
 
@@ -132,5 +134,29 @@ describe('practice lesson page', () => {
   it('says so when no mistakes are due for review', async () => {
     await open('?skill=review');
     expect(stageText()).toContain('Nothing to review right now');
+  });
+
+  it('keeps the passage on screen while answering a reading lesson', async () => {
+    const lessonR = reading.lessons[0];
+    await open(`?skill=reading&id=${lessonR.id}`);
+    expect(stageText()).toContain(lessonR.passage.paragraphs[0]);
+    click('#startBtn');
+    expect(stageText()).toContain(lessonR.passage.paragraphs[0]);
+    expect(document.getElementById('stageHeading').textContent).toBe(lessonR.questions[0].prompt);
+  });
+
+  it('shows the transcript up front when audio is unavailable, and after the questions otherwise', async () => {
+    const lessonL = listening.lessons[0];
+    await open(`?skill=listening&id=${lessonL.id}`);
+    expect(stageText()).toContain('Audio is not available');
+    expect(stageText()).toContain(lessonL.listening.text);
+    click('#startBtn');
+    for (const q of lessonL.questions) {
+      await answer(q.answer);
+      document.querySelector('form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      await tick();
+    }
+    expect(stageText()).toContain('Show transcript');
+    expect(save.mock.calls[0][1]).toBe('listening');
   });
 });

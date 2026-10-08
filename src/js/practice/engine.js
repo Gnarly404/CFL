@@ -65,6 +65,10 @@ export function validateLesson(lesson) {
   if (lesson.words) {
     if (!lesson.words.length) problems.push(`${lesson.id}: empty word list`);
     for (const w of lesson.words) if (!w.word || !w.definition || !w.example) problems.push(`${lesson.id}: word needs word, definition and example`);
+  } else if (lesson.passage) {
+    if (!lesson.passage.paragraphs?.length) problems.push(`${lesson.id}: passage needs paragraphs`);
+  } else if (lesson.listening) {
+    if (!lesson.listening.text) problems.push(`${lesson.id}: listening needs text`);
   } else {
     if (!Array.isArray(lesson.rule) || !lesson.rule.length) problems.push(`${lesson.id}: missing rule`);
     if (!Array.isArray(lesson.examples) || !lesson.examples.length) problems.push(`${lesson.id}: missing examples`);

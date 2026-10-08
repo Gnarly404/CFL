@@ -13,10 +13,10 @@ Status key: **Done**, **Partial**, **Not started**.
 | 7 Dashboard | Partial | Continue Learning and skill cards use real progress. Missing: Today's Practice, schedule, materials, fees from real data |
 | 8 Practice architecture and persistence | Partial | Hub, lesson lifecycle, saved lesson progress. Missing: practice session records, resuming a half-finished lesson, per-question attempt log |
 | 9 Grammar | Partial | 5 lessons (assistant-written, need review), explained feedback, retry. Missing: more lessons, levels |
-| 10 Vocabulary | Partial | 4 lessons, word list, quiz, spaced review of missed words. Missing: flashcard flip mode, pronunciation audio |
-| 11 Listening | Not started | Needs audio (recordings or browser text-to-speech) |
+| 10 Vocabulary | Partial | 4 lessons, word list with Listen buttons (browser speech), quiz, spaced review of missed words. Missing: flashcard flip mode |
+| 11 Listening | Partial | 3 lessons played with browser text-to-speech (play, stop, slow speed, unsupported and error states, transcript after the questions). Missing: real recordings, accents, longer dialogues, replay limits |
 | 12 Speaking | Not started | Phase 1 is record and playback |
-| 13 Reading | Not started | |
+| 13 Reading | Partial | 3 passages (assistant-written, need review) with the passage on screen while answering. Missing: more passages, vocabulary help, timed mode |
 | 14 Writing | Not started | Drafts and checklist feedback first; instructor feedback later |
 | 15 Results, mistakes, feedback | Partial | Result screen with review, mistake bank, spaced review (1, 3, 7 days), My mistakes page. Missing: time spent, per-question attempts, skill-level mistake filters |
 | 16 Progress, goals, personalisation | Partial | Skill progress and Continue Learning. Missing: daily goals, recommendations, streaks and achievements, placement and CEFR (v2 spec) |
@@ -39,6 +39,6 @@ Status key: **Done**, **Partial**, **Not started**.
 
 ## Needs a decision or input from the owner
 - Review of all lesson content (Grammar and Vocabulary so far).
-- Listening: audio recordings, or browser text-to-speech as a stand-in.
+- Listening: browser text-to-speech is the stand-in for now (owner decision); real recordings can replace it later. Voice quality depends on the device.
 - Real programme details (fees, intakes, photos) and a production domain.
 - Mail provider for transactional email; confirm the Gmail app password was rotated.

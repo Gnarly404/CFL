@@ -119,8 +119,15 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 - `docs/SPEC-COVERAGE.md` maps every section of the Production spec to its status.
 - Tests: 22 files, 215 pass, now including hub and My mistakes page tests.
 
+### Reading and Listening (fourth slice)
+
+- Reading: 3 passages in `src/data/practice/reading.json`, passage kept on screen (collapsible) during questions.
+- Listening: 3 scripts in `src/data/practice/listening.json`, played with the browser's text-to-speech (`js/ui/speech.js`): Play/Stop, slow speed, ready/playing/finished/error states. If the browser has no speech support the transcript is shown up front; otherwise it appears after the questions. Voice and accent depend on the device; a recorded-audio field can replace the script later without changing the page.
+- Vocabulary word lists now have a Listen button for pronunciation.
+- Content again written by the assistant and needs review. 23 test files, 227 tests pass; speech tested against a fake `speechSynthesis` only, not real devices.
+
 ### Next up
 1. Run `npm run test:rules` and fix any rules bug (the lessonProgress rules are now used for real).
-2. Reading and Listening, then Speaking (record and playback) and Writing (drafts).
+2. Speaking (record and playback) and Writing (drafts), then daily goals and recommendations, flashcard mode.
 3. Mistake review page and daily goal; weak-area recommendations.
 4. Remaining session 2 items (self-hosted fonts and icons, CSP, shared public header and footer).
