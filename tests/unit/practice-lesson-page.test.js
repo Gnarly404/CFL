@@ -6,9 +6,13 @@ import { loadPage, tick } from '../helpers.js';
 
 const save = vi.fn();
 vi.mock('@/auth/guards.js', () => ({ guardPage: vi.fn().mockResolvedValue({ user: { uid: 'u1' } }) }));
+const saveMistakes = vi.fn();
+const loadMistakes = vi.fn();
 vi.mock('@/services/practice-service.js', () => ({
   loadLessonProgress: vi.fn().mockResolvedValue({}),
   saveLessonResult: (...args) => save(...args),
+  loadMistakes: (...args) => loadMistakes(...args),
+  saveMistakes: (...args) => saveMistakes(...args),
 }));
 
 const lesson = grammar.lessons[0];
@@ -31,6 +35,8 @@ async function answer(optionIndex) {
 
 describe('practice lesson page', () => {
   beforeEach(() => {
+    saveMistakes.mockReset().mockResolvedValue();
+    loadMistakes.mockReset().mockResolvedValue({});
     save.mockReset().mockImplementation(async (_u, _s, _id, result) => ({ ...result, attempts: 1, bestPercent: result.percent }));
   });
 
@@ -96,5 +102,35 @@ describe('practice lesson page', () => {
   it('does not open a skill that has no content yet', async () => {
     await open('?skill=speaking&id=x');
     expect(stageText()).toContain('Lesson not found');
+  });
+
+  it('records a missed question as an open mistake due in a day', async () => {
+    await open(`?skill=grammar&id=${lesson.id}`);
+    click('#startBtn');
+    for (const [i, q] of lesson.questions.entries()) {
+      await answer(i === 0 ? (q.answer + 1) % q.options.length : q.answer);
+      document.querySelector('form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      await tick();
+    }
+    const updates = saveMistakes.mock.calls[0][1];
+    expect(updates).toHaveLength(1);
+    expect(updates[0]).toMatchObject({ skill: 'grammar', lessonId: lesson.id, questionId: lesson.questions[0].id, status: 'open', count: 1, box: 0 });
+  });
+
+  it('runs a review session from due mistakes and advances them when answered correctly', async () => {
+    const q = lesson.questions[0];
+    loadMistakes.mockResolvedValue({ [q.id]: { questionId: q.id, status: 'open', box: 0, count: 1, dueAt: '2000-01-01T00:00:00.000Z' } });
+    await open('?skill=review');
+    expect(document.getElementById('stageHeading').textContent).toBe(q.prompt);
+    await answer(q.answer);
+    document.querySelector('form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    await tick();
+    expect(save).not.toHaveBeenCalled();
+    expect(saveMistakes.mock.calls[0][1][0]).toMatchObject({ questionId: q.id, box: 1, status: 'open' });
+  });
+
+  it('says so when no mistakes are due for review', async () => {
+    await open('?skill=review');
+    expect(stageText()).toContain('Nothing to review right now');
   });
 });

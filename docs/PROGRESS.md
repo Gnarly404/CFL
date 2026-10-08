@@ -112,6 +112,13 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 - The runner, hub and dashboard are now skill-agnostic: add a skill by adding its JSON, registering it in `js/practice/content.js` and marking it `available` in `js/practice/skills.js`.
 - Not built yet: flashcard flip mode and true spaced repetition (words are not scheduled for review over time; a missed word is only shown again on that lesson's results).
 
+### Mistake review (third slice)
+
+- Wrong answers are saved to `mistakes/{uid}_{questionId}` with a spaced schedule: due in 1 day, then 3, then 7; the third correct answer once due resolves it. Correct answers on mistakes that are not yet due do not advance them (no gaming by retrying).
+- `/student/practice/mistakes` lists open mistakes by skill; `/student/practice/lesson?skill=review` runs a mixed review of up to 10 due mistakes (`&all=1` for all open ones). The hub shows how many are due.
+- `docs/SPEC-COVERAGE.md` maps every section of the Production spec to its status.
+- Tests: 22 files, 215 pass, now including hub and My mistakes page tests.
+
 ### Next up
 1. Run `npm run test:rules` and fix any rules bug (the lessonProgress rules are now used for real).
 2. Reading and Listening, then Speaking (record and playback) and Writing (drafts).

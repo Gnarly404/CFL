@@ -1,9 +1,9 @@
 import { guardPage } from '@/auth/guards.js';
 import { ROUTES } from '@/core/routes.js';
-import { getSkillContent, lessonUrl } from '@/practice/content.js';
-import { scoreAttempt } from '@/practice/engine.js';
+import { getSkillContent, lessonUrl, questionIndex } from '@/practice/content.js';
+import { dueMistakes, scoreAttempt, updateMistake } from '@/practice/engine.js';
 import { SKILLS } from '@/practice/skills.js';
-import { loadLessonProgress, saveLessonResult } from '@/services/practice-service.js';
+import { loadLessonProgress, loadMistakes, saveLessonResult, saveMistakes } from '@/services/practice-service.js';
 import { h } from '@/ui/h.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
 
@@ -11,21 +11,37 @@ mountPortalShell('practice');
 const session = await guardPage({ roles: ['student'] });
 
 const params = new URLSearchParams(window.location.search);
-const skill = SKILLS.find((entry) => entry.available && entry.id === params.get('skill'));
-const lessons = skill ? getSkillContent(skill.id).lessons : [];
-const lessonIndex = lessons.findIndex((l) => l.id === params.get('id'));
-const lesson = lessons[lessonIndex];
+const isReview = params.get('skill') === 'review';
 const stage = document.getElementById('stage');
+
+let mistakes = {};
+try { mistakes = await loadMistakes(session.user.uid); } catch (error) { console.warn('Could not load mistakes', error?.code ?? error); }
+
+const skill = isReview ? { id: 'review', label: 'My mistakes' } : SKILLS.find((entry) => entry.available && entry.id === params.get('skill'));
+const lessons = skill && !isReview ? getSkillContent(skill.id).lessons : [];
+const lessonIndex = lessons.findIndex((l) => l.id === params.get('id'));
+const lesson = isReview ? buildReviewLesson() : lessons[lessonIndex];
+
+function buildReviewLesson() {
+  const index = questionIndex();
+  const open = Object.values(mistakes).filter((m) => m.status === 'open');
+  const chosen = params.get('all') === '1' ? open : dueMistakes(open, new Date());
+  const questions = chosen.slice(0, 10).map((m) => index[m.questionId]?.question).filter(Boolean);
+  return questions.length ? { id: 'review', title: 'Practice my mistakes', skipLearn: true, questions } : null;
+}
 
 document.getElementById('crumbs').replaceChildren(
   h('li', {}, h('a', { href: ROUTES.practice }, 'English Practice')),
-  ...(skill ? [h('li', {}, skill.label)] : []),
+  ...(isReview ? [h('li', {}, h('a', { href: ROUTES.practiceMistakes }, 'My mistakes'))] : skill ? [h('li', {}, skill.label)] : []),
   ...(lesson ? [h('li', { 'aria-current': 'page' }, lesson.title)] : []),
 );
 
 if (!lesson) {
-  stage.replaceChildren(h('h1', {}, 'Lesson not found'), h('p', { class: 'muted' }, 'This lesson does not exist.'),
-    h('a', { class: 'btn btn-primary', href: ROUTES.practice }, 'Back to English Practice'));
+  stage.replaceChildren(
+    h('h1', {}, isReview ? 'Nothing to review right now' : 'Lesson not found'),
+    h('p', { class: 'muted' }, isReview ? 'No mistakes are due. Keep practising and come back later.' : 'This lesson does not exist.'),
+    h('a', { class: 'btn btn-primary', href: isReview ? ROUTES.practiceMistakes : ROUTES.practice }, isReview ? 'Back to My mistakes' : 'Back to English Practice'),
+  );
 } else {
   document.title = `${lesson.title} - CFL English Practice`;
   await runLesson();
@@ -33,17 +49,23 @@ if (!lesson) {
 
 async function runLesson() {
   const questions = lesson.questions;
+  const index = questionIndex();
   let progress = {};
-  try { progress = await loadLessonProgress(session.user.uid, skill.id); } catch (error) { console.warn('Could not load progress', error?.code ?? error); }
+  if (!isReview) {
+    try { progress = await loadLessonProgress(session.user.uid, skill.id); } catch (error) { console.warn('Could not load progress', error?.code ?? error); }
+  }
 
-  let step = 'learn';
-  let index = 0;
+  let step = lesson.skipLearn ? 'question' : 'learn';
+  let current = 0;
   let picked = null;
   let checked = false;
   let answers = [];
   let error = '';
   let saveNote = '';
   let result = null;
+  let pending = [];
+  let progressSaved = false;
+  let mistakesSaved = false;
 
   const focusHeading = () => document.getElementById('stageHeading')?.focus();
   const show = (...nodes) => { stage.replaceChildren(...nodes); focusHeading(); };
@@ -68,7 +90,7 @@ async function runLesson() {
   }
 
   function renderQuestion() {
-    const q = questions[index];
+    const q = questions[current];
     const form = h('form', { class: 'practice-form', novalidate: true });
     const options = q.options.map((text, i) => {
       const input = h('input', { type: 'radio', name: 'answer', id: `opt-${i}`, value: i, disabled: checked });
@@ -83,44 +105,60 @@ async function runLesson() {
     const feedback = checked
       ? h('div', { class: 'feedback', role: 'status' }, h('strong', {}, picked === q.answer ? 'Correct' : 'Not quite'), q.why)
       : '';
-    const last = index === questions.length - 1;
+    const last = current === questions.length - 1;
     form.append(fieldset, feedback, error ? h('p', { class: 'form-note', role: 'alert' }, error) : '',
       h('div', { class: 'actions' }, h('button', { class: 'btn btn-primary', type: 'submit' }, !checked ? 'Check answer' : last ? 'See results' : 'Next question')));
     form.addEventListener('submit', (event) => {
       event.preventDefault();
       if (!checked) {
         if (picked === null) { error = 'Choose an answer first.'; render(); return; }
-        error = ''; checked = true; answers[index] = picked; render(); return;
+        error = ''; checked = true; answers[current] = picked; render(); return;
       }
-      if (!last) { index += 1; picked = null; checked = false; render(); return; }
+      if (!last) { current += 1; picked = null; checked = false; render(); return; }
       finish();
     });
-    show(h('p', { class: 'step-meta' }, `Step 2 of 2: Practice · Question ${index + 1} of ${questions.length}`), form);
+    show(h('p', { class: 'step-meta' }, `${lesson.skipLearn ? '' : 'Step 2 of 2: Practice · '}Question ${current + 1} of ${questions.length}`), form);
   }
 
   async function persist() {
     saveNote = 'Saving your progress…';
     render();
-    try {
-      const record = await saveLessonResult(session.user.uid, skill.id, lesson.id, result, progress[lesson.id]);
-      progress = { ...progress, [lesson.id]: record };
-      saveNote = 'Progress saved.';
-    } catch (err) {
-      console.warn('Could not save progress', err?.code ?? err);
-      saveNote = 'Your progress could not be saved.';
+    let failed = false;
+    if (!isReview && !progressSaved) {
+      try {
+        const record = await saveLessonResult(session.user.uid, skill.id, lesson.id, result, progress[lesson.id]);
+        progress = { ...progress, [lesson.id]: record };
+        progressSaved = true;
+      } catch (err) { failed = true; console.warn('Could not save progress', err?.code ?? err); }
     }
+    if (!mistakesSaved) {
+      try {
+        await saveMistakes(session.user.uid, pending);
+        mistakes = { ...mistakes, ...Object.fromEntries(pending.map((u) => [u.questionId, u])) };
+        mistakesSaved = true;
+      } catch (err) { failed = true; console.warn('Could not save mistakes', err?.code ?? err); }
+    }
+    saveNote = failed ? 'Your progress could not be saved.' : 'Progress saved.';
     render();
   }
 
   function finish() {
     result = scoreAttempt(questions, answers);
+    const now = new Date();
+    pending = questions.flatMap((q, i) => {
+      const record = updateMistake(mistakes[q.id], answers[i] === q.answer, now);
+      const origin = index[q.id];
+      return record && origin ? [{ skill: origin.skillId, lessonId: origin.lessonId, questionId: q.id, ...record }] : [];
+    });
+    progressSaved = false;
+    mistakesSaved = false;
     step = 'results';
     persist();
   }
 
   function renderResults() {
     const missed = questions.filter((q) => result.mistakes.includes(q.id));
-    const following = lessons[lessonIndex + 1];
+    const following = isReview ? null : lessons[lessonIndex + 1];
     const retrySave = saveNote === 'Your progress could not be saved.'
       ? h('button', { class: 'btn', type: 'button', id: 'retrySave' }, 'Try saving again') : '';
     show(
@@ -136,11 +174,11 @@ async function runLesson() {
       h('div', { class: 'actions' },
         h('button', { class: 'btn', type: 'button', id: 'again' }, 'Try again'),
         following ? h('a', { class: 'btn btn-primary', href: lessonUrl(skill.id, following.id) }, 'Next lesson') : '',
-        h('a', { class: 'btn', href: ROUTES.practice }, 'Back to English Practice'),
+        h('a', { class: 'btn', href: isReview ? ROUTES.practiceMistakes : ROUTES.practice }, isReview ? 'Back to My mistakes' : 'Back to English Practice'),
         retrySave),
     );
     document.getElementById('again').addEventListener('click', () => {
-      step = 'question'; index = 0; picked = null; checked = false; answers = []; result = null; saveNote = ''; render();
+      step = 'question'; current = 0; picked = null; checked = false; answers = []; result = null; saveNote = ''; render();
     });
     document.getElementById('retrySave')?.addEventListener('click', persist);
   }

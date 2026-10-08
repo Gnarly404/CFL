@@ -26,6 +26,32 @@ export function nextLesson(lessons, progress) {
   return lessons.find((lesson) => lessonStatus(progress, lesson.id) !== 'completed') ?? null;
 }
 
+const STEP_DAYS = [1, 3, 7];
+const addDays = (date, days) => new Date(date.getTime() + days * 86400000).toISOString();
+
+/**
+ * Spaced review of mistakes. A wrong answer opens (or reopens) a mistake due in 1 day.
+ * A correct answer, once the mistake is due, moves it to the next interval (3 days, then 7);
+ * a third correct answer resolves it. Returns the new record, or null when nothing changes.
+ */
+export function updateMistake(previous, correct, now = new Date()) {
+  if (!correct) {
+    return { box: 0, count: (previous?.count ?? 0) + 1, status: 'open', dueAt: addDays(now, STEP_DAYS[0]), lastWrongAt: now.toISOString() };
+  }
+  if (!previous || previous.status !== 'open') return null;
+  if (previous.dueAt && new Date(previous.dueAt) > now) return null;
+  const box = previous.box + 1;
+  if (box >= STEP_DAYS.length) return { ...previous, box, status: 'resolved', dueAt: null };
+  return { ...previous, box, status: 'open', dueAt: addDays(now, STEP_DAYS[box]) };
+}
+
+/** Open mistakes whose review date has arrived, oldest first. */
+export function dueMistakes(mistakes, now = new Date()) {
+  return mistakes
+    .filter((m) => m.status === 'open' && (!m.dueAt || new Date(m.dueAt) <= now))
+    .sort((a, b) => String(a.dueAt).localeCompare(String(b.dueAt)));
+}
+
 /** What to continue with: a skill already started, otherwise the first skill with a lesson left. */
 export function pickContinue(entries) {
   const open = entries.filter((entry) => entry.next);

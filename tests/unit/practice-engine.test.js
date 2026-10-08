@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import grammar from '../../src/data/practice/grammar.json';
 import vocabulary from '../../src/data/practice/vocabulary.json';
-import { lessonStatus, nextLesson, pickContinue, scoreAttempt, skillPercent, validateLesson } from '@/practice/engine.js';
+import { dueMistakes, lessonStatus, nextLesson, pickContinue, scoreAttempt, skillPercent, updateMistake, validateLesson } from '@/practice/engine.js';
 
 const lessons = [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
 const questions = [{ id: 'q1', answer: 1 }, { id: 'q2', answer: 0 }, { id: 'q3', answer: 2 }, { id: 'q4', answer: 1 }];
@@ -34,6 +34,39 @@ describe('progress helpers', () => {
   it('is safe with no progress', () => {
     expect(skillPercent(lessons, {})).toBe(0);
     expect(skillPercent([], {})).toBe(0);
+  });
+});
+
+describe('spaced mistake review', () => {
+  const now = new Date('2026-10-10T08:00:00.000Z');
+  const days = (n) => new Date(now.getTime() + n * 86400000).toISOString();
+  it('opens a mistake due in a day on a wrong answer, and counts repeats', () => {
+    expect(updateMistake(null, false, now)).toMatchObject({ box: 0, count: 1, status: 'open', dueAt: days(1) });
+    expect(updateMistake({ box: 2, count: 2, status: 'open', dueAt: days(5) }, false, now)).toMatchObject({ box: 0, count: 3, dueAt: days(1) });
+  });
+  it('ignores a correct answer with no open mistake', () => {
+    expect(updateMistake(null, true, now)).toBeNull();
+    expect(updateMistake({ box: 3, status: 'resolved' }, true, now)).toBeNull();
+  });
+  it('does not advance a mistake that is not due yet', () => {
+    expect(updateMistake({ box: 0, count: 1, status: 'open', dueAt: days(1) }, true, now)).toBeNull();
+  });
+  it('moves a due mistake through 3 and 7 days, then resolves it', () => {
+    const due = { box: 0, count: 1, status: 'open', dueAt: days(-1) };
+    const one = updateMistake(due, true, now);
+    expect(one).toMatchObject({ box: 1, status: 'open', dueAt: days(3) });
+    const two = updateMistake({ ...one, dueAt: days(-1) }, true, now);
+    expect(two).toMatchObject({ box: 2, status: 'open', dueAt: days(7) });
+    expect(updateMistake({ ...two, dueAt: days(-1) }, true, now)).toMatchObject({ box: 3, status: 'resolved', dueAt: null });
+  });
+  it('lists only open, due mistakes, oldest first', () => {
+    const list = [
+      { questionId: 'a', status: 'open', dueAt: days(-1) },
+      { questionId: 'b', status: 'open', dueAt: days(2) },
+      { questionId: 'c', status: 'resolved', dueAt: null },
+      { questionId: 'd', status: 'open', dueAt: days(-3) },
+    ];
+    expect(dueMistakes(list, now).map((m) => m.questionId)).toEqual(['d', 'a']);
   });
 });
 

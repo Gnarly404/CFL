@@ -25,3 +25,16 @@ export async function saveLessonResult(uid, skill, lessonId, result, previous) {
   await setDoc(doc(dbService(), 'lessonProgress', `${uid}_${lessonId}`), { ...record, updatedAt: serverTimestamp() });
   return record;
 }
+
+/** Mistakes for a student as { [questionId]: record }. */
+export async function loadMistakes(uid) {
+  const snap = await getDocs(query(collection(dbService(), 'mistakes'), where('studentId', '==', uid)));
+  return Object.fromEntries(snap.docs.map((entry) => [entry.data().questionId, entry.data()]));
+}
+
+export async function saveMistakes(uid, updates) {
+  await Promise.all(updates.map((update) => setDoc(
+    doc(dbService(), 'mistakes', `${uid}_${update.questionId}`),
+    { ...update, studentId: uid, updatedAt: serverTimestamp() },
+  )));
+}

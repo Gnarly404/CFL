@@ -1,7 +1,9 @@
 import { guardPage } from '@/auth/guards.js';
 import { lessonUrl } from '@/practice/content.js';
-import { lessonStatus, pickContinue } from '@/practice/engine.js';
+import { dueMistakes, lessonStatus, pickContinue } from '@/practice/engine.js';
+import { ROUTES } from '@/core/routes.js';
 import { loadOverview } from '@/practice/overview.js';
+import { loadMistakes } from '@/services/practice-service.js';
 import { SKILLS } from '@/practice/skills.js';
 import { h } from '@/ui/h.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
@@ -9,6 +11,9 @@ import { mountPortalShell } from '@/ui/portal-shell.js';
 mountPortalShell('practice');
 const session = await guardPage({ roles: ['student'] });
 const { entries, failed } = await loadOverview(session.user.uid);
+let mistakeList = [];
+try { mistakeList = Object.values(await loadMistakes(session.user.uid)).filter((m) => m.status === 'open'); } catch (error) { console.warn('Could not load mistakes', error?.code ?? error); }
+const dueCount = dueMistakes(mistakeList).length;
 
 const bar = (percent, label) => h('div', {
   class: 'progress', role: 'progressbar', 'aria-label': label, 'aria-valuemin': 0, 'aria-valuemax': 100, 'aria-valuenow': percent, style: `--value:${percent}%`,
@@ -37,7 +42,11 @@ if (failed) {
   note.textContent = 'Some saved progress could not be loaded. You can still practise, and results are saved when the connection returns.';
 }
 
-document.getElementById('skillSections').replaceChildren(...entries.map((entry) => h('section', { class: 'card', id: `${entry.skill.id}Lessons`, 'aria-labelledby': `${entry.skill.id}Heading` },
+document.getElementById('skillSections').replaceChildren(
+  h('section', { class: 'card' }, h('p', { class: 'eyebrow' }, 'Review'), h('h2', {}, 'My mistakes'),
+    h('p', { class: 'muted' }, mistakeList.length ? `${mistakeList.length} to review · ${dueCount} due now` : 'Nothing to review yet.'),
+    h('a', { class: dueCount ? 'btn btn-primary' : 'btn', href: ROUTES.practiceMistakes }, dueCount ? 'Review mistakes' : 'View my mistakes')),
+  ...entries.map((entry) => h('section', { class: 'card', id: `${entry.skill.id}Lessons`, 'aria-labelledby': `${entry.skill.id}Heading` },
   h('p', { class: 'eyebrow' }, entry.skill.label),
   h('h2', { id: `${entry.skill.id}Heading` }, `${entry.skill.label} lessons`),
   h('ol', { class: 'lesson-list' }, ...entry.lessons.map((lesson) => {

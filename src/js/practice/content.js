@@ -9,3 +9,16 @@ export function getSkillContent(skillId) {
 }
 
 export const lessonUrl = (skillId, lessonId) => `${ROUTES.practiceLesson}?skill=${encodeURIComponent(skillId)}&id=${encodeURIComponent(lessonId)}`;
+
+let cached = null;
+/** Every question by id, with where it came from. Used by mistake review. */
+export function questionIndex() {
+  if (cached) return cached;
+  cached = {};
+  for (const [skillId, content] of Object.entries(CONTENT)) {
+    for (const lesson of content.lessons) {
+      for (const question of lesson.questions) cached[question.id] = { skillId, lessonId: lesson.id, question };
+    }
+  }
+  return cached;
+}
