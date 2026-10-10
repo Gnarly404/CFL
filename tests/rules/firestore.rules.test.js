@@ -114,6 +114,13 @@ describe('learning state', () => {
     await assertFails(getDoc(doc(as.student('stu2'), 'lessonProgress/stu1_live')));
   });
 
+  it('practice sessions are append-only and only for yourself', async () => {
+    await assertSucceeds(setDoc(doc(as.student('stu1'), 'practiceSessions/stu1_l_1'), { studentId: 'stu1', seconds: 300, date: '2026-10-10' }));
+    await assertFails(setDoc(doc(as.student('stu1'), 'practiceSessions/stu2_l_1'), { studentId: 'stu2', seconds: 300, date: '2026-10-10' }));
+    await assertFails(updateDoc(doc(as.student('stu1'), 'practiceSessions/stu1_l_1'), { seconds: 3000 }));
+    await assertFails(deleteDoc(doc(as.student('stu1'), 'practiceSessions/stu1_l_1')));
+  });
+
   it('attempts are append-only', async () => {
     await assertSucceeds(addDoc(collection(as.student('stu1'), 'questionAttempts'), { studentId: 'stu1', correct: false }));
     await assertFails(updateDoc(doc(as.student('stu1'), 'questionAttempts/att1'), { correct: false }));

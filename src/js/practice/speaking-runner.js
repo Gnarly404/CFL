@@ -9,7 +9,7 @@ const CHECKS = ['I answered the question', 'I spoke clearly and not too fast', '
 const PRIVACY = 'Your recordings stay on this device. They are not uploaded or saved, and speaking is not scored automatically.';
 
 /** Phase 1 speaking: prompt, record, play back, self-check. Completion is saved; audio never leaves the browser. */
-export async function runSpeaking({ stage, lesson, skill, uid, following }) {
+export async function runSpeaking({ stage, lesson, skill, uid, following, tracker }) {
   let progress = {};
   try { progress = await loadLessonProgress(uid, skill.id); } catch (error) { console.warn('Could not load progress', error?.code ?? error); }
 
@@ -74,6 +74,7 @@ export async function runSpeaking({ stage, lesson, skill, uid, following }) {
     try {
       const record = await saveLessonResult(uid, skill.id, lesson.id, result, progress[lesson.id]);
       progress = { ...progress, [lesson.id]: record };
+      await tracker?.complete();
       saveNote = 'Progress saved.';
     } catch (error) {
       console.warn('Could not save progress', error?.code ?? error);
@@ -114,7 +115,7 @@ export async function runSpeaking({ stage, lesson, skill, uid, following }) {
         back(), retry),
     );
     document.getElementById('again').addEventListener('click', () => {
-      step = 'prompt'; index = 0; recorded = lesson.prompts.map(() => false); checks = lesson.prompts.map(() => 0); saveNote = ''; result = null; render();
+      step = 'prompt'; index = 0; recorded = lesson.prompts.map(() => false); checks = lesson.prompts.map(() => 0); saveNote = ''; result = null; tracker?.reset(); render();
     });
     document.getElementById('retrySave')?.addEventListener('click', () => persist(result));
   }

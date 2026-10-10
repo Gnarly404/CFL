@@ -4,6 +4,7 @@ import { getSkillContent, lessonUrl, questionIndex } from '@/practice/content.js
 import { dueMistakes, scoreAttempt, updateMistake } from '@/practice/engine.js';
 import { SKILLS } from '@/practice/skills.js';
 import { loadLessonProgress, loadMistakes, saveLessonResult, saveMistakes } from '@/services/practice-service.js';
+import { startTracker } from '@/practice/session-tracker.js';
 import { runSpeaking } from '@/practice/speaking-runner.js';
 import { runWriting } from '@/practice/writing-runner.js';
 import { h } from '@/ui/h.js';
@@ -47,12 +48,13 @@ if (!lesson) {
   );
 } else {
   document.title = `${lesson.title} - CFL English Practice`;
-  if (lesson.writing) await runWriting({ stage, lesson, skill, uid: session.user.uid, following: lessons[lessonIndex + 1] });
-  else if (lesson.prompts) await runSpeaking({ stage, lesson, skill, uid: session.user.uid, following: lessons[lessonIndex + 1] });
-  else await runLesson();
+  const tracker = startTracker({ uid: session.user.uid, skill: skill.id, lessonId: lesson.id, kind: isReview ? 'review' : 'lesson' });
+  if (lesson.writing) await runWriting({ stage, lesson, skill, uid: session.user.uid, following: lessons[lessonIndex + 1], tracker });
+  else if (lesson.prompts) await runSpeaking({ stage, lesson, skill, uid: session.user.uid, following: lessons[lessonIndex + 1], tracker });
+  else await runLesson(tracker);
 }
 
-async function runLesson() {
+async function runLesson(tracker) {
   const questions = lesson.questions;
   const index = questionIndex();
   let progress = {};
@@ -166,6 +168,7 @@ async function runLesson() {
         mistakesSaved = true;
       } catch (err) { failed = true; console.warn('Could not save mistakes', err?.code ?? err); }
     }
+    if (!failed) await tracker.complete();
     saveNote = failed ? 'Your progress could not be saved.' : 'Progress saved.';
     render();
   }
@@ -208,7 +211,7 @@ async function runLesson() {
         retrySave),
     );
     document.getElementById('again').addEventListener('click', () => {
-      step = 'question'; current = 0; picked = null; checked = false; answers = []; result = null; saveNote = ''; render();
+      step = 'question'; current = 0; picked = null; checked = false; answers = []; result = null; saveNote = ''; tracker.reset(); render();
     });
     document.getElementById('retrySave')?.addEventListener('click', persist);
   }

@@ -11,6 +11,7 @@ import { loadPage, tick } from '../helpers.js';
 const save = vi.fn();
 vi.mock('@/auth/guards.js', () => ({ guardPage: vi.fn().mockResolvedValue({ user: { uid: 'u1' } }) }));
 const saveMistakes = vi.fn();
+const recordSession = vi.fn();
 const loadSubmission = vi.fn();
 const createDraft = vi.fn();
 const updateDraft = vi.fn();
@@ -21,6 +22,7 @@ vi.mock('@/services/practice-service.js', () => ({
   saveLessonResult: (...args) => save(...args),
   loadMistakes: (...args) => loadMistakes(...args),
   saveMistakes: (...args) => saveMistakes(...args),
+  recordSession: (...args) => recordSession(...args),
   loadSubmission: (...args) => loadSubmission(...args),
   createDraft: (...args) => createDraft(...args),
   updateDraft: (...args) => updateDraft(...args),
@@ -48,6 +50,7 @@ async function answer(optionIndex) {
 describe('practice lesson page', () => {
   beforeEach(() => {
     saveMistakes.mockReset().mockResolvedValue();
+    recordSession.mockReset().mockResolvedValue();
     loadSubmission.mockReset().mockResolvedValue(null);
     createDraft.mockReset().mockResolvedValue();
     updateDraft.mockReset().mockResolvedValue();
@@ -323,6 +326,40 @@ describe('practice lesson page', () => {
       await open(`?skill=writing&id=${lessonW.id}`);
       expect(stageText()).toContain('editing is turned off');
       expect(document.getElementById('writingText')).toBeNull();
+    });
+  });
+
+  describe('practice sessions for daily goals', () => {
+    async function finishGrammar() {
+      await open(`?skill=grammar&id=${lesson.id}`);
+      click('#startBtn');
+      for (const q of lesson.questions) {
+        await answer(q.answer);
+        document.querySelector('form').dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+        await tick();
+      }
+    }
+
+    it('records one session when a lesson is saved', async () => {
+      await finishGrammar();
+      expect(recordSession).toHaveBeenCalledTimes(1);
+      const [uid, data] = recordSession.mock.calls[0];
+      expect(uid).toBe('u1');
+      expect(data).toMatchObject({ skill: 'grammar', lessonId: lesson.id, kind: 'lesson' });
+      expect(data.seconds).toBeGreaterThanOrEqual(5);
+      expect(data.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    });
+
+    it('does not record a session when the lesson could not be saved', async () => {
+      save.mockRejectedValue(new Error('offline'));
+      await finishGrammar();
+      expect(recordSession).not.toHaveBeenCalled();
+    });
+
+    it('still shows results when recording the session fails', async () => {
+      recordSession.mockRejectedValue(new Error('offline'));
+      await finishGrammar();
+      expect(stageText()).toContain('Progress saved.');
     });
   });
 });

@@ -143,8 +143,17 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 - If saved writing cannot be loaded, editing is turned off so a draft is never overwritten.
 - 25 test files, 258 tests pass. The Firestore rules tests (which cover submissions) still have not been run.
 
+### Daily goals, recommendations and streaks (seventh slice)
+
+- Every finished lesson, review and speaking or writing task writes one `practiceSessions/{uid}_{lessonId}_{time}` record (skill, kind, seconds, local date). Seconds are measured from opening the page and capped at 20 minutes so an idle tab cannot fake study time. The rules now make sessions append-only. A student's browser can still write any number, so this is a motivation tool, never an assessment or attendance record.
+- Today card (hub and dashboard): minutes against the goal, per-skill minutes, one Start goal link, streak, recommendations with the reason shown, badges. Goal choice is stored in the browser (`cfl.goalMinutes.<uid>`), so it does not follow the student between devices; moving it to `students/{uid}.preferences` is a small later change.
+- Recommendations (`js/practice/goals.js`): mistakes due, a skill at least 10 points below the overall average (only scored lessons, needs two scored skills), resume the skill practised last, or the first lesson. Milestone recommendations need a unit structure that does not exist yet.
+- Streak: consecutive local days with a session; today not yet practised does not reset it. Badges are computed from the last 90 days of sessions, not stored.
+- New index `practiceSessions (studentId, date)`: deploy with `firebase deploy --only firestore:indexes` before this goes live, otherwise the Today card shows its load-failed note.
+- 27 test files; full suite passes locally in this environment. Rules tests (including the new session rule) still not run.
+
 ### Next up
 1. Run `npm run test:rules` and fix any rules bug (the lessonProgress rules are now used for real).
-2. Daily goals and recommendations, flashcard mode, then the instructor tools (teacher review for Writing and Speaking).
+2. Flashcard mode, then the instructor tools (teacher review for Writing and Speaking).
 3. Mistake review page and daily goal; weak-area recommendations.
 4. Remaining session 2 items (self-hosted fonts and icons, CSP, shared public header and footer).

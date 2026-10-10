@@ -10,7 +10,7 @@ const AUTOSAVE_MS = 2000;
  * Writing practice. Drafts are saved separately from submitted work; once submitted the text can no longer be
  * changed, and nothing here ever rewrites what the student wrote.
  */
-export async function runWriting({ stage, lesson, skill, uid, following }) {
+export async function runWriting({ stage, lesson, skill, uid, following, tracker }) {
   const cfg = lesson.writing;
   const show = (...nodes) => { stage.replaceChildren(...nodes); document.getElementById('stageHeading')?.focus(); };
   const back = () => h('a', { class: 'btn', href: ROUTES.practice }, 'Back to English Practice');
@@ -138,6 +138,7 @@ export async function runWriting({ stage, lesson, skill, uid, following }) {
       console.warn('Could not save progress', error?.code ?? error);
       note = 'Submitted. Your lesson progress could not be updated; it will update next time.';
     }
+    await tracker?.complete();
     renderSubmitted({ content: text }, note);
   }
 

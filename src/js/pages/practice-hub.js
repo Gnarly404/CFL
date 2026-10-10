@@ -3,6 +3,7 @@ import { lessonUrl } from '@/practice/content.js';
 import { dueMistakes, lessonStatus, pickContinue } from '@/practice/engine.js';
 import { ROUTES } from '@/core/routes.js';
 import { loadOverview } from '@/practice/overview.js';
+import { mountToday } from '@/practice/today.js';
 import { loadMistakes } from '@/services/practice-service.js';
 import { SKILLS } from '@/practice/skills.js';
 import { h } from '@/ui/h.js';
@@ -35,6 +36,8 @@ document.getElementById('skillGrid').replaceChildren(...SKILLS.map((skill) => {
       h('small', {}, `${entry.percent}% complete · ${entry.done} of ${entry.lessons.length} lessons`), bar(entry.percent, `${skill.label} progress`))
     : h('div', { class: 'skill', 'aria-disabled': 'true' }, skill.label, h('small', {}, 'Coming soon'));
 }));
+
+await mountToday(document.getElementById('todayCard'), { uid: session.user.uid, entries, mistakes: mistakeList });
 
 if (failed) {
   const note = document.getElementById('hubNote');

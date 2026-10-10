@@ -66,3 +66,23 @@ export async function updateDraft(uid, promptId, content) {
 export async function submitDraft(uid, promptId, content) {
   await updateDoc(submissionRef(uid, promptId), { content, status: 'submitted', submittedAt: serverTimestamp(), updatedAt: serverTimestamp() });
 }
+
+/** One finished practice session. Written once and never changed, so daily totals and streaks come from real activity. */
+export async function recordSession(uid, { skill, lessonId, kind, seconds, date }) {
+  await setDoc(doc(dbService(), 'practiceSessions', `${uid}_${lessonId}_${Date.now()}`), {
+    studentId: uid, skill, lessonId, kind, seconds, date, createdAt: serverTimestamp(),
+  });
+}
+
+/** Sessions on or after a YYYY-MM-DD day. Needs the studentId + date index. */
+export async function loadSessions(uid, sinceDate) {
+  const snap = await getDocs(query(
+    collection(dbService(), 'practiceSessions'),
+    where('studentId', '==', uid),
+    where('date', '>=', sinceDate),
+  ));
+  return snap.docs.map((entry) => {
+    const data = entry.data();
+    return { ...data, createdAtMs: data.createdAt?.toMillis?.() ?? Date.parse(`${data.date}T12:00:00`) };
+  });
+}

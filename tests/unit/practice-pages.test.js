@@ -5,10 +5,12 @@ import { loadPage, tick } from '../helpers.js';
 
 const loadMistakes = vi.fn();
 const loadLessonProgress = vi.fn();
+const loadSessions = vi.fn();
 vi.mock('@/auth/guards.js', () => ({ guardPage: vi.fn().mockResolvedValue({ user: { uid: 'u1' } }) }));
 vi.mock('@/services/practice-service.js', () => ({
   loadLessonProgress: (...args) => loadLessonProgress(...args),
   loadMistakes: (...args) => loadMistakes(...args),
+  loadSessions: (...args) => loadSessions(...args),
 }));
 
 const text = (id) => document.getElementById(id).textContent;
@@ -24,6 +26,8 @@ describe('practice hub page', () => {
   beforeEach(() => {
     loadMistakes.mockReset().mockResolvedValue({});
     loadLessonProgress.mockReset().mockResolvedValue({});
+    loadSessions.mockReset().mockResolvedValue([]);
+    window.localStorage.clear();
   });
 
   it('offers the first lesson, lists skills and shows live and coming-soon skills', async () => {
@@ -48,6 +52,43 @@ describe('practice hub page', () => {
     await open('student/practice/index.html', '@/pages/practice-hub.js');
     expect(document.getElementById('hubNote').hidden).toBe(false);
     expect(text('hubContinueTitle')).toBe(grammar.lessons[0].title);
+  });
+});
+
+describe('today card on the hub', () => {
+  const todayKey = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+  beforeEach(() => {
+    loadMistakes.mockReset().mockResolvedValue({});
+    loadLessonProgress.mockReset().mockResolvedValue({});
+    loadSessions.mockReset();
+    window.localStorage.clear();
+  });
+
+  it('shows minutes done against the goal, per-skill time, a streak and a Start goal link', async () => {
+    loadSessions.mockResolvedValue([{ skill: 'grammar', lessonId: 'grammar-be', seconds: 600, date: todayKey(), createdAtMs: Date.now() }]);
+    await open('student/practice/index.html', '@/pages/practice-hub.js');
+    const card = text('todayCard');
+    expect(card).toContain('10 of 20 minutes');
+    expect(card).toContain('Grammar · 10 min');
+    expect(card).toContain('Streak: 1 day');
+    expect(card).toContain('First lesson');
+    expect(document.querySelector('#todayCard .btn-primary').textContent).toBe('Start goal');
+    expect(document.querySelector('#todayCard [role="progressbar"]').getAttribute('aria-valuenow')).toBe('50');
+  });
+
+  it('changes and remembers the daily goal', async () => {
+    loadSessions.mockResolvedValue([]);
+    await open('student/practice/index.html', '@/pages/practice-hub.js');
+    expect(text('todayCard')).toContain('0 of 20 minutes');
+    document.getElementById('goal-30').click();
+    expect(text('todayCard')).toContain('0 of 30 minutes');
+    expect(window.localStorage.getItem('cfl.goalMinutes.u1')).toBe('30');
+  });
+
+  it('says the numbers may be low when sessions cannot be loaded', async () => {
+    loadSessions.mockRejectedValue(new Error('offline'));
+    await open('student/practice/index.html', '@/pages/practice-hub.js');
+    expect(text('todayCard')).toContain('could not be loaded');
   });
 });
 
