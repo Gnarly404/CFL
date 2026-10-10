@@ -173,7 +173,7 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 3. Content management (lessons are JSON in the repo today), an instructor view of student progress, speaking review (needs an audio upload path, rules and consent wording).
 4. A shared public header and footer, and switching the CSP from Report-Only to enforcing after a signed-in check (see "Content-Security-Policy" below). Self-hosted fonts and the icon family are done.
 
-> Correction: an earlier note said there was no admin tool to assign instructors to students. There is: the admin console has a "Teaching assignments" section backed by the `adminAssignInstructor` Cloud Function, which audits every change.
+> Teaching assignments: the admin console has a "Teaching assignments" section (`src/js/admin/assignments.js`) backed by the `adminAssignInstructor` Cloud Function, which audits every change. It was added to the repository in the commit after the redesign merge; an earlier note claiming it already existed was wrong, because the code had been sitting uncommitted in a working copy.
 
 ## Motion, page transitions and voice (added after session 2)
 

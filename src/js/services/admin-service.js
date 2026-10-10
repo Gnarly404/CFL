@@ -32,4 +32,10 @@ export const decideApplication = ({ applicationId, decision, note = '' }) => cal
 export const createUser = ({ email, displayName, role }) => call('adminCreateUser', { email, displayName, role });
 export const setUserDisabled = ({ uid, disabled }) => call('adminSetUserStatus', { uid, disabled });
 export const setUserRole = ({ uid, role }) => call('adminSetUserRole', { uid, role });
+export const assignInstructor = ({ studentId, instructorId, assigned }) => call('adminAssignInstructor', { studentId, instructorId, assigned });
 export const resendInvite = ({ uid }) => call('adminResendInvite', { uid });
+
+/** Student records (admins can read them all): uid, instructorIds. Names and emails come from the user list. */
+export async function listStudents({ max = 500 } = {}) {
+  return rowsFromSnapshot(await getDocs(query(collection(dbService(), 'students'), limit(max)))).map(({ id, instructorIds }) => ({ uid: id, instructorIds: instructorIds ?? [] }));
+}
