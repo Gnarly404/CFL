@@ -86,3 +86,5 @@ a.skill:hover .skill-cta svg{transform:translateX(3px)}
 
 /* Daily-goal radios use the brand colour */
 .goal-opt input{accent-color:var(--navy)}
+
+#enrolments{margin:0;padding-left:1.1rem}

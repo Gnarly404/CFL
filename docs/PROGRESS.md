@@ -163,7 +163,7 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 1. Run `npm run test:rules` and fix any rules bug (the lessonProgress rules are now used for real).
 2. The instructor tools (teacher review for Writing and Speaking).
 3. Mistake review page and daily goal; weak-area recommendations.
-4. Remaining session 2 items: CSP and a shared public header and footer. (Self-hosted fonts and the icon family are done; see "Motion, page transitions and voice" below.)
+4. Remaining session 2 items: a shared public header and footer, and switching the CSP from Report-Only to enforcing after a signed-in check (see "Content-Security-Policy" below). Self-hosted fonts and the icon family are done.
 
 ## Motion, page transitions and voice (added after session 2)
 
@@ -189,3 +189,10 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 - Colour: white on the brand coral `#FF6F61` is 2.7:1, so anything that carries text now uses `--coral-strong` `#C8402F` (4.96:1 with white; hover `#B3321F`). Legacy `--color-accent` was redefined to the same value. The vivid coral stays for decoration only (veil, sound waves).
 - Fixed along the way: the gallery's "Explore Programs" was a button next to an empty link and did nothing (now a real link); programme buttons' accessible names now contain their visible text; voice buttons rely on their visible label; the footer bottom bar rendered light grey under white text (now solid navy).
 - Lesson flow (learn, practice, answer feedback, results, Listening player with Piper clips) was run in a browser through the same harness with no errors.
+
+### Content-Security-Policy
+
+- `firebase.json` now sends a `Content-Security-Policy-Report-Only` header (default-src, script-src and style-src `'self'`, no inline allowed; Google APIs, Cloud Functions, EmailJS and the Google Maps frame allowed; frames and plugins blocked).
+- Enforced in a browser (a local server sending the same header as a blocking policy) it produced **0 violations** on all public pages and, through the fake-data harness, the dashboard, hub, flashcards, mistakes, a full lesson with results voice, and the Listening player playing a Piper MP3. A negative control proved the detector blocks inline scripts, inline style attributes and foreign hosts.
+- To make that possible: the homepage's inline script (a `/CFL/` GitHub Pages path rewrite that does nothing on Firebase) was removed, the dashboard's one `style=` moved into `portal.css`, and `h()` now applies styles through the CSSOM. Tests keep pages free of inline script, style and handlers.
+- **Why it is Report-Only:** I could not exercise real Firebase sign-in, Firestore or Functions traffic or the contact form's EmailJS call. After deploying, sign in, run a lesson and send a contact message with the browser console open; if no "[Report Only] Refused to..." lines appear, change the header key to `Content-Security-Policy` in `firebase.json` to enforce it.
