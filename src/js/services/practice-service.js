@@ -102,3 +102,13 @@ export async function loadWordProgress(uid) {
 export async function saveWordProgress(uid, words) {
   await setDoc(wordsRef(uid), { studentId: uid, skill: 'vocabulary', kind: 'vocabulary-words', words, updatedAt: serverTimestamp() });
 }
+
+/** Teacher feedback on one of the student's submissions, or null. */
+export async function loadFeedback(uid, submissionId) {
+  const snap = await getDocs(query(
+    collection(dbService(), 'feedback'),
+    where('studentId', '==', uid),
+    where('submissionId', '==', submissionId),
+  ));
+  return snap.empty ? null : snap.docs[0].data();
+}

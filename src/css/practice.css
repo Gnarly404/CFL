@@ -58,3 +58,12 @@
 .badge-list .badge{padding:4px 12px}
 .flashcard{padding:var(--s6) var(--s4);margin:0 0 var(--s4);text-align:center;border:1px solid var(--line);border-radius:var(--radius);background:#f3f8fc}
 .flashcard h1{margin:0 0 var(--s3);font:700 2rem var(--font-head);color:var(--navy);outline:none}
+mark{background:#fff2a8;padding:0 2px;border-radius:3px}
+mark sup{font-weight:700;margin-left:2px}
+.note-row{border:1px solid var(--line);border-radius:12px;padding:var(--s4);margin:0 0 var(--s4)}
+.note-row legend{font:600 .95rem var(--font-head);color:var(--navy);padding:0 var(--s2)}
+.note-row label{display:block;margin:var(--s3) 0 var(--s1);font-size:.9rem;color:var(--muted)}
+.writing-line{width:100%;box-sizing:border-box;padding:var(--s3);border:1px solid var(--line);border-radius:10px;font:inherit}
+.note-row .btn{margin-top:var(--s3)}
+.teacher-feedback{margin:0 0 var(--s4)}
+.teacher-feedback ol{margin:var(--s3) 0 0;padding-left:1.2rem}

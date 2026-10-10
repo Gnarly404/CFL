@@ -141,6 +141,41 @@ describe('learning state', () => {
   });
 });
 
+describe('teacher review of writing', () => {
+  const fb = { studentId: 'stu1', submissionId: 's2', instructorId: 'ins1', overall: 'Good start.', notes: [] };
+
+  it('the assigned instructor reads submitted work but not drafts, and an unassigned one reads nothing', async () => {
+    await assertSucceeds(getDoc(doc(as.instructor('ins1'), 'submissions/s2')));
+    await assertFails(getDoc(doc(as.instructor('ins1'), 'submissions/s1')));
+    await assertFails(getDoc(doc(as.instructor('ins2'), 'submissions/s2')));
+    await assertSucceeds(getDocs(query(collection(as.instructor('ins1'), 'submissions'), where('studentId', '==', 'stu1'), where('status', '==', 'submitted'))));
+    await assertFails(getDocs(query(collection(as.instructor('ins2'), 'submissions'), where('studentId', '==', 'stu1'), where('status', '==', 'submitted'))));
+  });
+
+  it('instructors can never change a submission', async () => {
+    await assertFails(updateDoc(doc(as.instructor('ins1'), 'submissions/s2'), { content: 'edited' }));
+  });
+
+  it('the assigned instructor creates and edits feedback on a submitted piece only', async () => {
+    await assertSucceeds(setDoc(doc(as.instructor('ins1'), 'feedback/s2'), fb));
+    await assertSucceeds(updateDoc(doc(as.instructor('ins1'), 'feedback/s2'), { overall: 'Better.' }));
+    await assertFails(updateDoc(doc(as.instructor('ins1'), 'feedback/s2'), { studentId: 'stu2' }));
+    await assertFails(setDoc(doc(as.instructor('ins1'), 'feedback/s1'), { ...fb, submissionId: 's1' }));
+    await assertFails(setDoc(doc(as.instructor('ins2'), 'feedback/s2'), { ...fb, instructorId: 'ins2' }));
+    await assertFails(setDoc(doc(as.instructor('ins1'), 'feedback/s2'), { ...fb, instructorId: 'ins9' }));
+    await assertFails(deleteDoc(doc(as.instructor('ins1'), 'feedback/s2')));
+  });
+
+  it('the student reads their own feedback; others and the student cannot write it', async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => { await setDoc(doc(ctx.firestore(), 'feedback/s2'), fb); });
+    await assertSucceeds(getDoc(doc(as.student('stu1'), 'feedback/s2')));
+    await assertSucceeds(getDocs(query(collection(as.student('stu1'), 'feedback'), where('studentId', '==', 'stu1'), where('submissionId', '==', 's2'))));
+    await assertFails(getDoc(doc(as.student('stu2'), 'feedback/s2')));
+    await assertFails(updateDoc(doc(as.student('stu1'), 'feedback/s2'), { overall: 'Perfect!' }));
+    await assertSucceeds(getDocs(query(collection(as.instructor('ins1'), 'feedback'), where('instructorId', '==', 'ins1'))));
+  });
+});
+
 describe('messages, notifications and money', () => {
   it('only the two participants read a message; the recipient can mark it read; nobody creates one yet', async () => {
     await assertSucceeds(getDoc(doc(as.student('stu1'), 'messages/m1')));

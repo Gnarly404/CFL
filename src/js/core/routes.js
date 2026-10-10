@@ -14,6 +14,8 @@ export const ROUTES = Object.freeze({
   practiceMistakes: '/student/practice/mistakes',
   practiceFlashcards: '/student/practice/flashcards',
   instructor: '/instructor/dashboard',
+  instructorReview: '/instructor/review',
+  instructorReviewSubmission: '/instructor/review/submission',
   admin: '/admin/dashboard',
 });
 

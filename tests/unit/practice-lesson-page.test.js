@@ -11,6 +11,7 @@ import { loadPage, tick } from '../helpers.js';
 const save = vi.fn();
 vi.mock('@/auth/guards.js', () => ({ guardPage: vi.fn().mockResolvedValue({ user: { uid: 'u1' } }) }));
 const saveMistakes = vi.fn();
+const loadFeedback = vi.fn();
 const recordSession = vi.fn();
 const loadSubmission = vi.fn();
 const createDraft = vi.fn();
@@ -22,6 +23,7 @@ vi.mock('@/services/practice-service.js', () => ({
   saveLessonResult: (...args) => save(...args),
   loadMistakes: (...args) => loadMistakes(...args),
   saveMistakes: (...args) => saveMistakes(...args),
+  loadFeedback: (...args) => loadFeedback(...args),
   recordSession: (...args) => recordSession(...args),
   loadSubmission: (...args) => loadSubmission(...args),
   createDraft: (...args) => createDraft(...args),
@@ -50,6 +52,7 @@ async function answer(optionIndex) {
 describe('practice lesson page', () => {
   beforeEach(() => {
     saveMistakes.mockReset().mockResolvedValue();
+    loadFeedback.mockReset().mockResolvedValue(null);
     recordSession.mockReset().mockResolvedValue();
     loadSubmission.mockReset().mockResolvedValue(null);
     createDraft.mockReset().mockResolvedValue();
@@ -310,6 +313,29 @@ describe('practice lesson page', () => {
       expect(document.getElementById('writingText')).toBeNull();
       expect(stageText()).toContain('Dear Anna, i like lunch.');
       expect(stageText()).toContain('Write the word "I" with a capital letter.');
+    });
+
+    it('shows teacher feedback beside the unchanged text, marking quoted words', async () => {
+      loadSubmission.mockResolvedValue({ status: 'submitted', content: 'I like my town. It is big.' });
+      loadFeedback.mockResolvedValue({ overall: 'Clear and friendly.', notes: [{ quote: 'It is big', note: 'Say what makes it big.' }] });
+      await open(`?skill=writing&id=${lessonW.id}`);
+      expect(loadFeedback).toHaveBeenCalledWith('u1', `u1_${cfg.promptId}`);
+      expect(stageText()).toContain('Teacher feedback');
+      expect(stageText()).toContain('Clear and friendly.');
+      expect(stageText()).toContain('Say what makes it big.');
+      expect(document.querySelector('.submitted-text').textContent).toBe('I like my town. It is big1.');
+      expect(document.querySelector('.submitted-text mark').textContent).toBe('It is big1');
+      expect(stageText()).not.toContain('No teacher feedback yet');
+    });
+
+    it('says there is no feedback yet, and copes if feedback cannot be loaded', async () => {
+      loadSubmission.mockResolvedValue({ status: 'submitted', content: 'Hello.' });
+      await open(`?skill=writing&id=${lessonW.id}`);
+      expect(stageText()).toContain('No teacher feedback yet');
+      loadFeedback.mockRejectedValue(new Error('offline'));
+      await open(`?skill=writing&id=${lessonW.id}`);
+      expect(stageText()).toContain('Teacher feedback could not be loaded');
+      expect(stageText()).toContain('Hello.');
     });
 
     it('keeps the text and says so when a save fails', async () => {
