@@ -148,3 +148,20 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 2. Daily goals and recommendations, flashcard mode, then the instructor tools (teacher review for Writing and Speaking).
 3. Mistake review page and daily goal; weak-area recommendations.
 4. Remaining session 2 items (self-hosted fonts and icons, CSP, shared public header and footer).
+
+## Motion, page transitions and voice (added after session 2)
+
+- Motion engine in `src/js/motion/` (Motion v14, vanilla API): page veil transition, reveal, stagger, hero headline split, parallax, progress and count-up, nav glide, brochure tilt. One `<script type="module" src="/js/motion/boot.js">` per page; markup opts in with `data-reveal*`, `data-parallax`, `data-count`, `data-tilt`. Details in MOTION-AND-VOICE.md.
+- Voice: `scripts/build-voice.py` (Piper, ffmpeg) renders every spoken line to `public/audio/voice/`; `js/ui/voice.js` plays them; `js/ui/speech.js` falls back to browser speech. Buttons on the homepage, dashboard and practice hub use `data-voice-line`.
+- Self-hosted fonts, SVG icon family, shared skill card, hero rebuilt.
+- Checked: lint, build, routes, 280 tests; real Chromium on every public page, reduced motion, back button after a transition, voice playback; portal dashboard through a harness (desktop, phone, nav glide).
+- Not checked: a signed-in run of the portal pages, real devices and Safari, the sound of the voice by ear. The bundled Piper test voice is 16 kHz US English; swap in a better voice with `python scripts/build-voice.py --model <voice>.onnx --force`.
+
+### Follow-up round
+
+- Sign-in page rebuilt (brand panel, SVG password eye instead of emoji); activate, 404 and the instructor stub inherit the refreshed card.
+- Three different Bootstrap CDN copies and two Font Awesome copies are gone: Programmes uses neither, the gallery and admin console use one self-hosted Bootstrap (imported at the top of their own CSS so their rules win). Admin cards no longer lift on hover.
+- Lesson results have an opt-in "Hear feedback" button (lines in `src/data/voice-lines.json`).
+- `window.cflNavigate` lets script-driven redirects (after sign-in or sign-out) use the exit animation.
+- Fixed dead nav anchors: homepage `#contacts` now has a target; "Intakes" links to the Programmes page (there is no separate intakes section).
+- Still open and needs owner input: 4 social-media URLs and Privacy/Terms pages (the 12 `href="#"` placeholders), a strict Content-Security-Policy, a signed-in click-through of the portal, Safari and device testing.

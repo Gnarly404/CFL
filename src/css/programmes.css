@@ -5,9 +5,9 @@
     --color-blue: #56CCF2;
     --color-white: #FFFFFF;
     --color-gray: #666666;
-    --font-lato: 'Lato', sans-serif;
-    --font-poppins: 'Poppins', sans-serif;
-    --font-montserrat: 'Montserrat', sans-serif;
+    --font-lato: var(--font-ui);
+    --font-poppins: var(--font-display);
+    --font-montserrat: var(--font-display);
     --transition-speed: 0.3s;
     --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -206,11 +206,7 @@ body {
 }
 
 .gradient-text {
-    background: linear-gradient(90deg, var(--color-blue), var(--color-yellow));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-decoration: none;
+    color: var(--navy, #1e3a5f);
 }
 
 .nav-links {

@@ -16,7 +16,7 @@ body {
     align-items: center;
     min-height: 100vh;
     margin: 0;
-    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: var(--font-ui);
 }
 
 .login-container {

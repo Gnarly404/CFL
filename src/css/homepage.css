@@ -6,9 +6,9 @@
   --color-blue: #56CCF2;
   --color-white: #FFFFFF;
   --color-gray: #666666;
-  --font-lato: 'Lato', sans-serif;
-  --font-poppins: 'Poppins', sans-serif;
-  --font-montserrat: 'Montserrat', sans-serif;
+  --font-lato: var(--font-ui);
+  --font-poppins: var(--font-display);
+  --font-montserrat: var(--font-display);
   --transition-speed: 0.3s;
 }
 
@@ -71,11 +71,7 @@ body {
 }
 
 .gradient-text {
-  background: linear-gradient(90deg, var(--color-blue), var(--color-yellow));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-decoration: none;
+  color: var(--color-primary);
 }
 
 .nav-links {
@@ -123,88 +119,94 @@ body {
   animation: pulse 1s infinite;
 }
 
-/* Hero Section */
+/* Hero Section: one photograph, one headline, one action. Text sits on an ink gradient, not a card. */
 .hero {
-  min-height: 100vh;
-  background-image: url('/images/background.png');
-  background-size: cover;
-  background-position: center;
+  min-height: calc(100vh - 86px);
+  min-height: calc(100svh - 86px); /* the navbar is 86px tall */
   position: relative;
-  padding: 90px 0;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
+  padding: 120px 0 clamp(48px, 9vh, 96px);
+  background: var(--ink);
+}
+
+.hero-photo {
+  background-image: url('/images/background.png');
 }
 
 .hero::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(30, 58, 95, 0.7);
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(90deg, rgba(15, 37, 64, 0.92) 0%, rgba(15, 37, 64, 0.7) 45%, rgba(15, 37, 64, 0.15) 100%),
+    linear-gradient(0deg, rgba(15, 37, 64, 0.65) 0%, rgba(15, 37, 64, 0) 45%);
 }
 
 .hero-content-wrapper {
   position: relative;
+  z-index: 1;
   width: 100%;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 0 5%;
+  padding: 0 clamp(20px, 6vw, 96px);
 }
 
 .hero-content {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  padding: 2rem 2rem;
-  border-radius: 20px;
-  max-width: 50%;
+  max-width: 46rem;
   color: var(--color-white);
-  transform: translateY(0);
-  transition: transform 0.3s ease;
-}
-
-.hero-content:hover {
-  transform: translateY(-10px);
 }
 
 .hero-title {
-  font-size: 2.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.9rem, 7.4vw, 6.2rem);
   font-weight: 700;
-  margin-bottom: 1rem;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.4rem;
 }
 
 .hero-subtitle {
-  font-size: 1.8rem;
-  margin-bottom: 1.5rem;
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  font-weight: 600;
+  color: var(--sky);
+  margin-bottom: 1rem;
 }
 
 .hero-text {
   font-size: 1.1rem;
-  margin-bottom: 2rem;
+  line-height: 1.65;
+  max-width: 38rem;
+  color: rgba(255, 255, 255, 0.86);
+  margin-bottom: 2.2rem;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
 }
 
 .explore-btn {
-  display: inline-block;
-  padding: 1rem 2rem;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--color-accent);
-  background: var(--color-white);
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 28px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--coral);
+  text-decoration: none;
+  border-radius: 999px;
+  transition: transform 180ms var(--ease-out), background 180ms var(--ease-out);
 }
 
 .explore-btn:hover {
-  background: var(--color-accent);
-  color: var(--color-white);
+  background: #ff5a4a;
   transform: translateY(-3px);
 }
+
+.explore-btn:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }
 
 /* Features Section */
 .features {
@@ -574,9 +576,6 @@ body {
 }
 
 @media screen and (max-width: 992px) {
-  .hero-content {
-    max-width: 70%;
-  }
 
   .features-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -611,18 +610,8 @@ body {
     flex-wrap: wrap;
   }
 
-  .hero-content {
-    max-width: 90%;
-    padding: 1.5rem;
-  }
 
-  .hero-title {
-    font-size: 2rem;
-  }
 
-  .hero-subtitle {
-    font-size: 1.5rem;
-  }
 
   .features-grid {
     grid-template-columns: 1fr;
@@ -646,18 +635,8 @@ body {
 }
 
 @media screen and (max-width: 480px) {
-  .hero-content {
-    max-width: 95%;
-    padding: 1rem;
-  }
 
-  .hero-title {
-    font-size: 1.8rem;
-  }
 
-  .hero-subtitle {
-    font-size: 1.3rem;
-  }
 
   .feature-card {
     min-height: 300px;

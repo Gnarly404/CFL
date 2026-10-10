@@ -5,9 +5,9 @@
   --color-blue: #56CCF2;
   --color-white: #FFFFFF;
   --color-gray: #666666;
-  --font-lato: 'Lato', sans-serif;
-  --font-poppins: 'Poppins', sans-serif;
-  --font-montserrat: 'Montserrat', sans-serif;
+  --font-lato: var(--font-ui);
+  --font-poppins: var(--font-display);
+  --font-montserrat: var(--font-display);
   --transition-speed: 0.3s;
 }
 

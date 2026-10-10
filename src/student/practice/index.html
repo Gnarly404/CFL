@@ -1,30 +1,34 @@
 <!DOCTYPE html>
-<html lang="en" data-auth="pending">
+<html lang="en" data-auth="pending" data-veil="on">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>English Practice - CFL</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/foundation.css">
+<link rel="stylesheet" href="/css/fonts.css">
+<link rel="stylesheet" href="/css/motion.css">
 <link rel="stylesheet" href="/css/tokens.css">
 <link rel="stylesheet" href="/css/components.css">
 <link rel="stylesheet" href="/css/portal.css">
 <link rel="stylesheet" href="/css/practice.css">
 <link rel="icon" type="image/png" href="/images/logo.png">
 <script type="module" src="/js/pages/practice-hub.js"></script>
+<script type="module" src="/js/motion/boot.js"></script>
 </head>
 <body class="portal">
 <div class="portal-shell">
   <aside class="portal-side" id="portalSide"></aside>
   <main class="portal-main">
-    <header class="portal-head">
+    <header class="portal-head" data-reveal="fade">
       <h1>English Practice</h1>
       <p class="muted">Improve your English one skill at a time.</p>
+      <button type="button" class="voice-chip voice-chip--quiet" data-voice-line="hub.intro" aria-pressed="false" aria-label="Hear how practice works">
+        <span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+        <span>Hear the intro</span>
+      </button>
     </header>
     <p id="hubNote" class="form-note" role="alert" hidden></p>
-    <div class="stack">
+    <div class="stack" data-reveal-group>
       <section class="card continue" aria-labelledby="hubContinueTitle">
         <p class="eyebrow">Continue learning</p>
         <h2 id="hubContinueTitle">Loading…</h2>
@@ -34,9 +38,9 @@
       <section class="card" aria-labelledby="skillsTitle">
         <p class="eyebrow">Practice skills</p>
         <h2 id="skillsTitle">Choose a skill</h2>
-        <div id="skillGrid" class="skill-grid"></div>
+        <div id="skillGrid" class="skill-grid" data-reveal-group></div>
       </section>
-      <div id="skillSections" class="stack"></div>
+      <div id="skillSections" class="stack" data-reveal-group></div>
     </div>
   </main>
 </div>

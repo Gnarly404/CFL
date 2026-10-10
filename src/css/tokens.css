@@ -1,10 +1,20 @@
 :root{
+  /* Brand */
   --navy:#1E3A5F;--coral:#FF6F61;--blue:#56CCF2;--yellow:#F4C430;
-  --bg:#F5F7FA;--surface:#fff;--text:#24323F;--muted:#5b6b7a;--line:#e3e9f0;
-  --font-head:'Poppins',system-ui,sans-serif;--font-body:'Lato',system-ui,sans-serif;
-  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:72px;
-  --radius:16px;--shadow:0 1px 3px rgba(30,58,95,.08);
+  --ink:#0F2540;--sky:#56CCF2;--sun:#F4C430;
+  /* Surfaces and text */
+  --bg:#F5F7FA;--surface:#fff;--text:#24323F;--muted:#566677;--line:#e3e9f0;
+  /* Type: display for headings, UI face for everything else (fonts.css) */
+  --font-head:var(--font-display,'Segoe UI',system-ui,sans-serif);
+  --font-body:var(--font-ui,'Segoe UI',system-ui,sans-serif);
+  /* Spacing (spec 22.2) */
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:72px;--s9:96px;--s10:128px;
+  /* One radius scale and quiet surfaces: border first, shadow second */
+  --radius-sm:10px;--radius:16px;--radius-lg:24px;
+  --shadow:0 1px 2px rgba(15,37,64,.05),0 8px 24px -12px rgba(15,37,64,.12);
+  /* Motion (spec 23.2): micro 120 to 220ms, reveal 12 to 32px once, progress slow */
   --t-fast:150ms;--t-card:220ms;--t-progress:700ms;
+  --ease-out:cubic-bezier(.22,1,.36,1);
   --focus:0 0 0 3px rgba(86,204,242,.8);
 }
 @media (prefers-reduced-motion:reduce){

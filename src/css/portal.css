@@ -29,3 +29,57 @@ body.portal{margin:0;background:var(--bg);color:var(--text);font-family:var(--fo
   .portal-bottom [aria-current="page"]{color:var(--coral)}
   .portal-bottom [aria-disabled="true"]{opacity:.5}
 }
+
+/* ---------- Experience layer: calmer type, icon skill cards, quiet motion ---------- */
+.portal-head h1{font:700 clamp(1.7rem,3.2vw,2.3rem)/1.1 var(--font-head);letter-spacing:-.02em}
+.portal-nav a{font-weight:600}
+.eyebrow{font:600 .85rem var(--font-body);letter-spacing:0;text-transform:none}
+.card{transition:border-color var(--t-card) var(--ease-out)}
+.continue{background:linear-gradient(135deg,var(--ink),var(--navy));border-color:transparent;color:#fff}
+.continue .eyebrow,.continue .muted{color:rgba(255,255,255,.78)}
+.continue h2{color:#fff;font:700 clamp(1.4rem,2.6vw,1.9rem)/1.15 var(--font-head);letter-spacing:-.01em}
+.continue .btn-primary{border-color:var(--coral)}
+
+.skill-grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr))}
+.skill{position:relative;grid-template-columns:auto 1fr;align-items:start;column-gap:var(--s3);row-gap:var(--s3);padding:var(--s4) var(--s4) var(--s4);border-radius:var(--radius);color:var(--navy);transition:transform var(--t-card) var(--ease-out),border-color var(--t-card) var(--ease-out),box-shadow var(--t-card) var(--ease-out)}
+a.skill:hover{transform:translateY(-3px);border-color:var(--navy);box-shadow:var(--shadow)}
+a.skill:active{transform:translateY(0)}
+a.skill,a.skill:hover{text-decoration:none}
+.skill-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:#eaf1f9;color:var(--navy)}
+.skill-body{display:grid;gap:2px;align-content:center}
+.skill-name{font:700 1.05rem var(--font-head)}
+.skill-blurb{font:400 .85rem/1.35 var(--font-body);color:var(--muted)}
+.skill small,.skill .progress,.skill-cta{grid-column:1 / -1}
+.skill-cta{display:inline-flex;align-items:center;gap:var(--s2);font:700 .9rem var(--font-body);color:var(--coral)}
+.skill-cta svg{transition:transform var(--t-card) var(--ease-out)}
+a.skill:hover .skill-cta svg{transform:translateX(3px)}
+.skill[data-state="done"] .skill-icon{background:#e4f5ec;color:#1a7f4b}
+.skill[data-state="soon"]{background:transparent;border-style:dashed}
+.skill[data-state="soon"] .skill-icon{background:#f0f2f5;color:var(--muted)}
+.progress>span{background:linear-gradient(90deg,var(--navy),#2f6aa6)}
+.skill[data-state="done"] .progress>span{background:#1a7f4b}
+
+.lesson-row,.word-list li,.review-list li{transition:border-color var(--t-card) var(--ease-out)}
+.lesson-row:hover{border-color:#b9c9dc}
+
+/* Answers respond to the action that caused them (spec 23.3) */
+@keyframes cfl-pop{from{opacity:0;transform:translate3d(0,8px,0)}to{opacity:1;transform:none}}
+@keyframes cfl-nudge{20%{transform:translateX(-4px)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+.feedback{animation:cfl-pop 320ms var(--ease-out) both}
+.option.is-correct{animation:cfl-pop 280ms var(--ease-out) both}
+.option.is-wrong{animation:cfl-nudge 360ms var(--ease-out) both}
+
+/* Listening player: the wave moves only while audio is playing */
+.player .actions{align-items:center}
+.player .wave{color:var(--navy);margin-left:var(--s2)}
+.player[data-state="loading"] .status,.player[data-state="loading"] .muted{opacity:.7}
+
+/* Dashboard greeting button sits on the light header */
+.voice-chip--quiet{color:var(--navy);margin-top:var(--s2);min-height:40px;border-color:var(--line);background:var(--surface)}
+.voice-chip--quiet:hover{background:#eef3f9}
+.voice-chip--quiet .wave{color:var(--coral)}
+
+@media (prefers-reduced-motion:reduce){
+  .feedback,.option.is-correct,.option.is-wrong{animation:none}
+  a.skill:hover{transform:none}
+}

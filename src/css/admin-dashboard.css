@@ -1,3 +1,7 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+/* Bootstrap is imported first so this page's own rules always win; its body font follows the site font. */
+:root { --bs-body-font-family: var(--font-ui); }
+
 /* css/admin-dashboard.css */
 :root {
     --primary-color: #1E3A5F;
@@ -10,7 +14,7 @@
 
 body {
     background-color: var(--background-light);
-    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: var(--font-ui);
     color: var(--text-color);
     line-height: 1.6;
 }
@@ -117,3 +121,9 @@ body {
 .admin-section .table-wrap { overflow-x: auto; }
 .admin-section td.actions { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .admin-section td.empty { text-align: center; color: #666; padding: 1.5rem; }
+
+/* Experience layer: large tables and forms must not move under the pointer (spec 23.3) */
+.card { transition: border-color 200ms ease; }
+.card:hover { transform: none; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); }
+.btn-primary { transition: background-color 160ms ease, border-color 160ms ease; }
+.admin-header h1 { font-family: var(--font-display); letter-spacing: -0.01em; }

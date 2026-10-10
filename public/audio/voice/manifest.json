@@ -1,0 +1,360 @@
+{
+ "version": 1,
+ "voice": {
+  "model": "test_voice.onnx",
+  "sampleRate": 16000,
+  "lengthScale": 1.08
+ },
+ "lines": {
+  "home.welcome": "6eaaeb56",
+  "dash.morning": "0f3c0d6d",
+  "dash.afternoon": "ac2174f1",
+  "dash.evening": "c15ba869",
+  "hub.intro": "9aafcd45",
+  "results.perfect": "5adb2547",
+  "results.good": "fea131e9",
+  "results.retry": "6e9becaf"
+ },
+ "clips": {
+  "0ecc0de1": {
+   "text": "I am hungry after the long walk.",
+   "file": "0ecc0de1-test-voice-108.mp3",
+   "seconds": 2.05
+  },
+  "0f3c0d6d": {
+   "text": "Good morning. Ready to improve your English today? Pick up where you left off, or choose a skill to practise.",
+   "file": "0f3c0d6d-test-voice-108.mp3",
+   "seconds": 6.16
+  },
+  "10f5d87c": {
+   "text": "hungry",
+   "file": "10f5d87c-test-voice-108.mp3",
+   "seconds": 0.65
+  },
+  "1fc2355c": {
+   "text": "My father drives to work.",
+   "file": "1fc2355c-test-voice-108.mp3",
+   "seconds": 1.55
+  },
+  "225c9a2e": {
+   "text": "We watch the news in the evening.",
+   "file": "225c9a2e-test-voice-108.mp3",
+   "seconds": 1.73
+  },
+  "23e3d71a": {
+   "text": "mother",
+   "file": "23e3d71a-test-voice-108.mp3",
+   "seconds": 0.72
+  },
+  "2acbb175": {
+   "text": "Hello Sara, this is Peter. I cannot come to class on Tuesday because I have a doctor's appointment. I will come on Wednesday at ten o'clock instead. Please tell the teacher. Thank you. Goodbye.",
+   "file": "2acbb175-test-voice-108.mp3",
+   "seconds": 11.34
+  },
+  "3530569c": {
+   "text": "early",
+   "file": "3530569c-test-voice-108.mp3",
+   "seconds": 0.61
+  },
+  "35bc1205": {
+   "text": "brother",
+   "file": "35bc1205-test-voice-108.mp3",
+   "seconds": 0.83
+  },
+  "37607cbb": {
+   "text": "Introduce yourself: your name, where you live and who you live with.",
+   "file": "37607cbb-test-voice-108.mp3",
+   "seconds": 3.71
+  },
+  "3799e184": {
+   "text": "cousin",
+   "file": "3799e184-test-voice-108.mp3",
+   "seconds": 0.61
+  },
+  "3b952e97": {
+   "text": "bank",
+   "file": "3b952e97-test-voice-108.mp3",
+   "seconds": 0.58
+  },
+  "3c0df6de": {
+   "text": "I wake up early on school days.",
+   "file": "3c0df6de-test-voice-108.mp3",
+   "seconds": 1.94
+  },
+  "3f565bc0": {
+   "text": "We play football in the afternoon.",
+   "file": "3f565bc0-test-voice-108.mp3",
+   "seconds": 2.02
+  },
+  "411bea55": {
+   "text": "Our school is on this street.",
+   "file": "411bea55-test-voice-108.mp3",
+   "seconds": 1.73
+  },
+  "4626414d": {
+   "text": "She follows a recipe to bake a cake.",
+   "file": "4626414d-test-voice-108.mp3",
+   "seconds": 2.09
+  },
+  "481a0b42": {
+   "text": "He goes to the bank on Friday.",
+   "file": "481a0b42-test-voice-108.mp3",
+   "seconds": 1.69
+  },
+  "487cc3b1": {
+   "text": "She always says thank you.",
+   "file": "487cc3b1-test-voice-108.mp3",
+   "seconds": 1.69
+  },
+  "4f9cd7b3": {
+   "text": "hospital",
+   "file": "4f9cd7b3-test-voice-108.mp3",
+   "seconds": 0.79
+  },
+  "57b20f7d": {
+   "text": "dinner",
+   "file": "57b20f7d-test-voice-108.mp3",
+   "seconds": 0.58
+  },
+  "5adb2547": {
+   "text": "Excellent. Every answer was correct.",
+   "file": "5adb2547-test-voice-108.mp3",
+   "seconds": 2.45
+  },
+  "5b2455e8": {
+   "text": "neighbour",
+   "file": "5b2455e8-test-voice-108.mp3",
+   "seconds": 0.58
+  },
+  "628db649": {
+   "text": "What do you do, or what do you study?",
+   "file": "628db649-test-voice-108.mp3",
+   "seconds": 2.02
+  },
+  "64d204c0": {
+   "text": "What time do you wake up, and what do you do first?",
+   "file": "64d204c0-test-voice-108.mp3",
+   "seconds": 2.56
+  },
+  "652f2c70": {
+   "text": "thirsty",
+   "file": "652f2c70-test-voice-108.mp3",
+   "seconds": 0.72
+  },
+  "6736afe4": {
+   "text": "always",
+   "file": "6736afe4-test-voice-108.mp3",
+   "seconds": 0.76
+  },
+  "6e9becaf": {
+   "text": "Good effort. Read the explanations, then try this lesson again.",
+   "file": "6e9becaf-test-voice-108.mp3",
+   "seconds": 4.1
+  },
+  "6eaaeb56": {
+   "text": "Welcome to the Centre of Foreign Learning. Knowledge to empower. Explore our programmes, and start speaking with confidence.",
+   "file": "6eaaeb56-test-voice-108.mp3",
+   "seconds": 7.31
+  },
+  "7665043e": {
+   "text": "street",
+   "file": "7665043e-test-voice-108.mp3",
+   "seconds": 0.72
+  },
+  "7c3f812f": {
+   "text": "morning",
+   "file": "7c3f812f-test-voice-108.mp3",
+   "seconds": 0.68
+  },
+  "82db4d21": {
+   "text": "late",
+   "file": "82db4d21-test-voice-108.mp3",
+   "seconds": 0.58
+  },
+  "83d7a1bb": {
+   "text": "My cousin lives in another town.",
+   "file": "83d7a1bb-test-voice-108.mp3",
+   "seconds": 1.98
+  },
+  "8cac251b": {
+   "text": "I wait at the station for the train.",
+   "file": "8cac251b-test-voice-108.mp3",
+   "seconds": 1.94
+  },
+  "90e949a5": {
+   "text": "Tell me about your daily routine.",
+   "file": "90e949a5-test-voice-108.mp3",
+   "seconds": 1.87
+  },
+  "90f6fbd0": {
+   "text": "library",
+   "file": "90f6fbd0-test-voice-108.mp3",
+   "seconds": 0.94
+  },
+  "922c8d9c": {
+   "text": "We have lunch at school.",
+   "file": "922c8d9c-test-voice-108.mp3",
+   "seconds": 1.4
+  },
+  "97bea7a1": {
+   "text": "We buy vegetables at the market.",
+   "file": "97bea7a1-test-voice-108.mp3",
+   "seconds": 2.12
+  },
+  "9a32f866": {
+   "text": "breakfast",
+   "file": "9a32f866-test-voice-108.mp3",
+   "seconds": 0.83
+  },
+  "9aafcd45": {
+   "text": "Choose a skill. Short, regular practice works best, so even ten minutes today will help.",
+   "file": "9aafcd45-test-voice-108.mp3",
+   "seconds": 5.65
+  },
+  "9d12da41": {
+   "text": "Our neighbour says hello every morning.",
+   "file": "9d12da41-test-voice-108.mp3",
+   "seconds": 2.27
+  },
+  "9db7efdb": {
+   "text": "Good morning. I would like two kilos of rice and one litre of milk, please. Of course. That will be four hundred and fifty shillings. Here you are. Thank you, and have a nice day.",
+   "file": "9db7efdb-test-voice-108.mp3",
+   "seconds": 10.44
+  },
+  "9e2ced27": {
+   "text": "My brother plays football.",
+   "file": "9e2ced27-test-voice-108.mp3",
+   "seconds": 1.66
+  },
+  "ab285923": {
+   "text": "What is your favourite food, and why do you like it?",
+   "file": "ab285923-test-voice-108.mp3",
+   "seconds": 2.48
+  },
+  "ac2174f1": {
+   "text": "Good afternoon. Ready to improve your English today? Pick up where you left off, or choose a skill to practise.",
+   "file": "ac2174f1-test-voice-108.mp3",
+   "seconds": 6.44
+  },
+  "ac247217": {
+   "text": "afternoon",
+   "file": "ac247217-test-voice-108.mp3",
+   "seconds": 0.97
+  },
+  "acf83cb2": {
+   "text": "To get to the hospital, walk straight along this street for two hundred metres. Turn left at the bank. The hospital is next to the library, on the right. It takes about five minutes.",
+   "file": "acf83cb2-test-voice-108.mp3",
+   "seconds": 10.55
+  },
+  "aed72c13": {
+   "text": "station",
+   "file": "aed72c13-test-voice-108.mp3",
+   "seconds": 0.83
+  },
+  "b0fee263": {
+   "text": "father",
+   "file": "b0fee263-test-voice-108.mp3",
+   "seconds": 0.83
+  },
+  "b5f82e71": {
+   "text": "market",
+   "file": "b5f82e71-test-voice-108.mp3",
+   "seconds": 0.68
+  },
+  "c15ba869": {
+   "text": "Good evening. Ready to improve your English today? Pick up where you left off, or choose a skill to practise.",
+   "file": "c15ba869-test-voice-108.mp3",
+   "seconds": 6.59
+  },
+  "c35176ad": {
+   "text": "I eat breakfast at seven.",
+   "file": "c35176ad-test-voice-108.mp3",
+   "seconds": 1.76
+  },
+  "c3b8342f": {
+   "text": "evening",
+   "file": "c3b8342f-test-voice-108.mp3",
+   "seconds": 0.72
+  },
+  "c7ba54d3": {
+   "text": "She reads at the library after class.",
+   "file": "c7ba54d3-test-voice-108.mp3",
+   "seconds": 2.41
+  },
+  "c7f8afb0": {
+   "text": "My mother cooks dinner every evening.",
+   "file": "c7f8afb0-test-voice-108.mp3",
+   "seconds": 2.09
+  },
+  "c873861e": {
+   "text": "What do you usually do in the evening?",
+   "file": "c873861e-test-voice-108.mp3",
+   "seconds": 1.8
+  },
+  "cdd836db": {
+   "text": "Tell me about a place where you buy food.",
+   "file": "cdd836db-test-voice-108.mp3",
+   "seconds": 1.98
+  },
+  "ceccb674": {
+   "text": "Dinner is ready at eight.",
+   "file": "ceccb674-test-voice-108.mp3",
+   "seconds": 1.69
+  },
+  "cf1ef61f": {
+   "text": "lunch",
+   "file": "cf1ef61f-test-voice-108.mp3",
+   "seconds": 0.68
+  },
+  "d5ad2377": {
+   "text": "I study in the morning.",
+   "file": "d5ad2377-test-voice-108.mp3",
+   "seconds": 1.44
+  },
+  "db6876e0": {
+   "text": "My sister is two years older than me.",
+   "file": "db6876e0-test-voice-108.mp3",
+   "seconds": 2.09
+  },
+  "e232afd1": {
+   "text": "The hospital is near the bus station.",
+   "file": "e232afd1-test-voice-108.mp3",
+   "seconds": 2.12
+  },
+  "e5ec86e9": {
+   "text": "What do you like doing in your free time?",
+   "file": "e5ec86e9-test-voice-108.mp3",
+   "seconds": 1.98
+  },
+  "ec7e97cf": {
+   "text": "recipe",
+   "file": "ec7e97cf-test-voice-108.mp3",
+   "seconds": 0.83
+  },
+  "f1f159bf": {
+   "text": "He was late for the lesson.",
+   "file": "f1f159bf-test-voice-108.mp3",
+   "seconds": 1.4
+  },
+  "f2036da9": {
+   "text": "The children are thirsty on a hot day.",
+   "file": "f2036da9-test-voice-108.mp3",
+   "seconds": 2.23
+  },
+  "fcda1b82": {
+   "text": "Describe what you usually eat for breakfast.",
+   "file": "fcda1b82-test-voice-108.mp3",
+   "seconds": 2.59
+  },
+  "fe691321": {
+   "text": "sister",
+   "file": "fe691321-test-voice-108.mp3",
+   "seconds": 0.72
+  },
+  "fea131e9": {
+   "text": "Good work. Review the questions you missed, then try again.",
+   "file": "fea131e9-test-voice-108.mp3",
+   "seconds": 3.17
+  }
+ }
+}

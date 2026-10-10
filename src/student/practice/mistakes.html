@@ -1,26 +1,26 @@
 <!DOCTYPE html>
-<html lang="en" data-auth="pending">
+<html lang="en" data-auth="pending" data-veil="on">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>My mistakes - CFL English Practice</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/foundation.css">
+<link rel="stylesheet" href="/css/fonts.css">
+<link rel="stylesheet" href="/css/motion.css">
 <link rel="stylesheet" href="/css/tokens.css">
 <link rel="stylesheet" href="/css/components.css">
 <link rel="stylesheet" href="/css/portal.css">
 <link rel="stylesheet" href="/css/practice.css">
 <link rel="icon" type="image/png" href="/images/logo.png">
 <script type="module" src="/js/pages/practice-mistakes.js"></script>
+<script type="module" src="/js/motion/boot.js"></script>
 </head>
 <body class="portal">
 <div class="portal-shell">
   <aside class="portal-side" id="portalSide"></aside>
   <main class="portal-main">
     <nav aria-label="Breadcrumb"><ol class="crumbs"><li><a href="/student/practice">English Practice</a></li><li aria-current="page">My mistakes</li></ol></nav>
-    <header class="portal-head">
+    <header class="portal-head" data-reveal="fade">
       <h1>My mistakes</h1>
       <p id="mistakesSummary" class="muted">Loading…</p>
     </header>

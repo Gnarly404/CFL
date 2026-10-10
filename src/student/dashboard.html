@@ -1,31 +1,35 @@
 <!DOCTYPE html>
-<html lang="en" data-auth="pending">
+<html lang="en" data-auth="pending" data-veil="on">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Dashboard - CFL</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/css/foundation.css">
+<link rel="stylesheet" href="/css/fonts.css">
+<link rel="stylesheet" href="/css/motion.css">
 <link rel="stylesheet" href="/css/tokens.css">
 <link rel="stylesheet" href="/css/components.css">
 <link rel="stylesheet" href="/css/portal.css">
 <link rel="icon" type="image/png" href="/images/logo.png">
 <script type="module" src="/js/pages/student-dashboard.js"></script>
+<script type="module" src="/js/motion/boot.js"></script>
 </head>
 <body class="portal">
 <div class="portal-shell">
   <aside class="portal-side" id="portalSide"></aside>
 
   <main class="portal-main">
-    <header class="portal-head">
+    <header class="portal-head" data-reveal="fade">
       <p id="dayMessage" class="muted"></p>
       <h1>Welcome, <span id="studentName">…</span></h1>
       <p class="muted">Reg no: <span id="registrationNumber">…</span> · <span id="profileName">…</span> · <span id="profileStatus">Account active</span></p>
+    <button type="button" class="voice-chip voice-chip--quiet" data-voice-line="dash.auto" aria-pressed="false" aria-label="Hear today's greeting">
+        <span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+        <span>Hear greeting</span>
+      </button>
     </header>
 
-    <div class="stack">
+    <div class="stack" data-reveal-group>
       <section class="card continue" aria-labelledby="continueTitle">
         <p class="eyebrow">Continue learning</p>
         <h2 id="continueTitle">Loading…</h2>
@@ -36,7 +40,7 @@
       <section class="card" aria-labelledby="practiceTitle">
         <p class="eyebrow">English Practice</p>
         <h2 id="practiceTitle">Six skills, one place</h2>
-        <div id="skillGrid" class="skill-grid"></div>
+        <div id="skillGrid" class="skill-grid" data-reveal-group></div>
       </section>
 
       <div class="two-col">

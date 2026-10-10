@@ -66,3 +66,6 @@ html[data-auth="pending"] body { visibility: hidden; }
 
 /* Steps slide in from the side; never let that create sideways scrolling on small screens. */
 .multi-step-form { overflow-x: hidden; overflow-x: clip; }
+
+/* Controls use the page typeface instead of the browser default */
+button, input, select, textarea { font-family: inherit; }

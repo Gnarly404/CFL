@@ -22,7 +22,7 @@ export function initLogin({
   signInFn = signIn,
   resetFn = requestPasswordReset,
   getSession = currentSession,
-  navigate = (url) => window.location.assign(url),
+  navigate = (url) => (window.cflNavigate ?? ((target) => window.location.assign(target)))(url),
 } = {}) {
   const form = root.querySelector('#loginForm');
   if (!form) return;

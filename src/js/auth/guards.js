@@ -32,7 +32,7 @@ export async function guardPage({ roles, navigate = (url) => window.location.rep
 }
 
 /** Connects every [data-action="sign-out"] control. */
-export function wireSignOut(root = document, navigate = (url) => window.location.assign(url)) {
+export function wireSignOut(root = document, navigate = (url) => (window.cflNavigate ?? ((target) => window.location.assign(target)))(url)) {
   root.querySelectorAll('[data-action="sign-out"]').forEach((control) => {
     control.addEventListener('click', async (event) => {
       event.preventDefault();

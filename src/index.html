@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-veil="on">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Centre of Foreign Languages</title>
     <link rel="stylesheet" href="/css/foundation.css">
+<link rel="stylesheet" href="/css/fonts.css">
+<link rel="stylesheet" href="/css/motion.css">
     <link rel="stylesheet" href="/css/homepage.css">
     <link rel="icon" type="image/png" href="/images/logo.png">
+<script type="module" src="/js/motion/boot.js"></script>
 </head>
 <body>
     <!-- Navbar Section -->
@@ -17,10 +20,10 @@
                 <h1 class="motto gradient-text">Knowledge to Empower</h1>
             </div>
             <div class="nav-links">
-                <a href="/gallery" class="nav-link">GALLERY</a>
-                <a href="#contacts" class="nav-link">CONTACTS</a>
-                <a href="#intakes" class="nav-link">INTAKES</a>
-                <a href="/login" class="nav-link join-us">JOIN US</a>
+                <a href="/gallery" class="nav-link">Gallery</a>
+                <a href="#contacts" class="nav-link">Contacts</a>
+                <a href="/programmes" class="nav-link">Intakes</a>
+                <a href="/login" class="nav-link join-us">Join us</a>
             </div>
         </div>
     </nav>
@@ -28,18 +31,25 @@
     <!-- Main Content -->
     <main role="main">
         <!-- Hero Section -->
-        <section class="hero">
+        <section class="hero parallax-scope">
+            <div class="parallax-layer hero-photo" data-parallax="0.8" data-parallax-mode="exit" aria-hidden="true"></div>
             <div class="hero-content-wrapper">
                 <div class="hero-content">
-                    <h2 class="hero-title">Unlock Your Full Potential</h2>
-                    <h3 class="hero-subtitle">Empowering You with Knowledge and Skills</h3>
-                    <p class="hero-text">
+                    <h2 class="hero-title" data-split data-reveal-delay="0.1">Unlock Your Full Potential</h2>
+                    <h3 class="hero-subtitle" data-reveal>Empowering You with Knowledge and Skills</h3>
+                    <p class="hero-text" data-reveal>
                         At the Centre of Foreign Learning, we deliver comprehensive language
                         programs for learners of all ages, including adults. Our courses blend
                         real-world communication skills with personalized instruction from
                         experienced educators, ensuring that every student builds confidence and fluency.
                     </p>
-                    <a href="/programmes" class="explore-btn">Explore Our Programmes</a>
+                    <div class="hero-actions" data-reveal>
+                        <a href="/programmes" class="explore-btn">Explore Our Programmes</a>
+                        <button type="button" class="voice-chip" data-voice-line="home.welcome" aria-label="Play a spoken welcome">
+                            <span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+                            <span>Hear a welcome</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -47,15 +57,15 @@
         <!-- Features Section -->
         <section id="about" class="features">
             <div class="features-container">
-                <p class="features-intro">
+                <p class="features-intro" data-reveal>
                     Join our community of learners and experience the difference that
                     quality language education can make in your personal and professional
                     journey. Our proven methodology and dedicated instructors ensure your success.
                 </p>
 
-                <h2 class="section-title">Why Choose Us?</h2>
+                <h2 class="section-title" data-reveal>Why Choose Us?</h2>
 
-                <div class="features-grid">
+                <div class="features-grid" data-reveal-group>
                     <div class="feature-card">
                         <div class="icon-container">
                             <img src="/images/calendardays.svg" alt="Calendar" class="feature-icon">
@@ -89,7 +99,7 @@
         <div class="footer-content">
             <div class="footer-container">
                 <!-- Contact Form Section -->
-                <div class="footer-section">
+                <div id="contacts" class="footer-section">
                     <h2>Contact Us</h2>
                     <form class="contact-form">
                         <div class="form-group">
@@ -112,7 +122,7 @@
                         <li><a href="#about">About Us</a></li>
                         <li><a href="#courses">Our Courses</a></li>
                         <li><a href="#gallery">Gallery</a></li>
-                        <li><a href="#intakes">Upcoming Intakes</a></li>
+                        <li><a href="/programmes">Upcoming Intakes</a></li>
                     </ul>
                     
                     <h2 class="mt-6">Connect With Us</h2>

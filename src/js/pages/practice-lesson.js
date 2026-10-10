@@ -8,6 +8,7 @@ import { runSpeaking } from '@/practice/speaking-runner.js';
 import { runWriting } from '@/practice/writing-runner.js';
 import { h } from '@/ui/h.js';
 import { createAudioPlayer, speak, speechSupported } from '@/ui/speech.js';
+import { clipsSupported } from '@/ui/voice.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
 
 mountPortalShell('practice');
@@ -88,6 +89,11 @@ async function runLesson() {
       const listen = h('button', { type: 'button', class: 'link-btn', 'aria-label': `Listen to ${w.word}` }, 'Listen');
       listen.addEventListener('click', () => speak(w.word));
       item.append(listen);
+      if (w.example) {
+        const hear = h('button', { type: 'button', class: 'link-btn', 'aria-label': `Hear the example for ${w.word}` }, 'Hear example');
+        hear.addEventListener('click', () => speak(w.example));
+        item.append(' ', hear);
+      }
     }
     return item;
   };
@@ -185,6 +191,15 @@ async function runLesson() {
     persist();
   }
 
+  /** Spoken feedback, only when the person presses it and the browser can play the clips. */
+  function feedbackVoice() {
+    if (!clipsSupported()) return '';
+    const ratio = result.total ? result.correct / result.total : 0;
+    const line = ratio === 1 ? 'results.perfect' : ratio >= 0.6 ? 'results.good' : 'results.retry';
+    return h('button', { type: 'button', class: 'voice-chip voice-chip--quiet', 'data-voice-line': line, 'aria-pressed': 'false' },
+      h('span', { class: 'wave', 'aria-hidden': 'true' }, h('i'), h('i'), h('i'), h('i'), h('i')), h('span', {}, 'Hear feedback'));
+  }
+
   function renderResults() {
     const missed = questions.filter((q) => result.mistakes.includes(q.id));
     const following = isReview ? null : lessons[lessonIndex + 1];
@@ -194,6 +209,7 @@ async function runLesson() {
       h('p', { class: 'step-meta' }, 'Results'),
       h('h1', { id: 'stageHeading', tabindex: '-1' }, lesson.title),
       h('p', { class: 'score' }, `${result.correct} of ${result.total}`),
+      feedbackVoice(),
       h('p', { class: 'muted', role: 'status' }, saveNote),
       lesson.listening ? transcriptNode() : '',
       missed.length

@@ -1,0 +1,168 @@
+/* CFL motion layer (spec section 23). Loaded on every page, driven by /js/motion/boot.js.
+   Rules: transform and opacity only; movement 12 to 32px; reveals run once; everything is
+   switched off under prefers-reduced-motion. Without JavaScript nothing is ever hidden. */
+
+:root {
+  --navy: #1e3a5f;
+  --coral: #ff6f61;
+  --ink: #0f2540;
+  --sky: #56ccf2;
+  --sun: #f4c430;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  --m-micro: 180ms;
+  --m-reveal: 700ms;
+}
+
+/* ---------- Page veil -------------------------------------------------------
+   Pages ship with data-veil="on" on <html>, so the very first paint is the ink cover and
+   the browser never flashes unstyled content between pages. boot.js swaps this for the
+   animated panels and lifts them. The animation below is the safety net for the case
+   where the script never runs: the cover removes itself after 3.2 seconds. */
+html[data-veil]::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  background: var(--ink);
+  pointer-events: none;
+  animation: cfl-veil-failsafe 1ms linear 3.2s forwards;
+}
+@keyframes cfl-veil-failsafe { to { opacity: 0; visibility: hidden; } }
+
+.cfl-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  overflow: hidden;
+  pointer-events: none;
+  visibility: visible; /* pages that are still checking sign-in set body to hidden */
+}
+.cfl-veil[data-active] { pointer-events: auto; }
+.cfl-veil__panel {
+  position: absolute;
+  left: -6vw;
+  right: -6vw;
+  top: -20vh;
+  height: 140vh;
+  border-radius: 50% / 16vh; /* the curved leading and trailing edge */
+  will-change: transform;
+}
+.cfl-veil__panel[data-tone="sky"] { background: var(--sky); }
+.cfl-veil__panel[data-tone="coral"] { background: var(--coral, #ff6f61); }
+.cfl-veil__panel[data-tone="sun"] { background: var(--sun); }
+.cfl-veil__panel[data-tone="navy"] { background: var(--navy, #1e3a5f); }
+.cfl-veil__panel[data-tone="ink"] { background: var(--ink); }
+.cfl-veil__mark {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  color: #fff;
+}
+.cfl-veil__word { font: 700 clamp(2.4rem, 7vw, 4rem) / 1 var(--font-display, system-ui); letter-spacing: -0.02em; }
+.cfl-veil__mark .wave { height: 1.6rem; color: var(--sky); }
+.cfl-veil__mark .wave > i { width: 4px; }
+
+/* ---------- Reveal ---------------------------------------------------------
+   Hidden only while the veil is up or the engine is running; the engine clears the state
+   per element once it has animated in. */
+html:is([data-veil], [data-motion="on"]) [data-reveal]:not([data-revealed]),
+html:is([data-veil], [data-motion="on"]) [data-reveal-group] > :not([data-revealed]) {
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+}
+html:is([data-veil], [data-motion="on"]) [data-reveal="fade"]:not([data-revealed]) { transform: none; }
+html[data-veil] [data-reveal]:not([data-revealed]),
+html[data-veil] [data-reveal-group] > :not([data-revealed]) {
+  animation: cfl-show 1ms linear 3.2s forwards;
+}
+@keyframes cfl-show { to { opacity: 1; transform: none; } }
+
+/* Progress bars fill from the left when they scroll into view */
+html:is([data-veil], [data-motion="on"]) .progress > span:not([data-filled]) {
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.progress > span { transform-origin: left center; }
+
+/* Split headline words (see split-text.js) */
+.split-word { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.12em; margin-bottom: -0.12em; }
+.split-word > span { display: inline-block; will-change: transform; }
+
+/* Parallax layers live inside an overflow-hidden scope and are taller than it */
+[data-parallax] { will-change: transform; }
+.parallax-scope { position: relative; overflow: hidden; isolation: isolate; }
+.parallax-layer { position: absolute; inset: -14% 0; z-index: -1; background-size: cover; background-position: center; }
+
+/* ---------- Sound wave: the product's voice motif -------------------------- */
+.wave { display: inline-flex; align-items: center; gap: 3px; height: 1.4em; color: inherit; }
+.wave > i {
+  display: block;
+  width: 3px;
+  height: 100%;
+  border-radius: 3px;
+  background: currentColor;
+  transform: scaleY(var(--h, 0.4));
+  transform-origin: center;
+}
+.wave > i:nth-child(1) { --h: 0.35; animation-delay: -0.45s; }
+.wave > i:nth-child(2) { --h: 0.7; animation-delay: -0.3s; }
+.wave > i:nth-child(3) { --h: 1; animation-delay: -0.15s; }
+.wave > i:nth-child(4) { --h: 0.6; animation-delay: -0.6s; }
+.wave > i:nth-child(5) { --h: 0.3; animation-delay: -0.2s; }
+.wave[data-live] > i,
+[data-playing] .wave > i,
+[data-state="playing"] .wave > i { animation-name: cfl-wave; animation-duration: 900ms; animation-timing-function: ease-in-out; animation-iteration-count: infinite; }
+@keyframes cfl-wave { 0%, 100% { transform: scaleY(0.25); } 50% { transform: scaleY(1); } }
+
+/* Voice button: plays a clip rendered with Piper (see /js/ui/voice.js) */
+.voice-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 18px 0 16px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: 600 0.95rem var(--font-ui, system-ui);
+  cursor: pointer;
+  transition: background var(--m-micro) var(--ease-out), transform var(--m-micro) var(--ease-out);
+}
+.voice-chip:hover { background: rgba(255, 255, 255, 0.12); transform: translateY(-2px); }
+.voice-chip:active { transform: translateY(0); }
+.voice-chip:focus-visible { outline: 3px solid var(--sky); outline-offset: 3px; }
+.voice-chip[data-loading] { opacity: 0.7; cursor: progress; }
+
+/* ---------- Portal navigation glide ----------------------------------------- */
+.portal-nav { position: relative; }
+.portal-nav > a, .portal-nav > span { position: relative; z-index: 1; }
+.nav-pill {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.16);
+  pointer-events: none;
+  will-change: transform;
+}
+html[data-motion="on"] .portal-nav [aria-current="page"] { background: transparent; }
+.portal-bottom .nav-pill { border-radius: 999px; background: rgba(255, 111, 97, 0.14); }
+
+/* ---------- Reduced motion: no veil, no reveal, no parallax ------------------ */
+@media (prefers-reduced-motion: reduce) {
+  html[data-veil]::before { display: none; }
+  .cfl-veil { display: none; }
+  html [data-reveal], html [data-reveal-group] > *, html .progress > span {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  .wave > i { animation: none !important; }
+  .voice-chip:hover { transform: none; }
+}

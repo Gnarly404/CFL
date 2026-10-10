@@ -7,7 +7,7 @@
 .pc-chip:focus-visible,.pc-btn:focus-visible,.pc-close:focus-visible{outline:3px solid #56CCF2;outline-offset:2px}
 .pc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
 .pc-card{display:flex;flex-direction:column;gap:12px;background:#fff;border:1px solid #e3e9f0;border-radius:16px;padding:24px;box-shadow:0 1px 3px rgba(30,58,95,.06)}
-.pc-kicker{margin:0;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:#5b6b7a}
+.pc-kicker{margin:0;font-size:.85rem;font-weight:600;color:#5b6b7a}
 .pc-card h2{margin:0;font-size:1.2rem;color:#1E3A5F}
 .pc-meta{margin:0;color:#24323F}
 .pc-btn{display:inline-block;margin-top:auto;border:1px solid #1E3A5F;background:#fff;color:#1E3A5F;border-radius:999px;padding:10px 20px;font:inherit;cursor:pointer;text-decoration:none}

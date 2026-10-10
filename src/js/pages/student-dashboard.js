@@ -9,6 +9,7 @@ import { loadOverview } from '@/practice/overview.js';
 import { SKILLS } from '@/practice/skills.js';
 import { h } from '@/ui/h.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
+import { skillCard } from '@/ui/skill-card.js';
 
 mountPortalShell('dashboard');
 const session = await guardPage({ roles: ['student'] });
@@ -88,11 +89,6 @@ try {
     actionEl.replaceChildren(h('a', { class: 'btn btn-primary', href: pick ? lessonUrl(pick.skill.id, pick.next.id) : ROUTES.practice }, pick ? (pick.done ? 'Continue' : 'Start lesson') : 'Open English Practice'));
   }
   if (gridEl) {
-    gridEl.replaceChildren(...SKILLS.map((skill) => {
-      const entry = entries.find((e) => e.skill.id === skill.id);
-      return entry
-        ? h('a', { class: 'skill', href: ROUTES.practice }, skill.label, h('small', {}, `${entry.percent}% complete`))
-        : h('div', { class: 'skill', 'aria-disabled': 'true' }, skill.label, h('small', {}, 'Coming soon'));
-    }));
+    gridEl.replaceChildren(...SKILLS.map((skill) => skillCard(skill, entries.find((e) => e.skill.id === skill.id), { href: ROUTES.practice })));
   }
 }

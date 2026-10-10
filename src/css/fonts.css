@@ -1,0 +1,10 @@
+/* Self-hosted type (spec section 22.3): one display face, one UI/body face.
+   Bricolage Grotesque carries headlines; Figtree is the readable body face for learners.
+   Only the unicode-range subsets a page actually uses are downloaded. */
+@import '@fontsource-variable/bricolage-grotesque/wght.css';
+@import '@fontsource-variable/figtree/index.css';
+
+:root {
+  --font-display: 'Bricolage Grotesque Variable', 'Segoe UI', system-ui, sans-serif;
+  --font-ui: 'Figtree Variable', 'Segoe UI', system-ui, sans-serif;
+}
