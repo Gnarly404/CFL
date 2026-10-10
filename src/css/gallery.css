@@ -108,7 +108,7 @@ body {
     left: 0;
     width: 100%;
     height: 4px;
-    background: var(--coral);
+    background: var(--coral-strong);
     transform: skewX(-20deg);
 }
 
@@ -147,7 +147,7 @@ body {
 }
 
 .btn-primary {
-    background: var(--coral);
+    background: var(--coral-strong);
     border: none;
     padding: 1rem 2rem;
     border-radius: 30px;
@@ -496,7 +496,7 @@ body {
 .brochure-features .feature-icon {
     font-size: 1.5rem;
     margin-right: 1rem;
-    color: var(--coral);
+    color: var(--coral-strong);
 }
 
 .brochure-features .feature-text {

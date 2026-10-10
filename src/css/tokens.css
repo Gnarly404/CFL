@@ -1,7 +1,7 @@
 :root{
   /* Brand */
   --navy:#1E3A5F;--coral:#FF6F61;--blue:#56CCF2;--yellow:#F4C430;
-  --ink:#0F2540;--sky:#56CCF2;--sun:#F4C430;
+  --coral-strong:#C8402F;--coral-strong-hover:#B3321F;--ink:#0F2540;--sky:#56CCF2;--sun:#F4C430;
   /* Surfaces and text */
   --bg:#F5F7FA;--surface:#fff;--text:#24323F;--muted:#566677;--line:#e3e9f0;
   /* Type: display for headings, UI face for everything else (fonts.css) */

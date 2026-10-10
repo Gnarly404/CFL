@@ -1,6 +1,6 @@
 :root {
   --color-primary: #1E3A5F;
-  --color-accent: #FF6F61;
+  --color-accent: #C8402F; /* accessible coral: 4.9:1 with white (brand #FF6F61 is 2.7:1) */
   --color-yellow: #F4C430;
   --color-blue: #56CCF2;
   --color-white: #FFFFFF;

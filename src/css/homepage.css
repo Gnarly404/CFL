@@ -1,7 +1,7 @@
 /* General Styles */
 :root {
   --color-primary: #1E3A5F;
-  --color-accent: #FF6F61;
+  --color-accent: #C8402F; /* accessible coral: 4.9:1 with white (brand #FF6F61 is 2.7:1) */
   --color-yellow: #F4C430;
   --color-blue: #56CCF2;
   --color-white: #FFFFFF;
@@ -195,14 +195,14 @@ body {
   font-size: 1.05rem;
   font-weight: 700;
   color: #fff;
-  background: var(--coral);
+  background: var(--coral-strong);
   text-decoration: none;
   border-radius: 999px;
   transition: transform 180ms var(--ease-out), background 180ms var(--ease-out);
 }
 
 .explore-btn:hover {
-  background: #ff5a4a;
+  background: var(--coral-strong-hover);
   transform: translateY(-3px);
 }
 
@@ -515,7 +515,8 @@ body {
 
 /* Footer Bottom Styles */
 .footer-bottom {
-  background: rgba(0, 0, 0, 0.2);
+  background: #162d4a; /* solid: the translucent black rendered light grey over the page */
+  color: rgba(255, 255, 255, 0.88);
   padding: 1.5rem 0;
 }
 

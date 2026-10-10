@@ -23,7 +23,7 @@ function card(p) {
   article.append(el('p', 'pc-kicker', p.category), el('h2', '', p.name), el('p', 'pc-meta', `Duration: ${p.duration}`));
   const btn = el('button', 'pc-btn', 'View programme');
   btn.type = 'button';
-  btn.setAttribute('aria-label', `View ${p.name}`);
+  btn.setAttribute('aria-label', `View programme: ${p.name}`);
   btn.addEventListener('click', () => openDetails(p));
   article.append(btn);
   return article;

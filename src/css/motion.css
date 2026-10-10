@@ -4,7 +4,9 @@
 
 :root {
   --navy: #1e3a5f;
-  --coral: #ff6f61;
+  --coral: #ff6f61; /* brand coral: decoration only (waves, veil) */
+  --coral-strong: #c8402f; /* coral that carries text: 4.9:1 with white */
+  --coral-strong-hover: #b3321f;
   --ink: #0f2540;
   --sky: #56ccf2;
   --sun: #f4c430;

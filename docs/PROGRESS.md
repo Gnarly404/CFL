@@ -182,3 +182,10 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 - Fixed dead nav anchors: homepage `#contacts` now has a target; "Intakes" links to the Programmes page (there is no separate intakes section).
 - Still open and needs owner input: 4 social-media URLs and Privacy/Terms pages (the 12 `href="#"` placeholders), a strict Content-Security-Policy, a signed-in click-through of the portal, Safari and device testing.
 - Merge with the goals and flashcards work: the new flashcards page got the same font, motion and veil wiring as every other page; the dashboard now loads `practice.css` (the Today card's goal pills were unstyled there without it).
+
+### Accessibility pass (axe-core)
+
+- axe-core (WCAG 2.0/2.1 A and AA rules) reports **0 violations on all 13 pages** (public pages from the built site; portal pages through a harness with stubbed Firebase). Automated checks catch only part of what matters, so a screen-reader and keyboard walkthrough is still worth doing.
+- Colour: white on the brand coral `#FF6F61` is 2.7:1, so anything that carries text now uses `--coral-strong` `#C8402F` (4.96:1 with white; hover `#B3321F`). Legacy `--color-accent` was redefined to the same value. The vivid coral stays for decoration only (veil, sound waves).
+- Fixed along the way: the gallery's "Explore Programs" was a button next to an empty link and did nothing (now a real link); programme buttons' accessible names now contain their visible text; voice buttons rely on their visible label; the footer bottom bar rendered light grey under white text (now solid navy).
+- Lesson flow (learn, practice, answer feedback, results, Listening player with Piper clips) was run in a browser through the same harness with no errors.

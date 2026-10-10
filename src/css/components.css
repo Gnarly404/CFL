@@ -1,6 +1,7 @@
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s2);min-height:44px;padding:0 var(--s5);border-radius:999px;border:1px solid var(--navy);background:var(--surface);color:var(--navy);font:600 .95rem var(--font-head);text-decoration:none;cursor:pointer;transition:background var(--t-fast),transform var(--t-fast)}
 .btn:hover{background:#eef3f9}
-.btn-primary{background:var(--coral);border-color:var(--coral);color:#fff}
+.btn-primary{background:var(--coral-strong);border-color:var(--coral-strong);color:#fff}
+.btn-primary:hover{background:var(--coral-strong-hover);border-color:var(--coral-strong-hover)}
 .btn-primary:hover{background:#f25f51}
 .btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed;pointer-events:none}
 .btn:focus-visible,a:focus-visible,button:focus-visible{outline:none;box-shadow:var(--focus)}
