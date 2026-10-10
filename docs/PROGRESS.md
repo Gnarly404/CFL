@@ -152,8 +152,15 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 - New index `practiceSessions (studentId, date)`: deploy with `firebase deploy --only firestore:indexes` before this goes live, otherwise the Today card shows its load-failed note.
 - 27 test files; full suite passes locally in this environment. Rules tests (including the new session rule) still not run.
 
+### Flashcards (eighth slice)
+
+- `/student/practice/flashcards`: a deck of up to 10 words (due words first, then new ones). Show the word, optional Listen (browser speech), Show meaning, then "I know this" or "Need practice". The hub card shows due, new and mastered counts.
+- Per-word record (`seen`, `known`, `needPractice`, `box`, `status`, `dueAt`) kept in one document `skillProgress/{uid}_vocabulary-words`. "Need practice" returns in 1 day; "I know this" moves a due word to 3 days, then 7, then mastered; saying "I know this" on a word that is not due yet records the attempt but does not advance it, so repeating decks cannot rush mastery. A flashcard session counts toward the daily goal.
+- If saved words cannot be loaded the page turns itself off rather than risk overwriting progress. All 24 words are the assistant's; the deck only covers the existing vocabulary lessons.
+- 29 test files, 298 tests pass; rules tests still not run (uses the existing `skillProgress` rule).
+
 ### Next up
 1. Run `npm run test:rules` and fix any rules bug (the lessonProgress rules are now used for real).
-2. Flashcard mode, then the instructor tools (teacher review for Writing and Speaking).
+2. The instructor tools (teacher review for Writing and Speaking).
 3. Mistake review page and daily goal; weak-area recommendations.
 4. Remaining session 2 items (self-hosted fonts and icons, CSP, shared public header and footer).

@@ -86,3 +86,19 @@ export async function loadSessions(uid, sinceDate) {
     return { ...data, createdAtMs: data.createdAt?.toMillis?.() ?? Date.parse(`${data.date}T12:00:00`) };
   });
 }
+
+const wordsRef = (uid) => doc(dbService(), 'skillProgress', `${uid}_vocabulary-words`);
+
+/** Flashcard confidence for every word as { [wordKey]: record }. Read by query so a missing document is not a rules error. */
+export async function loadWordProgress(uid) {
+  const snap = await getDocs(query(
+    collection(dbService(), 'skillProgress'),
+    where('studentId', '==', uid),
+    where('kind', '==', 'vocabulary-words'),
+  ));
+  return snap.empty ? {} : (snap.docs[0].data().words ?? {});
+}
+
+export async function saveWordProgress(uid, words) {
+  await setDoc(wordsRef(uid), { studentId: uid, skill: 'vocabulary', kind: 'vocabulary-words', words, updatedAt: serverTimestamp() });
+}

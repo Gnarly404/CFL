@@ -6,11 +6,13 @@ import { loadPage, tick } from '../helpers.js';
 const loadMistakes = vi.fn();
 const loadLessonProgress = vi.fn();
 const loadSessions = vi.fn();
+const loadWordProgress = vi.fn();
 vi.mock('@/auth/guards.js', () => ({ guardPage: vi.fn().mockResolvedValue({ user: { uid: 'u1' } }) }));
 vi.mock('@/services/practice-service.js', () => ({
   loadLessonProgress: (...args) => loadLessonProgress(...args),
   loadMistakes: (...args) => loadMistakes(...args),
   loadSessions: (...args) => loadSessions(...args),
+  loadWordProgress: (...args) => loadWordProgress(...args),
 }));
 
 const text = (id) => document.getElementById(id).textContent;
@@ -24,6 +26,7 @@ async function open(path, script) {
 
 describe('practice hub page', () => {
   beforeEach(() => {
+    loadWordProgress.mockReset().mockResolvedValue({});
     loadMistakes.mockReset().mockResolvedValue({});
     loadLessonProgress.mockReset().mockResolvedValue({});
     loadSessions.mockReset().mockResolvedValue([]);
@@ -36,6 +39,7 @@ describe('practice hub page', () => {
     expect(document.querySelectorAll('#skillGrid .skill')).toHaveLength(6);
     expect(document.querySelectorAll('#skillGrid [aria-disabled="true"]')).toHaveLength(0);
     expect(text('skillSections')).toContain('Vocabulary lessons');
+    expect(text('skillSections')).toContain('24 new');
     expect(text('skillSections')).toContain('Nothing to review yet.');
   });
 
@@ -58,6 +62,7 @@ describe('practice hub page', () => {
 describe('today card on the hub', () => {
   const todayKey = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
   beforeEach(() => {
+    loadWordProgress.mockReset().mockResolvedValue({});
     loadMistakes.mockReset().mockResolvedValue({});
     loadLessonProgress.mockReset().mockResolvedValue({});
     loadSessions.mockReset();

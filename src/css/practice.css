@@ -56,3 +56,5 @@
 .today-list{margin:var(--s3) 0;padding-left:1.1rem}
 .badge-list{display:flex;flex-wrap:wrap;gap:var(--s2);margin:0;padding:0;list-style:none}
 .badge-list .badge{padding:4px 12px}
+.flashcard{padding:var(--s6) var(--s4);margin:0 0 var(--s4);text-align:center;border:1px solid var(--line);border-radius:var(--radius);background:#f3f8fc}
+.flashcard h1{margin:0 0 var(--s3);font:700 2rem var(--font-head);color:var(--navy);outline:none}
