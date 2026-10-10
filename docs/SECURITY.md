@@ -43,7 +43,7 @@
 
 - Practice questions contain their answer keys and are readable by signed-in students. That is acceptable for ungraded
   practice; graded assessments must be marked by a function (planned with the English Practice session).
-- Instructor access to student learning data is intentionally closed until the instructor tools define assignment-scoped reads.
+- Instructor access to student data is scoped to assignment. An instructor can read a student's **submitted** writing (never drafts) only when listed in that student's `instructorIds`, and can create or edit `feedback` only on submitted work of such a student. Instructors still cannot read lesson progress, mistakes, practice sessions or any other learning data, and can never write to `submissions`. Feedback is a separate document, so a student's text is never altered.
 - Message creation is closed until messaging defines who may write to whom.
 - A signed-in token stays valid up to an hour. Role changes and disabling revoke refresh tokens, and privileged functions
   re-check the live role, but Firestore rules read the token. Keep that in mind for anything highly sensitive.

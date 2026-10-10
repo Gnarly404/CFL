@@ -18,7 +18,8 @@ Firebase Hosting  --  Cloud Functions (Node 22)  --  Firestore / Auth Admin / Se
 | `/register` | `src/register.html` (application form) | public |
 | `/login`, `/activate` | sign-in; set or reset a password from an emailed link | public |
 | `/student/dashboard` | student portal | role `student` |
-| `/instructor/dashboard` | instructor workspace (placeholder) | roles `instructor`, `admin` |
+| `/instructor/dashboard` | instructor workspace: assigned students, writing waiting for feedback | roles `instructor`, `admin` |
+| `/instructor/review`, `/instructor/review/submission` | writing review queue and the feedback page | roles `instructor`, `admin` |
 | `/admin/dashboard` | admin console | role `admin` |
 
 Old addresses (`/Programs.html`, `/Login.html`, `/public/...`, and so on) redirect with a 301; `/student`, `/instructor`
@@ -70,7 +71,8 @@ Written by "server" means Cloud Functions (Admin SDK); rules deny browser writes
 | `enrolments/{studentId_programmeId}` | server | owner, admin, assigned instructor | status, instructorIds, applicationId |
 | `programmes`, `courses`, `units`, `lessons`, `questions`, `assignments` | admin | active/published to the right audience | arrive with their sessions |
 | `practiceSessions`, `questionAttempts`, `lessonProgress`, `skillProgress`, `mistakes` | the student (own rows) | owner, admin | English Practice session |
-| `submissions` | student (drafts), admin (grading) | owner, admin | |
+| `submissions` | student (drafts, then submit) | owner, admin, assigned instructor (submitted only) | locked after submit |
+| `feedback/{submissionId}` | assigned instructor | the student, the writing instructor, admin | overall, notes (quote + comment), never edits the submission |
 | `schedules`, `attendance` | admin | signed in / owner | |
 | `messages`, `notifications` | server (messaging session) | participants / owner | recipient may set `readAt` |
 | `payments`, `certificates` | server | owner, admin | |

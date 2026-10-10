@@ -1,7 +1,8 @@
 import { ROUTES } from '@/core/routes.js';
 import { lessonUrl } from '@/practice/content.js';
 import { basicChecks, countWords } from '@/practice/writing.js';
-import { createDraft, loadLessonProgress, loadSubmission, saveLessonResult, submitDraft, updateDraft } from '@/services/practice-service.js';
+import { segments } from '@/review/feedback.js';
+import { createDraft, loadFeedback, loadLessonProgress, loadSubmission, saveLessonResult, submitDraft, updateDraft } from '@/services/practice-service.js';
 import { h } from '@/ui/h.js';
 
 const AUTOSAVE_MS = 2000;
@@ -33,20 +34,31 @@ export async function runWriting({ stage, lesson, skill, uid, following, tracker
   const checksList = (text) => h('ul', { class: 'check-list' }, ...basicChecks(text).map((c) => h('li', { class: c.ok ? 'is-ok' : 'is-note' }, h('span', { 'aria-hidden': 'true' }, c.ok ? '✓ ' : '• '), c.text)));
   const checksBox = (text) => h('section', { class: 'passage' }, h('h2', {}, 'Basic checks'), h('p', { class: 'muted' }, 'These simple checks are not a grammar review. Your text is never changed for you.'), checksList(text));
 
-  function renderSubmitted(record, note = '') {
+  function renderSubmitted(record, note = '', feedback = null, feedbackFailed = false) {
     const text = record.content;
+    const parts = feedback ? segments(text, feedback.notes ?? []) : null;
     show(
       h('p', { class: 'step-meta' }, 'Writing practice · Submitted'),
       h('h1', { id: 'stageHeading', tabindex: '-1' }, cfg.topic),
-      h('p', {}, `${countWords(text)} words. Your writing has been submitted and can no longer be edited. Teacher feedback is not available yet.`),
-      h('blockquote', { class: 'submitted-text' }, text),
+      h('p', {}, `${countWords(text)} words. Your writing has been submitted and can no longer be edited.${feedback ? '' : ' No teacher feedback yet.'}`),
+      h('blockquote', { class: 'submitted-text' }, ...(parts ?? [{ text, note: null }]).map((part) => (part.note === null ? part.text : h('mark', { title: `Note ${part.note + 1}` }, part.text, h('sup', {}, part.note + 1))))),
+      feedback ? h('section', { class: 'passage teacher-feedback' }, h('h2', {}, 'Teacher feedback'),
+        feedback.overall ? h('p', {}, feedback.overall) : '',
+        (feedback.notes ?? []).length ? h('ol', {}, ...feedback.notes.map((n) => h('li', {}, n.quote ? h('strong', {}, `“${n.quote}” `) : '', n.note))) : '') : '',
+      feedbackFailed ? h('p', { class: 'muted', role: 'status' }, 'Teacher feedback could not be loaded right now. Reload to try again.') : '',
       checksBox(text),
       note ? h('p', { class: 'muted', role: 'status' }, note) : '',
       h('div', { class: 'actions' }, following ? h('a', { class: 'btn btn-primary', href: lessonUrl(skill.id, following.id) }, 'Next lesson') : '', back()),
     );
   }
 
-  if (existing?.status === 'submitted') { renderSubmitted(existing); return; }
+  if (existing?.status === 'submitted') {
+    let feedback = null;
+    let feedbackFailed = false;
+    try { feedback = await loadFeedback(uid, `${uid}_${cfg.promptId}`); } catch (error) { feedbackFailed = true; console.warn('Could not load feedback', error?.code ?? error); }
+    renderSubmitted(existing, '', feedback, feedbackFailed);
+    return;
+  }
 
   let savedContent = existing ? existing.content : null;
   let saving = false;

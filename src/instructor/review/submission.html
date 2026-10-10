@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Instructor workspace - CFL</title>
+<title>Review writing - CFL</title>
 <link rel="stylesheet" href="/css/foundation.css">
 <link rel="stylesheet" href="/css/fonts.css">
 <link rel="stylesheet" href="/css/motion.css">
@@ -12,29 +12,15 @@
 <link rel="stylesheet" href="/css/portal.css">
 <link rel="stylesheet" href="/css/practice.css">
 <link rel="icon" type="image/png" href="/images/logo.png">
-<script type="module" src="/js/pages/instructor-dashboard.js"></script>
+<script type="module" src="/js/pages/instructor-review-submission.js"></script>
 <script type="module" src="/js/motion/boot.js"></script>
 </head>
 <body class="portal">
 <div class="portal-shell">
   <aside class="portal-side" id="portalSide"></aside>
   <main class="portal-main">
-    <header class="portal-head">
-      <h1>Welcome, <span id="instructorName">…</span></h1>
-      <p id="instructorBio" class="muted">Loading your profile…</p>
-    </header>
-    <p id="dashNote" class="form-note" role="alert" hidden></p>
-    <div class="stack">
-      <section class="card" aria-labelledby="awaitTitle">
-        <p class="eyebrow">Writing review</p>
-        <h2 id="awaitTitle">Loading…</h2>
-        <div id="awaitAction" class="actions"></div>
-      </section>
-      <section class="card" aria-labelledby="studentsTitle">
-        <h2 id="studentsTitle">Assigned students</h2>
-        <ul id="assignedStudents" class="review-list"><li>Loading students…</li></ul>
-      </section>
-    </div>
+    <nav aria-label="Breadcrumb"><ol class="crumbs"><li><a href="/instructor/review">Writing review</a></li><li aria-current="page">Submission</li></ol></nav>
+    <div id="stage" class="stack"></div>
   </main>
 </div>
 <nav class="portal-bottom" id="portalBottom" aria-label="Instructor mobile"></nav>

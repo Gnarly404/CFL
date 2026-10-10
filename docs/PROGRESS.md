@@ -159,9 +159,17 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 - If saved words cannot be loaded the page turns itself off rather than risk overwriting progress. All 24 words are the assistant's; the deck only covers the existing vocabulary lessons.
 - 29 test files, 298 tests pass; rules tests still not run (uses the existing `skillProgress` rule).
 
+### Instructor writing review (ninth slice)
+
+- `/instructor/dashboard` (rebuilt on the portal shell), `/instructor/review` (queue: waiting and done, oldest first) and `/instructor/review/submission` (the student's text exactly as submitted, an overall comment, and notes that can quote exact words; quoted words are marked in the text without changing it).
+- Feedback is its own document, `feedback/{submissionId}`. The student sees it under "Teacher feedback" on their submitted writing; instructors can edit it later. Instructors can never write to `submissions`.
+- Rules: instructors read **submitted** writing of students whose `instructorIds` include them (via `get()` on the student record); queries must name the student and the submitted status. Rules tests for all of this were added to `tests/rules`. **They have not been run.** The one thing I am least sure of is that Firestore accepts the per-student `get()`-based query; if the queue shows "could not be loaded", that rule is the first place to look.
+- Not built: speaking review (recordings are never uploaded), grading, viewing a student's progress, notifications when feedback arrives, and the admin assignment tool that fills `instructorIds` (it is still set by the admissions function and by hand).
+- 31 test files, 317 tests pass.
+
 ### Next up
 1. Run `npm run test:rules` and fix any rules bug (the lessonProgress rules are now used for real).
-2. The instructor tools (teacher review for Writing and Speaking).
+2. Admin tools (assign instructors to students, content management), notifications, messaging, and the rest (teacher review for Writing and Speaking).
 3. Mistake review page and daily goal; weak-area recommendations.
 4. Remaining session 2 items: a shared public header and footer, and switching the CSP from Report-Only to enforcing after a signed-in check (see "Content-Security-Policy" below). Self-hosted fonts and the icon family are done.
 
@@ -196,3 +204,4 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 - Enforced in a browser (a local server sending the same header as a blocking policy) it produced **0 violations** on all public pages and, through the fake-data harness, the dashboard, hub, flashcards, mistakes, a full lesson with results voice, and the Listening player playing a Piper MP3. A negative control proved the detector blocks inline scripts, inline style attributes and foreign hosts.
 - To make that possible: the homepage's inline script (a `/CFL/` GitHub Pages path rewrite that does nothing on Firebase) was removed, the dashboard's one `style=` moved into `portal.css`, and `h()` now applies styles through the CSSOM. Tests keep pages free of inline script, style and handlers.
 - **Why it is Report-Only:** I could not exercise real Firebase sign-in, Firestore or Functions traffic or the contact form's EmailJS call. After deploying, sign in, run a lesson and send a contact message with the browser console open; if no "[Report Only] Refused to..." lines appear, change the header key to `Content-Security-Policy` in `firebase.json` to enforce it.
+- Merged the instructor writing-review work (queue, feedback page, student feedback view): the three instructor pages got the same font, motion and veil wiring as every other page; all three are axe-clean (checked with the fake-data harness, empty-queue state).
