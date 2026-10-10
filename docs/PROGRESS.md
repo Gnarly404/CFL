@@ -168,10 +168,12 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 - 31 test files, 317 tests pass.
 
 ### Next up
-1. Run `npm run test:rules` and fix any rules bug (the lessonProgress rules are now used for real).
-2. Admin tools (assign instructors to students, content management), notifications, messaging, and the rest (teacher review for Writing and Speaking).
-3. Mistake review page and daily goal; weak-area recommendations.
-4. Remaining session 2 items: a shared public header and footer, and switching the CSP from Report-Only to enforcing after a signed-in check (see "Content-Security-Policy" below). Self-hosted fonts and the icon family are done.
+1. Run `npm run test:rules` somewhere with the Firebase emulators (needs Java 21 and access to storage.googleapis.com; the build sandbox blocks that host, so the Firestore emulator cannot be downloaded there). Fix any rules bug. Highest priority: the rules for lessonProgress, mistakes, practiceSessions, submissions and feedback are in real use and have never been exercised.
+2. Notifications (for example when teacher feedback arrives) and messaging.
+3. Content management (lessons are JSON in the repo today), an instructor view of student progress, speaking review (needs an audio upload path, rules and consent wording).
+4. A shared public header and footer, and switching the CSP from Report-Only to enforcing after a signed-in check (see "Content-Security-Policy" below). Self-hosted fonts and the icon family are done.
+
+> Correction: an earlier note said there was no admin tool to assign instructors to students. There is: the admin console has a "Teaching assignments" section backed by the `adminAssignInstructor` Cloud Function, which audits every change.
 
 ## Motion, page transitions and voice (added after session 2)
 
