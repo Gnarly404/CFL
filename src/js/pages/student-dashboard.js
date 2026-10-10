@@ -6,6 +6,7 @@ import { ROUTES } from '@/core/routes.js';
 import { lessonUrl } from '@/practice/content.js';
 import { pickContinue } from '@/practice/engine.js';
 import { loadOverview } from '@/practice/overview.js';
+import { mountToday } from '@/practice/today.js';
 import { SKILLS } from '@/practice/skills.js';
 import { h } from '@/ui/h.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
@@ -79,6 +80,8 @@ try {
 {
   const { entries } = await loadOverview(session.user.uid);
   const pick = pickContinue(entries);
+  const todayEl = document.getElementById('todayCard');
+  if (todayEl) await mountToday(todayEl, { uid: session.user.uid, entries });
   const titleEl = document.getElementById('continueTitle');
   const textEl = document.getElementById('continueText');
   const actionEl = document.getElementById('continueAction');

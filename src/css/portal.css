@@ -83,3 +83,6 @@ a.skill:hover .skill-cta svg{transform:translateX(3px)}
   .feedback,.option.is-correct,.option.is-wrong{animation:none}
   a.skill:hover{transform:none}
 }
+
+/* Daily-goal radios use the brand colour */
+.goal-opt input{accent-color:var(--navy)}

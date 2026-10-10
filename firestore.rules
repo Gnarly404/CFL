@@ -96,9 +96,7 @@ service cloud.firestore {
     match /practiceSessions/{sessionId} {
       allow read: if isUser(resource.data.studentId) || isAdmin();
       allow create: if isStudent() && isUser(request.resource.data.studentId);
-      allow update: if isStudent() && isUser(resource.data.studentId)
-                    && request.resource.data.studentId == resource.data.studentId;
-      allow delete: if false;
+      allow update, delete: if false;
     }
     match /questionAttempts/{attemptId} {
       allow read: if isUser(resource.data.studentId) || isAdmin();

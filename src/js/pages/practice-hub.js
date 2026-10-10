@@ -3,7 +3,9 @@ import { lessonUrl } from '@/practice/content.js';
 import { dueMistakes, lessonStatus, pickContinue } from '@/practice/engine.js';
 import { ROUTES } from '@/core/routes.js';
 import { loadOverview } from '@/practice/overview.js';
-import { loadMistakes } from '@/services/practice-service.js';
+import { deckCounts } from '@/practice/flashcards.js';
+import { mountToday } from '@/practice/today.js';
+import { loadMistakes, loadWordProgress } from '@/services/practice-service.js';
 import { SKILLS } from '@/practice/skills.js';
 import { h } from '@/ui/h.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
@@ -15,6 +17,11 @@ const { entries, failed } = await loadOverview(session.user.uid);
 let mistakeList = [];
 try { mistakeList = Object.values(await loadMistakes(session.user.uid)).filter((m) => m.status === 'open'); } catch (error) { console.warn('Could not load mistakes', error?.code ?? error); }
 const dueCount = dueMistakes(mistakeList).length;
+let cardText = 'Learn vocabulary with flip cards.';
+try {
+  const c = deckCounts(await loadWordProgress(session.user.uid));
+  cardText = `${c.due} due · ${c.fresh} new · ${c.mastered} of ${c.total} mastered`;
+} catch (error) { console.warn('Could not load word progress', error?.code ?? error); }
 
 const pick = pickContinue(entries);
 document.getElementById('hubContinueTitle').textContent = pick ? pick.next.title : 'All available lessons complete';
@@ -27,6 +34,8 @@ document.getElementById('hubContinueAction').replaceChildren(
 
 document.getElementById('skillGrid').replaceChildren(...SKILLS.map((skill) => skillCard(skill, entries.find((e) => e.skill.id === skill.id), { href: `#${skill.id}Lessons`, detail: true })));
 
+await mountToday(document.getElementById('todayCard'), { uid: session.user.uid, entries, mistakes: mistakeList });
+
 if (failed) {
   const note = document.getElementById('hubNote');
   note.hidden = false;
@@ -34,6 +43,8 @@ if (failed) {
 }
 
 document.getElementById('skillSections').replaceChildren(
+  h('section', { class: 'card' }, h('p', { class: 'eyebrow' }, 'Vocabulary'), h('h2', {}, 'Flashcards'), h('p', { class: 'muted' }, cardText),
+    h('a', { class: 'btn btn-primary', href: ROUTES.practiceFlashcards }, 'Practise flashcards')),
   h('section', { class: 'card' }, h('p', { class: 'eyebrow' }, 'Review'), h('h2', {}, 'My mistakes'),
     h('p', { class: 'muted' }, mistakeList.length ? `${mistakeList.length} to review · ${dueCount} due now` : 'Nothing to review yet.'),
     h('a', { class: dueCount ? 'btn btn-primary' : 'btn', href: ROUTES.practiceMistakes }, dueCount ? 'Review mistakes' : 'View my mistakes')),
