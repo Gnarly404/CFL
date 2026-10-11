@@ -3,6 +3,7 @@ import {
   availableDecisions, DECISION_LABELS, STATUS_LABELS,
 } from '@/utils/application-status.js';
 import { initAssignments } from './assignments.js';
+import { initSchedule } from './schedule.js';
 import { validateEmail, validateName } from '@/utils/validation.js';
 import { formatDate } from '@/utils/format.js';
 import {
@@ -32,6 +33,7 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
   };
 
   const assignments = initAssignments({ root, say, getUsers: () => knownUsers });
+  const schedule = initSchedule({ root, say, getUsers: () => knownUsers, adminUid: currentUid });
 
   async function run(label, work, { reload = ['applications', 'users'] } = {}) {
     try {
@@ -135,6 +137,7 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
       return;
     }
     assignments.load();
+    schedule.load();
   }
 
   filter?.addEventListener('change', loadApplications);

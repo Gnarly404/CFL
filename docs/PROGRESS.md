@@ -177,6 +177,16 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 - Needs deploying: the `instructorNotifyFeedback` function and the updated Firestore rules. The `notifications (userId, createdAt desc)` index already exists.
 - 43 test files, 393 tests pass.
 
+### Schedule (eleventh slice)
+
+- Rules tests were run on the owner's machine for the first time after the notifications slice: **26 of 26 passed** (Firestore 21, Storage 5). Some denials log "evaluation error" instead of a plain false; these still deny, so they fail closed. The schedule rules below are covered by new tests that have **not been run**.
+- `/student/schedule`: next class, upcoming classes by day, earlier classes (last 14 days) folded away, cancelled classes marked, a Join online link only when it is a plain https link. Shows plain explanations when the student is not enrolled, when nothing is scheduled, and when loading fails. Times show in the viewer's time zone with the zone name.
+- Admin console, "Class schedule": add a class (programme, title, date, start, end, in person or online, optional room, https link, notes and instructor) and cancel or restore it. Nothing is invented; with no classes the student sees "No upcoming classes yet".
+- Rules: `schedules` was readable by any signed-in user. Now a student reads a class only if enrolled in its programme (enrolment id `{studentId}_{programmeId}`), an instructor only if named on it, admins always. Admin writes are validated (title, mode, status, end after start). The student query names one programme per query, the same pattern as the writing-review rules; if the page says "could not be loaded" after deploy, run `npm run test:rules` and look at the schedule tests first.
+- Needs deploying: updated `firestore.rules` and `firestore.indexes.json` (new index `schedules: programmeId, startsAt`).
+- Not built: next class on the dashboard, an instructor's own timetable, attendance, calendar export, reminders.
+- 48 test files, 446 tests pass.
+
 ### Next up
 1. Run `npm run test:rules` somewhere with the Firebase emulators (needs Java 21 and access to storage.googleapis.com; the build sandbox blocks that host, so the Firestore emulator cannot be downloaded there). Fix any rules bug. Highest priority: the rules for lessonProgress, mistakes, practiceSessions, submissions and feedback are in real use and have never been exercised.
 2. Messaging (message centre) and more notification sources.

@@ -9,8 +9,8 @@ Status key: **Done**, **Partial**, **Not started**.
 | 2 Codebase audit, 3 Release gate | Partial | P0 code fixes done (one repo, Firebase Auth, Cloud Function admin creation, rules, routes). Missing: rules tests never run, no staging project, secret rotation unconfirmed |
 | 4 Architecture and routes | Done | Lowercase routes, 301s from old filenames, route checker in CI |
 | 5, 17 Public site, programme cards, admissions | Partial | Cards simplified and rendered from `programmes.json`. Shared header and footer (`partials/`), Privacy and Terms pages, footer contact form (opens the visitor's email app; there is no server behind it). Legal text needs the Centre's confirmation (controller name, retention, data-request contact). Missing: programme detail pages, public hero and CTA strategy, applicant status page, placeholder `#` links (including social icons until accounts exist) |
-| 6 Student portal navigation | Partial | Sidebar and mobile nav shipped. Schedule, Progress, Messages pages do not exist |
-| 7 Dashboard | Partial | Continue Learning and skill cards use real progress. Missing: Today's Practice, schedule, materials, fees from real data |
+| 6 Student portal navigation | Partial | Sidebar and mobile nav shipped, with Dashboard, Practice, Schedule and Notifications pages. Progress and Messages pages do not exist |
+| 7 Dashboard | Partial | Continue Learning and skill cards use real progress. Missing: next class on the dashboard, materials, fees from real data |
 | 8 Practice architecture and persistence | Partial | Hub, lesson lifecycle, saved lesson progress. Missing: practice session records, resuming a half-finished lesson, per-question attempt log |
 | 9 Grammar | Partial | 5 lessons (assistant-written, need review), explained feedback, retry. Missing: more lessons, levels |
 | 10 Vocabulary | Partial | 4 lessons, word list with Listen and Hear example buttons (Piper clips, browser speech as fallback), quiz, spaced review of missed words. Flashcards at `/student/practice/flashcards`: flip cards, I know this / Need practice, per-word attempt history, spaced review (1, 3, 7 days then mastered). Missing: Word of the Day, written pronunciation guides, adding words beyond the 24 starter words |
@@ -29,7 +29,7 @@ Status key: **Done**, **Partial**, **Not started**.
 | 25 Accessibility | Partial | Focus management, labelled controls, reduced-motion tokens. No audit run |
 | 26 Performance | Not started | |
 | 27 Notifications and messaging | Partly built | Notifications: student list page, unread badge, read/archive, teacher-feedback notification. Not built: message centre (27.2), other notification sources |
-| 28 Admin and instructor product | Partial | Instructor: dashboard, assigned students, writing review queue and feedback page. Missing: speaking review (needs audio upload), student progress view for instructors, course and schedule tools, messaging; admin tools (admissions decisions UI, content management, user management beyond the basic dashboard) |
+| 28 Admin and instructor product | Partial | Instructor: dashboard, assigned students, writing review queue and feedback page. Admin: add, cancel and restore classes in a Class schedule section. Missing: speaking review (needs audio upload), student progress view for instructors, an instructor's own timetable view, attendance, messaging; admin tools (content management, user management beyond the basic dashboard) |
 | 29 Analytics and audit | Not started | Audit logging exists for admin actions only |
 | 30 Content management | Not started | Lesson content is JSON in the repo |
 | 31 QA | Partial | 45 test files, 426 tests (unit, page-flow, functions). Missing: rules tests, end-to-end, accessibility checks |

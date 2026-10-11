@@ -88,6 +88,67 @@
             </div>
         </section>
 
+        <section class="card admin-section" aria-labelledby="classesHeading">
+            <div class="card-header"><h2 id="classesHeading">Class schedule</h2></div>
+            <div class="card-body">
+                <p class="login-help">Students enrolled in the programme you choose see the class on their Schedule page. Times are in this browser's time zone.</p>
+                <form id="classForm" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-4 form-group">
+                            <label for="classProgramme" class="form-label">Programme</label>
+                            <select class="form-select" id="classProgramme" required></select>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label for="classTitle" class="form-label">Class title</label>
+                            <input type="text" class="form-control" id="classTitle" maxlength="120" autocomplete="off" required>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label for="classInstructor" class="form-label">Instructor (optional)</label>
+                            <select class="form-select" id="classInstructor"></select>
+                        </div>
+                        <div class="col-md-3 form-group">
+                            <label for="classDate" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="classDate" required>
+                        </div>
+                        <div class="col-md-2 form-group">
+                            <label for="classStart" class="form-label">Starts</label>
+                            <input type="time" class="form-control" id="classStart" required>
+                        </div>
+                        <div class="col-md-2 form-group">
+                            <label for="classEnd" class="form-label">Ends</label>
+                            <input type="time" class="form-control" id="classEnd" required>
+                        </div>
+                        <div class="col-md-2 form-group">
+                            <label for="classMode" class="form-label">Where</label>
+                            <select class="form-select" id="classMode">
+                                <option value="in_person">In person</option>
+                                <option value="online">Online</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 form-group">
+                            <label for="classLocation" class="form-label">Room or address (optional)</label>
+                            <input type="text" class="form-control" id="classLocation" maxlength="200" autocomplete="off">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="classLink" class="form-label">Join link (optional, https only)</label>
+                            <input type="url" class="form-control" id="classLink" autocomplete="off">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="classNotes" class="form-label">Notes for students (optional)</label>
+                            <input type="text" class="form-control" id="classNotes" maxlength="500" autocomplete="off">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add class</button>
+                </form>
+            </div>
+            <div class="card-body table-wrap">
+                <table class="table table-hover align-middle">
+                    <thead><tr><th>When</th><th>Class</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="classesBody"></tbody>
+                </table>
+            </div>
+        </section>
+
         <section class="card admin-section" aria-labelledby="accountsHeading">
             <div class="card-header"><h2 id="accountsHeading">Accounts</h2></div>
             <div class="card-body table-wrap">

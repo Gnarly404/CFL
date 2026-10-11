@@ -75,3 +75,8 @@ mark sup{font-weight:700;margin-left:2px}
 .notif .actions{margin-top:var(--s3)}
 .notif-meta{display:flex;flex-wrap:wrap;gap:var(--s2);align-items:center;font-size:.85rem;color:var(--muted)}
 .filter-row{display:flex;flex-wrap:wrap;gap:var(--s2);align-items:center;margin-bottom:var(--s4)}
+
+/* Schedule */
+.class-row { list-style: none; padding: var(--space-3, 12px) 0; border-top: 1px solid var(--line, #e3e3e3); }
+.class-row:first-child { border-top: 0; }
+.class-row.is-cancelled h3, .class-row.is-cancelled > p { text-decoration: line-through; opacity: .7; }

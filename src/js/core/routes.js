@@ -14,6 +14,7 @@ export const ROUTES = Object.freeze({
   practiceMistakes: '/student/practice/mistakes',
   practiceFlashcards: '/student/practice/flashcards',
   notifications: '/student/notifications',
+  schedule: '/student/schedule',
   instructor: '/instructor/dashboard',
   instructorReview: '/instructor/review',
   instructorReviewSubmission: '/instructor/review/submission',
