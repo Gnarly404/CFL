@@ -4,6 +4,7 @@ import { h } from './h.js';
 const ITEMS = [
   { key: 'dashboard', label: 'Dashboard', href: ROUTES.instructor },
   { key: 'review', label: 'Writing review', href: ROUTES.instructorReview },
+  { key: 'messages', label: 'Messages', href: ROUTES.instructorMessages },
 ];
 
 /** Fills #portalSide and #portalBottom for instructor pages. */

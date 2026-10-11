@@ -192,9 +192,19 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 - Local emulator: the server returns the activation link and the admin page sends it through EmailJS, so the whole flow can be tried locally. Real project: the server emails the invitation itself (`SMTP_PASS`) and returns no link; the admin page now says "sent by the server" instead of showing an emulator error. The EmailJS path is covered by tests; the real-project path depends on the mail secret being set and **has not been tried against a live project**.
 - `.firebaserc`: `default` points at staging again (a placeholder until a staging project exists), so a plain `firebase deploy` cannot reach production. Deploy with `firebase use production && firebase deploy` until staging exists. Backup files (`*.bak`) are now git-ignored.
 
+### Message centre (twelfth slice)
+
+- `/student/messages` and `/instructor/messages`: a list of conversations (latest message, unread count) and the conversation itself with a reply box (Ctrl+Enter sends). Teachers and students can start a conversation with anyone assigned to them, even before any message exists. On narrow screens the list and the conversation show one at a time.
+- Server: `sendMessage` and `messageContacts` callable functions. `sendMessage` checks the assignment against the student record, that both accounts are active, cleans the text, rate limits the sender, and writes the message. A student recipient gets one notification per conversation (`message_{threadId}`), refreshed and marked unread by each new message, linking to `/student/messages?with=<teacher>`.
+- Rules: messages are readable by anyone listed in `participants` (queries must use `where('participants', 'array-contains', uid)`); only the recipient can set `readAt`; nobody can create or delete from a browser. New index `messages: participants (array), createdAt desc`.
+- Teachers are not notified of student messages yet (no notification page for staff); they see unread counts in their Messages list.
+- Not built: messages from Administration or CFL, attachments, deleting or editing a message, typing indicators, search.
+- Rules tests for messages were added and **have not been run**. Needs deploying: functions `sendMessage` and `messageContacts`, updated rules, new index.
+- 55 test files, 487 tests pass.
+
 ### Next up
 1. Run `npm run test:rules` somewhere with the Firebase emulators (needs Java 21 and access to storage.googleapis.com; the build sandbox blocks that host, so the Firestore emulator cannot be downloaded there). Fix any rules bug. Highest priority: the rules for lessonProgress, mistakes, practiceSessions, submissions and feedback are in real use and have never been exercised.
-2. Messaging (message centre) and more notification sources.
+2. Messages from Administration, and more notification sources (class reminders, payments).
 3. Content management (lessons are JSON in the repo today), an instructor view of student progress, speaking review (needs an audio upload path, rules and consent wording).
 4. Switching the CSP from Report-Only to enforcing after a signed-in check (see "Content-Security-Policy" below). Self-hosted fonts, the icon family and the shared public header and footer are done.
 

@@ -15,8 +15,10 @@ export const ROUTES = Object.freeze({
   practiceFlashcards: '/student/practice/flashcards',
   notifications: '/student/notifications',
   schedule: '/student/schedule',
+  messages: '/student/messages',
   instructor: '/instructor/dashboard',
   instructorReview: '/instructor/review',
+  instructorMessages: '/instructor/messages',
   instructorReviewSubmission: '/instructor/review/submission',
   admin: '/admin/dashboard',
 });

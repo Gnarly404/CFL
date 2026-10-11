@@ -15,5 +15,8 @@ export { adminAssignInstructor } from './src/admin/assign-instructor.js';
 // Instructor tools
 export { instructorNotifyFeedback } from './src/instructor/notify-feedback.js';
 
+// Messaging
+export { sendMessage, messageContacts } from './src/messages/messages.js';
+
 // Account lifecycle
 export { activateAccount } from './src/auth/activate-account.js';

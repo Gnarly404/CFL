@@ -7,7 +7,7 @@ const ITEMS = [
   { key: 'notifications', label: 'Notifications', short: 'Alerts', href: ROUTES.notifications, badge: true },
   { key: 'schedule', label: 'Schedule', short: 'Schedule', href: ROUTES.schedule },
   { key: 'progress', label: 'Progress', short: 'Progress' },
-  { key: 'messages', label: 'Messages', short: 'Messages' },
+  { key: 'messages', label: 'Messages', short: 'Messages', href: ROUTES.messages },
 ];
 
 const badgeNode = () => h('span', { class: 'nav-badge', 'data-notification-count': true, hidden: true });
@@ -28,7 +28,7 @@ export function mountPortalShell(active) {
     h('nav', { class: 'portal-nav', 'aria-label': 'Account' }, h('a', { href: ROUTES.login, 'data-action': 'sign-out' }, 'Sign out')),
   );
   bottom?.replaceChildren(
-    ...ITEMS.filter((entry) => ['dashboard', 'practice', 'schedule', 'notifications'].includes(entry.key)).map((entry) => h('a', { href: entry.href, 'aria-current': entry.key === active ? 'page' : null }, entry.short, entry.badge ? badgeNode() : '')),
+    ...ITEMS.filter((entry) => ['dashboard', 'practice', 'schedule', 'messages', 'notifications'].includes(entry.key)).map((entry) => h('a', { href: entry.href, 'aria-current': entry.key === active ? 'page' : null }, entry.short, entry.badge ? badgeNode() : '')),
     h('span', { 'aria-disabled': 'true' }, 'Progress'),
     h('a', { href: ROUTES.login, 'data-action': 'sign-out' }, 'Sign out'),
   );

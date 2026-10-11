@@ -80,3 +80,25 @@ mark sup{font-weight:700;margin-left:2px}
 .class-row { list-style: none; padding: var(--space-3, 12px) 0; border-top: 1px solid var(--line, #e3e3e3); }
 .class-row:first-child { border-top: 0; }
 .class-row.is-cancelled h3, .class-row.is-cancelled > p { text-decoration: line-through; opacity: .7; }
+
+/* Message centre */
+.inbox { display: grid; grid-template-columns: minmax(220px, 300px) 1fr; gap: var(--space-4, 16px); align-items: start; }
+.thread-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.thread-row { width: 100%; text-align: left; display: grid; gap: 2px; padding: 10px 12px; border: 1px solid var(--line, #e3e3e3); border-radius: 10px; background: var(--surface, #fff); color: inherit; font: inherit; cursor: pointer; min-height: 44px; }
+.thread-row.is-active { border-color: var(--accent, #1d4ed8); }
+.thread-row.is-unread .thread-name { font-weight: 700; }
+.thread-name { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.thread-preview, .thread-time { font-size: .85em; overflow-wrap: anywhere; }
+.bubbles { list-style: none; margin: 0 0 var(--space-3, 12px); padding: 0; display: grid; gap: 10px; max-height: 50vh; overflow-y: auto; }
+.bubble { max-width: 85%; padding: 8px 12px; border-radius: 12px; border: 1px solid var(--line, #e3e3e3); }
+.bubble.mine { justify-self: end; background: var(--surface-2, #f1f5f9); }
+.bubble.theirs { justify-self: start; }
+.bubble-text { margin: 0 0 4px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.bubble-time { font-size: .8em; }
+.inbox-back { display: none; margin-bottom: 8px; }
+@media (max-width: 760px) {
+  .inbox { grid-template-columns: 1fr; }
+  .inbox--open .inbox-list { display: none; }
+  .inbox:not(.inbox--open) .inbox-thread { display: none; }
+  .inbox-back { display: inline-flex; }
+}

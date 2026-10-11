@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" data-auth="pending" data-veil="on">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Messages - CFL Staff</title>
+<link rel="stylesheet" href="/css/foundation.css">
+<link rel="stylesheet" href="/css/fonts.css">
+<link rel="stylesheet" href="/css/motion.css">
+<link rel="stylesheet" href="/css/tokens.css">
+<link rel="stylesheet" href="/css/components.css">
+<link rel="stylesheet" href="/css/portal.css">
+<link rel="stylesheet" href="/css/practice.css">
+<link rel="icon" type="image/png" href="/images/logo.png">
+<script type="module" src="/js/pages/instructor-messages.js"></script>
+<script type="module" src="/js/motion/boot.js"></script>
+</head>
+<body class="portal">
+<div class="portal-shell">
+  <aside class="portal-side" id="portalSide"></aside>
+  <main class="portal-main">
+    <header class="portal-head">
+      <h1>Messages</h1>
+      <p id="inboxSummary" class="muted">Loading…</p>
+    </header>
+    <p id="inboxNote" class="form-note" role="alert" hidden></p>
+    <div id="inbox" class="inbox">
+      <nav class="inbox-list" aria-label="Conversations"><ul id="inboxList" class="thread-list"></ul></nav>
+      <section id="inboxThread" class="inbox-thread card" aria-label="Conversation"></section>
+    </div>
+  </main>
+</div>
+<nav class="portal-bottom" id="portalBottom" aria-label="Portal mobile"></nav>
+</body>
+</html>

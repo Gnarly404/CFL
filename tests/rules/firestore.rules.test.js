@@ -43,6 +43,7 @@ beforeEach(async () => {
     await setDoc(doc(db, 'lessonProgress/stu1_live'), { studentId: 'stu1', lessonId: 'live', percent: 40 });
     await setDoc(doc(db, 'questionAttempts/att1'), { studentId: 'stu1', correct: true });
     await setDoc(doc(db, 'messages/m1'), { senderId: 'ins1', recipientId: 'stu1', body: 'Hello' });
+    await setDoc(doc(db, 'messages/m2'), { threadId: 'stu1_ins1', participants: ['stu1', 'ins1'], studentId: 'stu1', instructorId: 'ins1', senderId: 'ins1', recipientId: 'stu1', body: 'Unit 3 please', createdAt: Timestamp.fromMillis(2_000_000_000_000), readAt: null });
     await setDoc(doc(db, 'notifications/n1'), { userId: 'stu1', title: 'Hi' });
     await setDoc(doc(db, 'payments/p1'), { studentId: 'stu1', amount: 100 });
     await setDoc(doc(db, 'auditLogs/a1'), { action: 'x' });
@@ -219,6 +220,34 @@ describe('messages, notifications and money', () => {
     await assertSucceeds(getDoc(doc(as.admin(), 'auditLogs/a1')));
     await assertFails(getDoc(doc(as.student(), 'auditLogs/a1')));
     await assertFails(addDoc(collection(as.admin(), 'auditLogs'), { action: 'forged' }));
+  });
+});
+
+describe('messages between a student and their teacher', () => {
+  it('each participant reads their conversation by naming themselves, and nobody else can', async () => {
+    const mine = (db, uid) => getDocs(query(collection(db, 'messages'), where('participants', 'array-contains', uid), orderBy('createdAt', 'desc')));
+    await assertSucceeds(mine(as.student('stu1'), 'stu1'));
+    await assertSucceeds(mine(as.instructor('ins1'), 'ins1'));
+    await assertFails(mine(as.student('stu2'), 'stu1'));
+    await assertFails(mine(as.instructor('ins2'), 'ins1'));
+    await assertFails(getDocs(collection(as.student('stu1'), 'messages')));
+    await assertFails(getDoc(doc(as.admin(), 'messages/m2')));
+    await assertFails(getDoc(doc(as.anon(), 'messages/m2')));
+  });
+
+  it('only the recipient can mark a message read, and nothing else changes', async () => {
+    await assertSucceeds(updateDoc(doc(as.student('stu1'), 'messages/m2'), { readAt: Timestamp.now() }));
+    await assertFails(updateDoc(doc(as.instructor('ins1'), 'messages/m2'), { readAt: Timestamp.now() }));
+    await assertFails(updateDoc(doc(as.student('stu1'), 'messages/m2'), { body: 'edited' }));
+    await assertFails(updateDoc(doc(as.student('stu1'), 'messages/m2'), { readAt: Timestamp.now(), body: 'edited' }));
+  });
+
+  it('browsers can never create or delete a message', async () => {
+    const m = { threadId: 'stu1_ins1', participants: ['stu1', 'ins1'], senderId: 'stu1', recipientId: 'ins1', body: 'hi' };
+    await assertFails(addDoc(collection(as.student('stu1'), 'messages'), m));
+    await assertFails(addDoc(collection(as.instructor('ins1'), 'messages'), { ...m, senderId: 'ins1', recipientId: 'stu1' }));
+    await assertFails(addDoc(collection(as.admin(), 'messages'), m));
+    await assertFails(deleteDoc(doc(as.student('stu1'), 'messages/m2')));
   });
 });
 

@@ -192,8 +192,11 @@ service cloud.firestore {
 
     // Messages: participants read; the recipient may mark as read.
     // Creating messages is enabled with recipient scoping in the messaging session.
+    // Messages are created only by the sendMessage function. Both people in a conversation are listed in
+    // `participants`, so a query with where('participants', 'array-contains', uid) is allowed for each of them.
     match /messages/{messageId} {
-      allow read: if isUser(resource.data.senderId) || isUser(resource.data.recipientId);
+      allow read: if isUser(resource.data.get('senderId', '')) || isUser(resource.data.get('recipientId', ''))
+                  || (signedIn() && request.auth.uid in resource.data.get('participants', []));
       allow update: if isUser(resource.data.recipientId) && changesOnly(['readAt']);
       allow create, delete: if false;
     }

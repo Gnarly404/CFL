@@ -29,6 +29,13 @@ export function fakeDb() {
     collection(col) {
       return {
         doc: (id = `auto${++counter}`) => ref(col, id),
+        where(field, op, value) {
+          const matches = () => [...store.entries()]
+            .filter(([key, doc]) => key.startsWith(`${col}/`) && (op === 'array-contains' ? Array.isArray(doc[field]) && doc[field].includes(value) : doc[field] === value))
+            .map(([key, doc]) => ({ id: key.slice(col.length + 1), data: () => structuredClone(doc) }));
+          const query = { limit: () => query, get: async () => ({ docs: matches() }) };
+          return query;
+        },
         async add(data) {
           counter += 1;
           store.set(`${col}/auto${counter}`, { ...data });

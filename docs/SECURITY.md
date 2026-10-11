@@ -45,7 +45,7 @@
   practice; graded assessments must be marked by a function (planned with the English Practice session).
 - Instructor access to student data is scoped to assignment. An instructor can read a student's **submitted** writing (never drafts) only when listed in that student's `instructorIds`, and can create or edit `feedback` only on submitted work of such a student. Instructors still cannot read lesson progress, mistakes, practice sessions or any other learning data, and can never write to `submissions`. Feedback is a separate document, so a student's text is never altered.
 - Instructors can schedule classes only under their own `instructorId`, read only their assigned classes, and change only a class's scheduled/cancelled status. Students see only classes for programmes in which they are enrolled; admins can manage all schedules.
-- Message creation is closed until messaging defines who may write to whom.
+- Messages are created only by the `sendMessage` function. A student may message only a teacher listed in their `instructorIds`, and a teacher only students who list them; both accounts must exist and be active, text is plain (cleaned, 2000 characters, shown as text never markup), and each sender is limited to 30 messages an hour. Each message lists both people in `participants`; only they can read it. Admins cannot read conversations. Browsers can only mark a message they received as read.
 - A signed-in token stays valid up to an hour. Role changes and disabling revoke refresh tokens, and privileged functions
   re-check the live role, but Firestore rules read the token. Keep that in mind for anything highly sensitive.
 - No Content-Security-Policy yet: the pages still load Bootstrap, Font Awesome and fonts from CDNs. The design-system
