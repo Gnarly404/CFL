@@ -23,6 +23,7 @@ cp functions/.secret.local.example functions/.secret.local
 printf 'APP_BASE_URL=http://localhost:5173\nMAIL_TRANSPORT=console\n' > functions/.env.local
 
 npm run emulators      # terminal 1: Auth, Firestore, Functions, Storage
+# or: npm run emulators:keep   (same, but saves accounts and data to ./emulator-data when you press Ctrl+C, and loads them next time)
 npm run seed           # terminal 2: demo accounts and sample applications
 npm run dev            # terminal 3: the site at http://localhost:5173
 ```

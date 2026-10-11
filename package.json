@@ -18,6 +18,7 @@
     "check:routes": "node scripts/check-routes.mjs",
     "verify": "npm run check:shared && npm run lint && npm test && npm run build && npm run check:routes",
     "emulators": "firebase emulators:start --project demo-cfl --only auth,functions,firestore,storage",
+    "emulators:keep": "node scripts/run-emulators.mjs",
     "seed": "node scripts/run-seed-local.mjs",
     "bootstrap-admin": "node scripts/bootstrap-admin.mjs",
     "sync:shared": "node scripts/sync-shared.mjs",

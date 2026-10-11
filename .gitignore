@@ -19,3 +19,6 @@ serviceAccount*.json
 
 # Editor and tool backups
 *.bak
+
+# Saved local emulator data
+emulator-data/
