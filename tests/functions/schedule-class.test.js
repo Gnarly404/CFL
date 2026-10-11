@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { scheduleClassCore } from '../../functions/src/instructor/schedule-class.js';
+import { manageScheduledClassCore, scheduleClassCore } from '../../functions/src/instructor/schedule-class.js';
 import { fakeDb, fakeFieldValue, log } from './helpers/fakes.js';
 
 const actor = { uid: 'ins1', role: 'instructor', email: 'teacher@example.com' };
@@ -31,27 +31,16 @@ const messages = (deps) => [...deps.db.store.entries()].filter(([key]) => key.st
 const notifications = (deps) => [...deps.db.store.entries()].filter(([key]) => key.startsWith('notifications/')).map(([, value]) => value);
 
 describe('scheduleClass', () => {
-  it('saves the class and sends its details only to enrolled, enabled students', async () => {
+  it('returns after creating the class without waiting for student notifications', async () => {
     const deps = setup();
     const result = await scheduleClassCore(deps, { actor, data: input });
 
-    expect(result).toMatchObject({ recipientCount: 1, sent: 1, failed: 0 });
+    expect(result.classId).toBeTruthy();
     expect(deps.db.store.get(`schedules/${result.classId}`)).toMatchObject({
       title: 'Grammar workshop', programmeId: 'english-intake', instructorId: 'ins1', status: 'scheduled',
     });
-    expect(messages(deps)).toHaveLength(1);
-    expect(messages(deps)[0]).toMatchObject({
-      participants: ['stu1', 'ins1'], studentId: 'stu1', instructorId: 'ins1',
-      senderId: 'ins1', recipientId: 'stu1', kind: 'class_announcement', classId: result.classId,
-    });
-    expect(messages(deps)[0].body).toContain('Date: Monday, 12 October 2026');
-    expect(messages(deps)[0].body).toContain('Time: 10:00 am to 11:00 am EAT');
-    expect(messages(deps)[0].body).toContain('Programme: English Intake');
-    expect(messages(deps)[0].body).toContain('Join link: https://meet.example/class');
-    expect(messages(deps)[0].body).toContain('Notes: Bring your workbook.');
-    expect(notifications(deps)).toEqual([expect.objectContaining({
-      userId: 'stu1', category: 'class', title: 'New class: Grammar workshop', sourceId: result.classId,
-    })]);
+    expect(messages(deps)).toHaveLength(0);
+    expect(notifications(deps)).toHaveLength(0);
   });
 
   it('rejects unsafe join links before creating a class', async () => {
@@ -62,13 +51,39 @@ describe('scheduleClass', () => {
     expect(messages(deps)).toHaveLength(0);
   });
 
-  it('creates the class without fan-out when there are no enrolled students', async () => {
+  it('rejects a class that overlaps another active class for the instructor', async () => {
     const deps = setup();
-    deps.db.store.delete('enrolments/e1');
-    deps.db.store.delete('enrolments/e1-copy');
-    deps.db.store.delete('enrolments/e2');
+    deps.db.store.set('schedules/existing', {
+      instructorId: 'ins1', status: 'scheduled',
+      startsAt: new Date('2026-10-12T07:30:00.000Z'),
+      endsAt: new Date('2026-10-12T08:30:00.000Z'),
+    });
+    await expect(scheduleClassCore(deps, { actor, data: input })).rejects.toMatchObject({ code: 'already-exists' });
+    expect([...deps.db.store.keys()].filter((key) => key.startsWith('schedules/'))).toHaveLength(1);
+  });
+
+  it('allows a new class when the apparent overlap was cancelled', async () => {
+    const deps = setup();
+    deps.db.store.set('schedules/cancelled', {
+      instructorId: 'ins1', status: 'cancelled',
+      startsAt: new Date('2026-10-12T07:30:00.000Z'),
+      endsAt: new Date('2026-10-12T08:30:00.000Z'),
+    });
     const result = await scheduleClassCore(deps, { actor, data: input });
-    expect(result).toMatchObject({ recipientCount: 0, sent: 0, failed: 0 });
-    expect(messages(deps)).toHaveLength(0);
+    expect(result.classId).toBeTruthy();
+  });
+
+  it('cancels, restores, and permanently deletes only the instructor’s own class', async () => {
+    const deps = setup();
+    deps.db.store.set('schedules/owned', { instructorId: 'ins1', status: 'scheduled' });
+    deps.db.store.set('schedules/other', { instructorId: 'ins2', status: 'scheduled' });
+    await manageScheduledClassCore(deps, { actor, data: { classId: 'owned', action: 'cancel' } });
+    expect(deps.db.store.get('schedules/owned').status).toBe('cancelled');
+    await manageScheduledClassCore(deps, { actor, data: { classId: 'owned', action: 'restore' } });
+    expect(deps.db.store.get('schedules/owned').status).toBe('scheduled');
+    await expect(manageScheduledClassCore(deps, { actor, data: { classId: 'other', action: 'delete' } }))
+      .rejects.toMatchObject({ code: 'permission-denied' });
+    await manageScheduledClassCore(deps, { actor, data: { classId: 'owned', action: 'delete' } });
+    expect(deps.db.store.has('schedules/owned')).toBe(false);
   });
 });

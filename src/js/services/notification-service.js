@@ -1,5 +1,5 @@
 import {
-  collection, doc, getDocs, limit, orderBy, query, serverTimestamp, updateDoc, where, writeBatch,
+  collection, doc, getDocs, limit, onSnapshot, orderBy, query, serverTimestamp, updateDoc, where, writeBatch,
 } from 'firebase/firestore';
 import { dbService } from './firebase-db.js';
 
@@ -26,6 +26,19 @@ export async function loadNotifications(uid) {
       archived: Boolean(data.archivedAt),
     };
   });
+}
+
+/** Keeps the navigation unread count in sync while a student stays on a portal page. */
+export function watchUnreadNotifications(uid, onCount, onError) {
+  return onSnapshot(query(
+    collection(dbService(), 'notifications'),
+    where('userId', '==', uid), orderBy('createdAt', 'desc'), limit(MAX),
+  ), (snap) => {
+    onCount(snap.docs.filter((entry) => {
+      const data = entry.data();
+      return !data.readAt && !data.archivedAt;
+    }).length);
+  }, onError);
 }
 
 const ref = (id) => doc(dbService(), 'notifications', id);

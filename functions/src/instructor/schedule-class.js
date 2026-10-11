@@ -1,13 +1,13 @@
 import { onCall, HttpsError } from 'firebase-functions/https';
-import { buildRuntime } from '../lib/runtime.js';
+import { services } from '../lib/admin.js';
 import { requireRole } from '../lib/require-role.js';
-import { SMTP_PASS } from '../lib/config.js';
 
 const MAX_TITLE = 120;
 const MAX_LOCATION = 200;
 const MAX_NOTES = 500;
-const RECIPIENTS_PER_BATCH = 200;
 const isText = (value) => typeof value === 'string';
+const millis = (value) => value?.toMillis?.() ?? (value instanceof Date ? value.getTime() : 0);
+const ID = /^[A-Za-z0-9_-]{1,200}$/;
 
 function parseClass(data) {
   const programmeId = isText(data?.programmeId) ? data.programmeId.trim() : '';
@@ -42,109 +42,73 @@ function parseClass(data) {
   return { programmeId, title, mode, startsAt, endsAt, location, notes, joinLink: safeJoinLink };
 }
 
-function classMessage(value, instructorName) {
-  const date = new Intl.DateTimeFormat('en-KE', { dateStyle: 'full', timeZone: 'Africa/Nairobi' }).format(value.startsAt);
-  const time = new Intl.DateTimeFormat('en-KE', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Africa/Nairobi' });
-  const lines = [
-    `Class scheduled: ${value.title}`,
-    `Instructor: ${instructorName}`,
-    `Programme: ${value.programmeId.split(/[-_]/).map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}`,
-    `Date: ${date}`,
-    `Time: ${time.format(value.startsAt)} to ${time.format(value.endsAt)} EAT`,
-    `Format: ${value.mode === 'online' ? 'Online' : 'In person'}`,
-  ];
-  if (value.location) lines.push(`Location: ${value.location}`);
-  if (value.joinLink) lines.push(`Join link: ${value.joinLink}`);
-  if (value.notes) lines.push(`Notes: ${value.notes}`);
-  return lines.join('\n');
-}
-
-async function activeStudentsForProgramme(db, programmeId) {
-  const enrolments = await db.collection('enrolments').where('programmeId', '==', programmeId).get();
-  const ids = [...new Set(enrolments.docs.map((doc) => doc.data().studentId).filter((id) => isText(id) && id))];
-  const users = await Promise.all(ids.map((id) => db.collection('users').doc(id).get()));
-  return users
-    .filter((user) => user.exists && user.data().role === 'student' && user.data().status !== 'disabled')
-    .map((user) => ({ uid: user.id, data: user.data() }));
-}
-
-async function sendAnnouncements(deps, { recipients, instructor, value, classId }) {
-  const { db, FieldValue, log } = deps;
-  let sent = 0;
-  let failed = 0;
-  const body = classMessage(value, instructor.displayName || 'Your instructor');
-
-  for (let offset = 0; offset < recipients.length; offset += RECIPIENTS_PER_BATCH) {
-    const group = recipients.slice(offset, offset + RECIPIENTS_PER_BATCH);
-    const batch = db.batch();
-    for (const student of group) {
-      const threadId = `${student.uid}_${instructor.uid}`;
-      const messageRef = db.collection('messages').doc();
-      const notificationRef = db.collection('notifications').doc(`class_${classId}_${student.uid}`);
-      batch.set(messageRef, {
-        threadId,
-        participants: [student.uid, instructor.uid],
-        studentId: student.uid,
-        instructorId: instructor.uid,
-        studentName: student.data.displayName || student.data.email || 'Student',
-        instructorName: instructor.displayName || 'Your instructor',
-        senderId: instructor.uid,
-        recipientId: student.uid,
-        senderRole: 'instructor',
-        kind: 'class_announcement',
-        classId,
-        body,
-        createdAt: FieldValue.serverTimestamp(),
-        readAt: null,
-      });
-      batch.set(notificationRef, {
-        userId: student.uid,
-        type: 'class',
-        category: 'class',
-        title: `New class: ${value.title}`,
-        body: `Class details from ${instructor.displayName || 'your instructor'}.`,
-        link: `/student/messages?with=${encodeURIComponent(instructor.uid)}`,
-        sourceId: classId,
-        createdAt: FieldValue.serverTimestamp(),
-        readAt: null,
-        archivedAt: null,
-      });
-    }
-    try {
-      await batch.commit();
-      sent += group.length;
-    } catch (error) {
-      failed += group.length;
-      log?.error?.('class announcement batch failed', { classId, error: String(error) });
-    }
-  }
-  return { sent, failed };
-}
-
 export async function scheduleClassCore(deps, { actor, data }) {
   const value = parseClass(data);
-  const recipients = await activeStudentsForProgramme(deps.db, value.programmeId);
   const instructorSnap = await deps.db.collection('users').doc(actor.uid).get();
-  const instructor = {
-    uid: actor.uid,
-    displayName: instructorSnap.exists && instructorSnap.data().displayName || actor.email || 'Instructor',
-  };
+  const instructorName = instructorSnap.exists && instructorSnap.data().displayName || actor.email || 'Instructor';
   const classRef = deps.db.collection('schedules').doc();
-  await classRef.set({
+  const classData = {
     ...value,
     status: 'scheduled',
     instructorId: actor.uid,
-    instructorName: instructor.displayName,
+    instructorName,
     createdBy: actor.uid,
     createdAt: deps.FieldValue.serverTimestamp(),
     updatedAt: deps.FieldValue.serverTimestamp(),
+  };
+  const assignedClasses = deps.db.collection('schedules')
+    .where('instructorId', '==', actor.uid)
+    .where('status', '==', 'scheduled');
+  const lockRef = deps.db.collection('scheduleLocks').doc(actor.uid);
+
+  await deps.db.runTransaction(async (transaction) => {
+    await transaction.get(lockRef);
+    const snapshot = await transaction.get(assignedClasses);
+    const start = value.startsAt.getTime();
+    const end = value.endsAt.getTime();
+    const collision = snapshot.docs.some((entry) => {
+      const existing = entry.data();
+      return millis(existing.startsAt) < end && millis(existing.endsAt) > start;
+    });
+    if (collision) throw new HttpsError('already-exists', 'This class overlaps with another class on your schedule. Choose a different time.');
+    transaction.set(lockRef, { updatedAt: deps.FieldValue.serverTimestamp() }, { merge: true });
+    transaction.create(classRef, classData);
   });
-  const delivery = await sendAnnouncements(deps, { recipients, instructor, value, classId: classRef.id });
-  return { classId: classRef.id, recipientCount: recipients.length, ...delivery };
+  return { classId: classRef.id };
 }
 
-export const scheduleClass = onCall({ cors: true, timeoutSeconds: 120, secrets: [SMTP_PASS] }, async (request) => {
-  const deps = buildRuntime();
+export const scheduleClass = onCall({ cors: true }, async (request) => {
+  const deps = services();
   const actor = await requireRole(request, ['instructor'], deps);
   return scheduleClassCore(deps, { actor, data: request.data });
+});
+
+export async function manageScheduledClassCore(deps, { actor, data }) {
+  const classId = isText(data?.classId) ? data.classId : '';
+  const action = data?.action;
+  if (!ID.test(classId)) throw new HttpsError('invalid-argument', 'Choose a valid class.');
+  if (!['cancel', 'restore', 'delete'].includes(action)) throw new HttpsError('invalid-argument', 'Choose a valid class action.');
+
+  const ref = deps.db.collection('schedules').doc(classId);
+  await deps.db.runTransaction(async (transaction) => {
+    const snapshot = await transaction.get(ref);
+    if (!snapshot.exists) throw new HttpsError('not-found', 'This class no longer exists.');
+    const scheduleClass = snapshot.data();
+    if (scheduleClass.instructorId !== actor.uid) throw new HttpsError('permission-denied', 'You can manage only your own classes.');
+    if (action === 'delete') {
+      transaction.delete(ref);
+      return;
+    }
+    const status = action === 'cancel' ? 'cancelled' : 'scheduled';
+    if (scheduleClass.status !== status) {
+      transaction.update(ref, { status, updatedAt: deps.FieldValue.serverTimestamp() });
+    }
+  });
+  return { classId, action };
+}
+
+export const manageScheduledClass = onCall({ cors: true }, async (request) => {
+  const deps = services();
+  const actor = await requireRole(request, ['instructor'], deps);
+  return manageScheduledClassCore(deps, { actor, data: request.data });
 });

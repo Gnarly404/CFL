@@ -175,12 +175,7 @@ service cloud.firestore {
                   || (isInstructor() && resource.data.get('instructorId', '') == request.auth.uid)
                   || (isStudent() && exists(/databases/$(database)/documents/enrolments/$(request.auth.uid + '_' + resource.data.programmeId)));
         allow create: if isAdmin() && validClass();
-        allow update: if (isAdmin() && validClass())
-              || (isInstructor()
-                && resource.data.get('instructorId', '') == request.auth.uid
-                && request.resource.data.get('instructorId', '') == request.auth.uid
-                && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
-                && request.resource.data.status in ['scheduled', 'cancelled']);
+      allow update: if isAdmin() && validClass();
       allow delete: if isAdmin();
     }
     match /attendance/{recordId} {

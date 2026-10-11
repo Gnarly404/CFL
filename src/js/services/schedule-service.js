@@ -1,5 +1,5 @@
 import {
-  collection, doc, getDocs, limit, orderBy, query, serverTimestamp, Timestamp, updateDoc, where,
+  collection, getDocs, limit, orderBy, query, Timestamp, where,
 } from 'firebase/firestore';
 import { call } from './callable.js';
 import { dbService } from './firebase-db.js';
@@ -40,6 +40,4 @@ export async function createClass(value) {
   });
 }
 
-export const setClassCancelled = (id, cancelled) => updateDoc(doc(dbService(), 'schedules', id), {
-  status: cancelled ? 'cancelled' : 'scheduled', updatedAt: serverTimestamp(),
-});
+export const manageScheduledClass = (classId, action) => call('manageScheduledClass', { classId, action });

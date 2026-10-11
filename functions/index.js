@@ -15,6 +15,8 @@ export { adminAssignInstructor } from './src/admin/assign-instructor.js';
 // Instructor tools
 export { instructorNotifyFeedback } from './src/instructor/notify-feedback.js';
 export { scheduleClass } from './src/instructor/schedule-class.js';
+export { manageScheduledClass } from './src/instructor/schedule-class.js';
+export { notifyScheduleChanges } from './src/instructor/schedule-notifications.js';
 
 // Messaging
 export { sendMessage, messageContacts } from './src/messages/messages.js';

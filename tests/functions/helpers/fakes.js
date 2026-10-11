@@ -23,19 +23,29 @@ export function fakeDb() {
       if (!store.has(key)) throw new Error(`no document ${key}`);
       store.set(key, { ...store.get(key), ...patch });
     },
+    async delete() { store.delete(`${col}/${id}`); },
   });
+  const makeQuery = (col, filters = []) => {
+    const query = {
+      where(field, op, value) { return makeQuery(col, [...filters, [field, op, value]]); },
+      limit() { return query; },
+      async get() {
+        const matches = [...store.entries()]
+          .filter(([key, data]) => key.startsWith(`${col}/`) && filters.every(([field, op, value]) => (
+            op === 'array-contains' ? Array.isArray(data[field]) && data[field].includes(value) : data[field] === value
+          )))
+          .map(([key, data]) => ({ id: key.slice(col.length + 1), data: () => structuredClone(data) }));
+        return { docs: matches };
+      },
+    };
+    return query;
+  };
   return {
     store,
     collection(col) {
       return {
         doc: (id = `auto${++counter}`) => ref(col, id),
-        where(field, op, value) {
-          const matches = () => [...store.entries()]
-            .filter(([key, doc]) => key.startsWith(`${col}/`) && (op === 'array-contains' ? Array.isArray(doc[field]) && doc[field].includes(value) : doc[field] === value))
-            .map(([key, doc]) => ({ id: key.slice(col.length + 1), data: () => structuredClone(doc) }));
-          const query = { limit: () => query, get: async () => ({ docs: matches() }) };
-          return query;
-        },
+        where: (field, op, value) => makeQuery(col, [[field, op, value]]),
         async add(data) {
           counter += 1;
           store.set(`${col}/auto${counter}`, { ...data });
@@ -52,7 +62,7 @@ export function fakeDb() {
       return current;
     },
     runTransaction: async (fn) => fn({
-      get: (r) => r.get(), set: (r, d, o) => r.set(d, o), update: (r, p) => r.update(p),
+      get: (r) => r.get(), set: (r, d, o) => r.set(d, o), create: (r, d) => r.set(d), update: (r, p) => r.update(p), delete: (r) => r.delete(),
     }),
   };
 }

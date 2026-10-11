@@ -4,11 +4,11 @@ import { tick } from '../helpers.js';
 
 const listClasses = vi.fn();
 const createClass = vi.fn();
-const setClassCancelled = vi.fn();
+const manageScheduledClass = vi.fn();
 vi.mock('@/services/schedule-service.js', () => ({
   listClasses: (...a) => listClasses(...a),
   createClass: (...a) => createClass(...a),
-  setClassCancelled: (...a) => setClassCancelled(...a),
+  manageScheduledClass: (...a) => manageScheduledClass(...a),
 }));
 
 const row = (extra = {}) => ({ id: 'c1', programmeId: 'english-intake', title: 'Speaking', startsAtMs: Date.now() + 86_400_000, endsAtMs: Date.now() + 90_000_000, mode: 'online', instructorName: 'Ms Otieno', cancelled: false, ...extra });
@@ -27,7 +27,7 @@ async function setup(list = []) {
 const set = (id, value) => { document.getElementById(id).value = value; };
 const submit = async () => { document.getElementById('classForm').dispatchEvent(new Event('submit', { cancelable: true })); await tick(); };
 
-beforeEach(() => { listClasses.mockReset(); createClass.mockReset().mockResolvedValue({ classId: 'new', recipientCount: 2, sent: 2, failed: 0 }); setClassCancelled.mockReset().mockResolvedValue(); });
+beforeEach(() => { listClasses.mockReset(); createClass.mockReset().mockResolvedValue({ classId: 'new' }); manageScheduledClass.mockReset().mockResolvedValue(); });
 
 describe('instructor class schedule', () => {
   it('loads only the current instructor’s classes and shows an empty state', async () => {
@@ -53,7 +53,7 @@ describe('instructor class schedule', () => {
     const [value] = createClass.mock.calls[0];
     expect(value.startsAt).toBeInstanceOf(Date);
     expect(value).toMatchObject({ programmeId: 'english-intake', title: 'Speaking', instructorId: 'ins1', instructorName: 'Ms Otieno', mode: 'in_person' });
-    expect(say).toHaveBeenCalledWith(expect.stringContaining('details was sent to 2 students'), 'success');
+    expect(say).toHaveBeenCalledWith('Class scheduled. Enrolled students are being notified.', 'success');
   });
 
   it('keeps the form and reports when saving fails', async () => {
@@ -61,20 +61,33 @@ describe('instructor class schedule', () => {
     const say = await setup();
     set('classProgramme', 'english-intake'); set('classTitle', 'Speaking'); set('classDate', '2026-10-12'); set('classStart', '10:00'); set('classEnd', '11:00');
     await submit();
-    expect(say).toHaveBeenCalledWith(expect.stringContaining('could not be saved'), 'error');
+    expect(say).toHaveBeenCalledWith('denied', 'error');
     expect(document.getElementById('classTitle').value).toBe('Speaking');
   });
 
-  it('cancels after confirmation and restores without asking', async () => {
+  it('cancels, restores, and permanently deletes with confirmation', async () => {
     await setup([row()]);
     vi.spyOn(window, 'confirm').mockReturnValueOnce(false).mockReturnValue(true);
-    const button = () => document.querySelector('#classesBody button');
-    button().click(); await tick();
-    expect(setClassCancelled).not.toHaveBeenCalled();
+    const button = (name) => document.querySelector(`#classesBody button[aria-label^="${name}"]`);
+    expect(button('Delete')).toBeTruthy();
+    button('Cancel').click(); await tick();
+    expect(manageScheduledClass).not.toHaveBeenCalled();
     listClasses.mockResolvedValue([row({ cancelled: true })]);
-    button().click(); await tick();
-    expect(setClassCancelled).toHaveBeenCalledWith('c1', true);
-    document.querySelector('#classesBody button').click(); await tick();
-    expect(setClassCancelled).toHaveBeenLastCalledWith('c1', false);
+    button('Cancel').click(); await tick();
+    expect(manageScheduledClass).toHaveBeenCalledWith('c1', 'cancel');
+    button('Restore').click(); await tick();
+    expect(manageScheduledClass).toHaveBeenLastCalledWith('c1', 'restore');
+    button('Delete').click(); await tick();
+    expect(manageScheduledClass).toHaveBeenLastCalledWith('c1', 'delete');
+  });
+
+  it('shows the server time-conflict alert and keeps the form values', async () => {
+    createClass.mockRejectedValue(new Error('This class overlaps with another class on your schedule.'));
+    const say = await setup();
+    set('classProgramme', 'english-intake'); set('classTitle', 'Speaking'); set('classDate', '2026-10-12');
+    set('classStart', '10:00'); set('classEnd', '11:00');
+    await submit();
+    expect(say).toHaveBeenCalledWith('This class overlaps with another class on your schedule.', 'error');
+    expect(document.getElementById('classTitle').value).toBe('Speaking');
   });
 });

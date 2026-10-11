@@ -49,7 +49,7 @@ try {
 
 if (result) {
   const now = Date.now();
-  const { upcoming, earlier } = splitClasses(result.classes, now);
+  const { upcoming, earlier } = splitClasses(result.classes.filter((scheduleClass) => !scheduleClass.cancelled), now);
   const next = nextClass(upcoming);
   const summary = $('scheduleSummary');
   if (!result.programmeIds.length) summary.textContent = 'You are not enrolled in a programme yet, so there are no classes to show.';

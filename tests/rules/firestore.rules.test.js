@@ -293,6 +293,7 @@ describe('class schedule', () => {
     await assertFails(updateDoc(doc(as.instructor('ins1'), 'schedules/c1'), { title: 'Changed' }));
     await assertFails(updateDoc(doc(as.instructor('ins2'), 'schedules/c1'), { status: 'cancelled' }));
     await assertFails(updateDoc(doc(as.student('stu1'), 'schedules/c1'), { status: 'cancelled' }));
+    await assertFails(deleteDoc(doc(as.instructor('ins1'), 'schedules/c1')));
   });
 });
 

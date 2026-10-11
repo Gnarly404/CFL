@@ -38,7 +38,7 @@ describe('student schedule page', () => {
     expect(text('earlierDays')).toContain('Class old');
   });
 
-  it('offers a join link only for a safe, uncancelled online class', async () => {
+  it('omits cancelled classes and offers join links only for scheduled online classes', async () => {
     loadMyClasses.mockResolvedValue({ programmeIds: ['p'], classes: [
       cls('a', 24, { mode: 'online', joinLink: 'https://meet.example.com/x' }),
       cls('b', 48, { mode: 'online', joinLink: 'https://meet.example.com/y', cancelled: true }),
@@ -47,7 +47,7 @@ describe('student schedule page', () => {
     const links = [...document.querySelectorAll('a[href^="https://meet"]')];
     expect(links.map((a) => a.getAttribute('href'))).toEqual(['https://meet.example.com/x', 'https://meet.example.com/x']);
     expect(links[0].getAttribute('rel')).toContain('noopener');
-    expect(text('scheduleDays')).toContain('Cancelled');
+    expect(text('scheduleDays')).not.toContain('Class b');
   });
 
   it('does not make a cancelled class the next class', async () => {

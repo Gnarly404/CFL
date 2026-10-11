@@ -1,11 +1,11 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const loadNotifications = vi.fn();
-vi.mock('@/services/notification-service.js', () => ({ loadNotifications: (...a) => loadNotifications(...a) }));
+const watchUnreadNotifications = vi.fn();
+vi.mock('@/services/notification-service.js', () => ({ watchUnreadNotifications: (...a) => watchUnreadNotifications(...a) }));
 
 beforeEach(() => {
-  loadNotifications.mockReset();
+  watchUnreadNotifications.mockReset();
   document.body.innerHTML = '<span data-notification-count data-attention-key="notifications" hidden></span><span data-notification-count data-attention-key="notifications" hidden></span>';
 });
 
@@ -37,12 +37,19 @@ describe('notification badge', () => {
 
   it('loads the count, and stays hidden when loading fails', async () => {
     const { mountNotificationBadge } = await import('@/ui/notification-badge.js');
-    loadNotifications.mockResolvedValue([{ read: false, archived: false }, { read: true, archived: false }]);
-    await mountNotificationBadge('u');
+    let updateCount;
+    let reportError;
+    watchUnreadNotifications.mockImplementation((uid, onCount, onError) => {
+      expect(uid).toBe('u');
+      updateCount = onCount;
+      reportError = onError;
+      return () => {};
+    });
+    mountNotificationBadge('u');
+    updateCount(1);
     expect(document.querySelector('[data-notification-count]').textContent).toContain('1');
     document.querySelectorAll('[data-notification-count]').forEach((n) => { n.hidden = true; });
-    loadNotifications.mockRejectedValue(new Error('x'));
-    await mountNotificationBadge('u');
+    reportError(new Error('x'));
     expect(document.querySelector('[data-notification-count]').hidden).toBe(true);
   });
 });
