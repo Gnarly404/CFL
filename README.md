@@ -20,7 +20,9 @@ npm --prefix functions ci
 
 # Local settings for the functions emulator (both files are git-ignored)
 cp functions/.secret.local.example functions/.secret.local
-printf 'APP_BASE_URL=http://localhost:5173\nMAIL_TRANSPORT=console\n' > functions/.env.local
+printf 'APP_BASE_URL=http://localhost:5173\nMAIL_TRANSPORT=console\nMAIL_FROM=Centre of Foreign Learning <no-reply@example.com>\nSMTP_HOST=smtp.gmail.com\nSMTP_PORT=465\nSMTP_USER=\nIP_HASH_SALT=cfl-local\n' > functions/.env.local
+# Windows PowerShell: put those seven KEY=value lines in functions\.env.local with any editor.
+# Listing all of them stops the emulator from asking for each one when it starts.
 
 npm run emulators      # terminal 1: Auth, Firestore, Functions, Storage
 # or: npm run emulators:keep   (same, but saves accounts and data to ./emulator-data when you press Ctrl+C, and loads them next time)
