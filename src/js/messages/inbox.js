@@ -102,7 +102,6 @@ export async function mountInbox({
       h('ul', { class: 'bubbles', id: 'inboxMessages', 'aria-live': 'polite', 'aria-label': `Conversation with ${entry.otherName}` }, ...bubbles),
       entry.canSend
         ? h('div', { class: 'composer' },
-          h('p', { class: 'composer-recipient' }, h('span', { class: 'muted' }, 'To'), h('strong', {}, entry.otherName)),
           h('label', { for: 'inboxMessage', class: 'eyebrow' }, 'Your message'), box,
           h('div', { class: 'actions' }, sendButton, h('span', { id: 'inboxCount', class: 'muted' }, `${draft.length} / ${MAX_BODY}`)))
         : h('p', { class: 'muted' }, entry.announcementOnly ? 'Class announcements are read-only. Contact your assigned teacher if you have a question.' : 'You can no longer send messages to this person.'),

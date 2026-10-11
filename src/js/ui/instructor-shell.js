@@ -15,10 +15,13 @@ export function mountInstructorShell(active) {
     h('div', { class: 'portal-brand' }, h('img', { src: '/images/logo.png', alt: '' }), h('span', {}, 'CFL Staff')),
     h('nav', { class: 'portal-nav', 'aria-label': 'Instructor' }, ...ITEMS.map(link)),
     h('div', { class: 'portal-spacer' }),
-    h('nav', { class: 'portal-nav', 'aria-label': 'Account' }, h('a', { href: ROUTES.login, 'data-action': 'sign-out' }, 'Sign out')),
+    h('nav', { class: 'portal-nav portal-account', 'aria-label': 'Account' },
+      h('span', { class: 'portal-user-name', 'data-user-name': true }),
+      h('a', { href: ROUTES.login, 'data-action': 'sign-out' }, 'Sign out')),
   );
   document.getElementById('portalBottom')?.replaceChildren(
     ...ITEMS.map(link),
-    h('a', { href: ROUTES.login, 'data-action': 'sign-out' }, 'Sign out'),
+    h('a', { href: ROUTES.login, 'data-action': 'sign-out' },
+      h('span', { class: 'portal-user-name', 'data-user-name': true }), h('span', {}, 'Sign out')),
   );
 }

@@ -6,6 +6,7 @@ body.portal{margin:0;background:var(--bg);color:var(--text);font-family:var(--fo
 .portal-brand img{width:36px;height:36px;object-fit:contain}
 .portal-nav{display:flex;flex-direction:column;gap:var(--s1)}
 .portal-nav a,.portal-nav span{display:flex;justify-content:space-between;align-items:center;min-height:44px;padding:0 var(--s4);border-radius:12px;color:#dbe6f3;text-decoration:none}
+.portal-nav .portal-user-name{display:block;min-height:0;padding:var(--s2) var(--s4);color:rgba(255,255,255,.72);font-size:.82rem;overflow-wrap:anywhere}
 .portal-nav a{position:relative}
 .portal-nav .nav-attention{position:absolute;top:-4px;right:4px;display:grid;place-items:center;min-width:20px;min-height:20px;height:20px;margin:0;padding:0 5px;border:2px solid var(--navy);border-radius:999px;background:#c13d3d;color:#fff;font:700 .7rem var(--font-head);line-height:1}
 .portal-nav .nav-attention[hidden]{display:none}
@@ -31,6 +32,8 @@ body.portal{margin:0;background:var(--bg);color:var(--text);font-family:var(--fo
   .portal-bottom{position:fixed;inset:auto 0 0 0;display:flex;justify-content:space-around;padding:var(--s2) var(--s2) calc(var(--s2) + env(safe-area-inset-bottom,0px));background:var(--surface);border-top:1px solid var(--line)}
   .portal-bottom a,.portal-bottom span{display:flex;align-items:center;justify-content:center;min-width:64px;min-height:44px;color:var(--navy);text-decoration:none;font:600 .8rem var(--font-head)}
   .portal-bottom a{position:relative}
+  .portal-bottom [data-action="sign-out"]{flex-direction:column;gap:0;max-width:100px;overflow:hidden}
+  .portal-bottom .portal-user-name{display:block;min-width:0;min-height:0;max-width:88px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:.62rem}
   .portal-bottom .nav-attention{position:absolute;top:0;right:4px;display:grid;place-items:center;min-width:20px;min-height:20px;height:20px;margin:0;padding:0 5px;border:2px solid var(--surface);border-radius:999px;background:#c13d3d;color:#fff;font:700 .7rem var(--font-head);line-height:1}
   .portal-bottom .nav-attention[hidden]{display:none}
   .portal-bottom [aria-current="page"]{color:var(--coral-strong)}

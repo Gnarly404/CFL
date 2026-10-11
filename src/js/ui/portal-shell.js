@@ -25,11 +25,14 @@ export function mountPortalShell(active) {
     h('div', { class: 'portal-brand' }, h('img', { src: '/images/logo.png', alt: '' }), h('span', {}, 'CFL')),
     h('nav', { class: 'portal-nav', 'aria-label': 'Student portal' }, ...ITEMS.map((entry) => item(entry, active))),
     h('div', { class: 'portal-spacer' }),
-    h('nav', { class: 'portal-nav', 'aria-label': 'Account' }, h('a', { href: ROUTES.login, 'data-action': 'sign-out' }, 'Sign out')),
+    h('nav', { class: 'portal-nav portal-account', 'aria-label': 'Account' },
+      h('span', { class: 'portal-user-name', 'data-user-name': true }),
+      h('a', { href: ROUTES.login, 'data-action': 'sign-out' }, 'Sign out')),
   );
   bottom?.replaceChildren(
     ...ITEMS.filter((entry) => ['dashboard', 'practice', 'schedule', 'messages', 'notifications'].includes(entry.key)).map((entry) => h('a', { href: entry.href, 'aria-current': entry.key === active ? 'page' : null }, entry.short, entry.badge ? badgeNode() : '')),
     h('span', { 'aria-disabled': 'true' }, 'Progress'),
-    h('a', { href: ROUTES.login, 'data-action': 'sign-out' }, 'Sign out'),
+    h('a', { href: ROUTES.login, 'data-action': 'sign-out' },
+      h('span', { class: 'portal-user-name', 'data-user-name': true }), h('span', {}, 'Sign out')),
   );
 }

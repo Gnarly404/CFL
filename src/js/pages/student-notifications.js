@@ -11,7 +11,11 @@ import { mountPortalShell } from '@/ui/portal-shell.js';
 mountPortalShell('notifications');
 const session = await guardPage({ roles: ['student'] });
 const $ = (id) => document.getElementById(id);
-const note = (text) => { $('notifNote').hidden = !text; $('notifNote').textContent = text; };
+const note = (text, kind = 'error') => {
+  $('notifNote').hidden = !text;
+  $('notifNote').dataset.kind = kind;
+  $('notifNote').textContent = text;
+};
 
 let list = null;
 let filter = 'all';
@@ -26,11 +30,12 @@ try {
 
 const patch = (id, changes) => { list = list.map((n) => (n.id === id ? { ...n, ...changes } : n)); };
 
-async function act(label, work, apply) {
+async function act(label, work, apply, successMessage) {
   note('');
   try {
     await work();
     apply();
+    note(successMessage, 'success');
   } catch (error) {
     console.warn(`Could not ${label}`, error?.code ?? error);
     note(`Could not ${label}. Try again.`);
@@ -45,18 +50,30 @@ function row(n) {
     const open = h('a', { class: 'btn btn-primary', href: link, 'aria-label': `Open: ${n.title}` }, 'Open');
     open.addEventListener('click', async (event) => {
       event.preventDefault();
-      if (!n.read) { try { await markRead(n.id); } catch (error) { console.warn('Could not mark as read', error?.code ?? error); } }
+      if (!n.read) {
+        try {
+          await markRead(n.id);
+          patch(n.id, { read: true });
+          draw();
+        } catch (error) {
+          console.warn('Could not mark as read', error?.code ?? error);
+        }
+      }
       navigate(link);
     });
     actions.push(open);
   }
   if (!n.read) {
     const read = h('button', { class: 'btn', type: 'button', 'aria-label': `Mark as read: ${n.title}` }, 'Mark as read');
-    read.addEventListener('click', () => act('mark it as read', () => markRead(n.id), () => patch(n.id, { read: true })));
+    read.addEventListener('click', () => act(
+      'mark it as read', () => markRead(n.id), () => patch(n.id, { read: true }), 'Notification marked as read.',
+    ));
     actions.push(read);
   }
   const remove = h('button', { class: 'btn', type: 'button', 'aria-label': `Archive: ${n.title}` }, 'Archive');
-  remove.addEventListener('click', () => act('archive it', () => archive(n.id), () => patch(n.id, { read: true, archived: true })));
+  remove.addEventListener('click', () => act(
+    'archive it', () => archive(n.id), () => patch(n.id, { read: true, archived: true }), 'Notification archived.',
+  ));
   actions.push(remove);
   return h('li', { class: `notif${n.read ? '' : ' is-unread'}`, 'data-id': n.id },
     h('div', { class: 'notif-meta' }, h('span', { class: 'badge' }, categoryLabel(n.category)), n.read ? '' : h('strong', {}, 'Unread'), h('span', {}, timeAgo(n.createdAtMs))),

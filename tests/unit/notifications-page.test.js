@@ -57,6 +57,8 @@ describe('student notifications page', () => {
     click('button[aria-label="Mark as read: T-a"]'); await tick();
     expect(markRead).toHaveBeenCalledWith('a');
     expect(text('notifSummary')).toBe('0 unread · 2 in total');
+    expect(text('notifNote')).toBe('Notification marked as read.');
+    expect(document.getElementById('notifNote').dataset.kind).toBe('success');
   });
 
   it('archives an item', async () => {
@@ -64,6 +66,8 @@ describe('student notifications page', () => {
     click('button[aria-label="Archive: T-b"]'); await tick();
     expect(archive).toHaveBeenCalledWith('b');
     expect(text('notifList')).not.toContain('T-b');
+    expect(text('notifNote')).toBe('Notification archived.');
+    expect(document.getElementById('notifNote').dataset.kind).toBe('success');
   });
 
   it('marks all as read', async () => {
@@ -78,6 +82,7 @@ describe('student notifications page', () => {
     click('a[aria-label="Open: T-a"]'); await tick();
     expect(markRead).toHaveBeenCalledWith('a');
     expect(navigate).toHaveBeenCalledWith('/student/practice');
+    expect(text('notifSummary')).toBe('0 unread · 2 in total');
   });
 
   it('still opens the link if marking read fails', async () => {

@@ -120,6 +120,7 @@ body {
 .admin-nav a { position: relative; display: inline-flex; align-items: center; min-height: 44px; padding: 0.45rem 0.75rem; border-radius: 6px; color: #fff; text-decoration: none; font-weight: 600; white-space: nowrap; }
 .admin-nav a:hover,.admin-nav a:focus-visible { background: rgba(255,255,255,.14); color: #fff; }
 .admin-actions { display: flex; flex: 0 0 auto; gap: 0.5rem; }
+.admin-user { max-width: 14rem; align-self: center; overflow: hidden; color: #fff; font-size: 0.82rem; text-overflow: ellipsis; white-space: nowrap; }
 .admin-nav .nav-attention { position: absolute; top: -3px; right: 0; display: grid; place-items: center; min-width: 20px; height: 20px; padding: 0 5px; border: 2px solid #1f4e79; border-radius: 999px; background: #c13d3d; color: #fff; font-size: 0.7rem; line-height: 1; }
 .admin-nav .nav-attention[hidden] { display: none; }
 .admin-section { margin-bottom: 1.5rem; }
@@ -138,4 +139,5 @@ body {
     .admin-header { justify-content: space-between; padding: 0.65rem 1rem; }
     .admin-nav { order: 3; flex: 1 0 100%; justify-content: flex-start; flex-wrap: nowrap; overflow-x: auto; }
     .admin-actions { margin-left: auto; }
+    .admin-user { max-width: 7rem; }
 }
