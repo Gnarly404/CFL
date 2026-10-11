@@ -11,6 +11,7 @@ import {
 import {
   createUser, decideApplication, listApplications, listUsers, resendInvite, setUserDisabled, setUserRole,
 } from '@/services/admin-service.js';
+import { sendAccountInvitation } from '@/services/email.js';
 
 const CONFIRM = {
   approve: 'Approve this application? A student account is created and an invitation email is sent.',
@@ -46,6 +47,39 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
     }
   }
 
+  async function deliverInvitation(result, {
+    email,
+    displayName,
+    role,
+  }) {
+    if (!result?.activationUrl) {
+      say(
+        'The account operation completed, but no local activation link was returned. Check the Firebase emulator configuration.',
+        'error',
+      );
+      return false;
+    }
+
+    try {
+      await sendAccountInvitation({
+        email,
+        displayName,
+        role,
+        activationUrl: result.activationUrl,
+      });
+
+      say(`Invitation email sent successfully to ${email}.`, 'success');
+      return true;
+    } catch (error) {
+      console.error('EmailJS invitation failed:', error);
+      say(
+        `The account operation succeeded, but the invitation email failed for ${email}. Check your EmailJS configuration and try resending.`,
+        'error',
+      );
+      return false;
+    }
+  }
+
   const statusBadge = (status) => el('span', { class: `badge-status badge-${status}` }, STATUS_LABELS[status] ?? status);
 
   function applicationRow(app) {
@@ -54,7 +88,22 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
       class: `btn btn-sm ${decision === 'approve' ? 'btn-primary' : 'btn-outline-secondary'}`,
       onclick: async () => {
         if (CONFIRM[decision] && !window.confirm(CONFIRM[decision])) return;
-        await run(DECISION_LABELS[decision], () => decideApplication({ applicationId: app.id, decision }));
+
+        const result = await run(
+          DECISION_LABELS[decision],
+          () => decideApplication({
+            applicationId: app.id,
+            decision,
+          }),
+        );
+
+        if (decision === 'approve' && result) {
+          await deliverInvitation(result, {
+            email: app.email,
+            displayName: app.applicantName,
+            role: 'student',
+          });
+        }
       },
     }, DECISION_LABELS[decision]));
     return el('tr', {},
@@ -98,7 +147,21 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
       actions.push(el('button', {
         type: 'button',
         class: 'btn btn-sm btn-outline-secondary',
-        onclick: () => run('Invitation sent', () => resendInvite({ uid: user.uid }), { reload: [] }),
+        onclick: async () => {
+          const result = await run(
+            'Invitation prepared',
+            () => resendInvite({ uid: user.uid }),
+            { reload: [] },
+          );
+
+          if (result) {
+            await deliverInvitation(result, {
+              email: user.email,
+              displayName: user.displayName,
+              role: user.role,
+            });
+          }
+        },
       }, 'Resend invitation'));
     }
     return el('tr', {},
@@ -153,13 +216,31 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
 
     const button = createForm.querySelector('button[type="submit"]');
     setBusy(button, true, 'Creating…');
-    const result = await run('Account created', () => createUser({
-      email: email.value.trim(), displayName: name.value.trim(), role: role.value,
-    }), { reload: ['users'] });
+    const result = await run(
+      'Account created',
+      () => createUser({
+        email: email.value.trim(),
+        displayName: name.value.trim(),
+        role: role.value,
+      }),
+      { reload: ['users'] },
+    );
     setBusy(button, false);
     if (result) {
+      const invitationSent = await deliverInvitation(result, {
+        email: email.value.trim(),
+        displayName: name.value.trim(),
+        role: role.value,
+      });
+
       createForm.reset();
-      if (result.activationUrl) say(`Account created. Local emulator activation link: ${result.activationUrl}`, 'success');
+
+      if (invitationSent && result.activationUrl) {
+        say(
+          `Account created and invitation sent. Local activation link: ${result.activationUrl}`,
+          'success',
+        );
+      }
     }
   });
 

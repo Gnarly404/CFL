@@ -23,6 +23,7 @@ export async function decideApplicationCore(deps, { actor, data }) {
   }
 
   let userId = application.userId ?? null;
+  let accountActivationUrl = null;
   if (target === 'approved') {
     const { applicant } = application;
     const account = await provision({
@@ -44,6 +45,7 @@ export async function decideApplicationCore(deps, { actor, data }) {
       applicationId,
     });
     userId = account.uid;
+    accountActivationUrl = account.activationUrl ?? null;
 
     if (application.programmeId) {
       await db.collection('enrolments').doc(`${userId}_${application.programmeId}`).set({
@@ -77,7 +79,13 @@ export async function decideApplicationCore(deps, { actor, data }) {
       log?.warn('application update email failed', { applicationId, error: String(error) });
     }
   }
-  return { status: target, userId };
+  return {
+    status: target,
+    userId,
+    ...(target === 'approved' && deps.exposeLinks && accountActivationUrl
+      ? { activationUrl: accountActivationUrl }
+      : {}),
+  };
 }
 
 export const decideApplication = onCall({ cors: true, secrets: [SMTP_PASS] }, async (request) => {

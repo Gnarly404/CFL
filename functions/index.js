@@ -1,7 +1,4 @@
-import { setGlobalOptions } from 'firebase-functions/options';
-import { REGION } from './src/lib/config.js';
-
-setGlobalOptions({ region: REGION, maxInstances: 10 });
+import './global-options.js';
 
 // Admissions
 export { submitApplication } from './src/applications/submit.js';
