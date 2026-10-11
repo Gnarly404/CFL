@@ -7,12 +7,14 @@ const listAssignedStudents = vi.fn();
 const loadSubmittedWork = vi.fn();
 const loadMyFeedback = vi.fn();
 const saveFeedback = vi.fn();
+const notifyStudent = vi.fn();
 vi.mock('@/auth/guards.js', () => ({ guardPage: vi.fn().mockResolvedValue({ user: { uid: 'ins1', email: 'i@x.com' } }) }));
 vi.mock('@/services/review-service.js', () => ({
   listAssignedStudents: (...a) => listAssignedStudents(...a),
   loadSubmittedWork: (...a) => loadSubmittedWork(...a),
   loadMyFeedback: (...a) => loadMyFeedback(...a),
   saveFeedback: (...a) => saveFeedback(...a),
+  notifyStudent: (...a) => notifyStudent(...a),
 }));
 vi.mock('@/services/instructor-service.js', () => ({ getInstructorDashboardData: vi.fn().mockResolvedValue({ displayName: 'Ms Otieno', bio: '' }) }));
 
@@ -34,6 +36,7 @@ beforeEach(() => {
   loadMyFeedback.mockReset().mockResolvedValue({});
   loadSubmittedWork.mockReset().mockImplementation(async (id) => (id === 'stu1' ? [sub('stu1', 2000)] : [sub('stu2', 1000)]));
   saveFeedback.mockReset().mockResolvedValue();
+  notifyStudent.mockReset().mockResolvedValue({ created: true });
 });
 
 describe('instructor review queue', () => {
@@ -124,6 +127,34 @@ describe('feedback page', () => {
     click('#saveFeedback'); await tick();
     expect(text('stage')).toContain('could not be saved');
     expect(document.getElementById('overall').value).toBe('Keep me');
+  });
+
+  it('tells the server to notify the student after saving', async () => {
+    await open('instructor/review/submission.html', '@/pages/instructor-review-submission.js', url);
+    type(document.getElementById('overall'), 'Nice');
+    click('#saveFeedback'); await tick();
+    expect(notifyStudent).toHaveBeenCalledWith(`stu1_${task.promptId}`);
+    expect(document.getElementById('retryNotify')).toBeNull();
+  });
+
+  it('keeps the feedback and offers a retry when the notification fails', async () => {
+    notifyStudent.mockRejectedValueOnce(new Error('down'));
+    await open('instructor/review/submission.html', '@/pages/instructor-review-submission.js', url);
+    type(document.getElementById('overall'), 'Nice');
+    click('#saveFeedback'); await tick();
+    expect(text('stage')).toContain('not been notified');
+    expect(saveFeedback).toHaveBeenCalledTimes(1);
+    click('#retryNotify'); await tick();
+    expect(notifyStudent).toHaveBeenCalledTimes(2);
+    expect(document.getElementById('retryNotify')).toBeNull();
+  });
+
+  it('does not notify when saving fails', async () => {
+    saveFeedback.mockRejectedValue(new Error('offline'));
+    await open('instructor/review/submission.html', '@/pages/instructor-review-submission.js', url);
+    type(document.getElementById('overall'), 'x');
+    click('#saveFeedback'); await tick();
+    expect(notifyStudent).not.toHaveBeenCalled();
   });
 
   it('does not open writing from a student who is not assigned', async () => {

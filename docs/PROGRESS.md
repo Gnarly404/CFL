@@ -12,7 +12,7 @@ upload the latest zip and say "continue with session N"; this file is the handof
 | 3 | Student portal and dashboard | **Started**: Continue Learning and skill cards use real lesson progress. Still open: schedule, materials, fees from real data, profile and settings pages, email change |
 | 4 | English Practice (hub, engine, six skills, results, mistake review) | **Started**: hub, lesson shell, Grammar (5 starter lessons) work end to end. Vocabulary also works (4 starter lessons). Still open: Listening, Speaking, Reading, Writing, a cross-lesson mistake review page, daily goal, recommendations |
 | 5 | Public site, programmes, admissions pages | Planned |
-| 6 | Admin and instructor tools, messaging and notifications | Planned |
+| 6 | Admin and instructor tools, messaging and notifications | In progress (notifications done; messaging planned) |
 | 7 | Personalisation, hardening (CI deploy, accessibility, performance, monitoring), final release zip | Planned |
 
 The owner confirmed this order: student portal and English Practice come before the public site.
@@ -164,12 +164,22 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 - `/instructor/dashboard` (rebuilt on the portal shell), `/instructor/review` (queue: waiting and done, oldest first) and `/instructor/review/submission` (the student's text exactly as submitted, an overall comment, and notes that can quote exact words; quoted words are marked in the text without changing it).
 - Feedback is its own document, `feedback/{submissionId}`. The student sees it under "Teacher feedback" on their submitted writing; instructors can edit it later. Instructors can never write to `submissions`.
 - Rules: instructors read **submitted** writing of students whose `instructorIds` include them (via `get()` on the student record); queries must name the student and the submitted status. Rules tests for all of this were added to `tests/rules`. **They have not been run.** The one thing I am least sure of is that Firestore accepts the per-student `get()`-based query; if the queue shows "could not be loaded", that rule is the first place to look.
-- Not built: speaking review (recordings are never uploaded), grading, viewing a student's progress, notifications when feedback arrives, and the admin assignment tool that fills `instructorIds` (it is still set by the admissions function and by hand).
+- Not built: speaking review (recordings are never uploaded), grading, viewing a student's progress, and the admin assignment tool that fills `instructorIds` (it is still set by the admissions function and by hand).
 - 31 test files, 317 tests pass.
+
+### Notifications (tenth slice)
+
+- `/student/notifications`: All/Unread filter, mark as read, mark all as read, archive, and an Open button that marks read then follows the link. A count badge shows on the portal nav (desktop and mobile) and is loaded by the dashboard and the practice hub.
+- Browsers cannot create notifications (rules forbid it). After an instructor saves feedback, the page calls the `instructorNotifyFeedback` function. It checks that the feedback is theirs, that the submission is submitted, and that they still teach that student, then writes `notifications/feedback_{submissionId}`. It is idempotent and never turns a read notification back to unread. If the call fails the instructor sees "saved, but not notified yet" with a Notify student retry button.
+- Only the first feedback notifies. Later edits do not notify again.
+- Rules: the owner may now change only `readAt` and `archivedAt` on a notification, never its text or link. The rules test for this was added but **has not been run** (no emulator here).
+- Links are followed only if they stay inside `/student`. Archived items are hidden client side; the list loads the newest 100.
+- Needs deploying: the `instructorNotifyFeedback` function and the updated Firestore rules. The `notifications (userId, createdAt desc)` index already exists.
+- 43 test files, 393 tests pass.
 
 ### Next up
 1. Run `npm run test:rules` somewhere with the Firebase emulators (needs Java 21 and access to storage.googleapis.com; the build sandbox blocks that host, so the Firestore emulator cannot be downloaded there). Fix any rules bug. Highest priority: the rules for lessonProgress, mistakes, practiceSessions, submissions and feedback are in real use and have never been exercised.
-2. Notifications (for example when teacher feedback arrives) and messaging.
+2. Messaging (message centre) and more notification sources.
 3. Content management (lessons are JSON in the repo today), an instructor view of student progress, speaking review (needs an audio upload path, rules and consent wording).
 4. A shared public header and footer, and switching the CSP from Report-Only to enforcing after a signed-in check (see "Content-Security-Policy" below). Self-hosted fonts and the icon family are done.
 

@@ -15,5 +15,8 @@ export { adminSetUserRole } from './src/admin/set-user-role.js';
 export { adminResendInvite } from './src/admin/resend-invite.js';
 export { adminAssignInstructor } from './src/admin/assign-instructor.js';
 
+// Instructor tools
+export { instructorNotifyFeedback } from './src/instructor/notify-feedback.js';
+
 // Account lifecycle
 export { activateAccount } from './src/auth/activate-account.js';

@@ -9,10 +9,12 @@ import { loadMistakes, loadWordProgress } from '@/services/practice-service.js';
 import { SKILLS } from '@/practice/skills.js';
 import { h } from '@/ui/h.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
+import { mountNotificationBadge } from '@/ui/notification-badge.js';
 import { skillCard } from '@/ui/skill-card.js';
 
 mountPortalShell('practice');
 const session = await guardPage({ roles: ['student'] });
+mountNotificationBadge(session.user.uid);
 const { entries, failed } = await loadOverview(session.user.uid);
 let mistakeList = [];
 try { mistakeList = Object.values(await loadMistakes(session.user.uid)).filter((m) => m.status === 'open'); } catch (error) { console.warn('Could not load mistakes', error?.code ?? error); }

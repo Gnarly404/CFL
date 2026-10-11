@@ -28,7 +28,7 @@ Status key: **Done**, **Partial**, **Not started**.
 | 24 Mobile | Partial | Bottom nav, 44px targets. Not checked on a device |
 | 25 Accessibility | Partial | Focus management, labelled controls, reduced-motion tokens. No audit run |
 | 26 Performance | Not started | |
-| 27 Notifications and messaging | Not started | |
+| 27 Notifications and messaging | Partly built | Notifications: student list page, unread badge, read/archive, teacher-feedback notification. Not built: message centre (27.2), other notification sources |
 | 28 Admin and instructor product | Partial | Instructor: dashboard, assigned students, writing review queue and feedback page. Missing: speaking review (needs audio upload), student progress view for instructors, course and schedule tools, messaging; admin tools (admissions decisions UI, content management, user management beyond the basic dashboard) |
 | 29 Analytics and audit | Not started | Audit logging exists for admin actions only |
 | 30 Content management | Not started | Lesson content is JSON in the repo |
