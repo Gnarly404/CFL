@@ -73,7 +73,7 @@ Written by "server" means Cloud Functions (Admin SDK); rules deny browser writes
 | `practiceSessions`, `questionAttempts`, `lessonProgress`, `skillProgress`, `mistakes` | the student (own rows) | owner, admin | English Practice session |
 | `submissions` | student (drafts, then submit) | owner, admin, assigned instructor (submitted only) | locked after submit |
 | `feedback/{submissionId}` | assigned instructor | the student, the writing instructor, admin | overall, notes (quote + comment), never edits the submission |
-| `schedules/{id}` | admin | admin; students enrolled in `programmeId`; the instructor in `instructorId` | class: programmeId, title, startsAt, endsAt, mode, location, instructorId/Name, joinLink (https), notes, status |
+| `schedules/{id}` | admin; instructor creates own classes and changes their status | admin; students enrolled in `programmeId`; the instructor in `instructorId` | class: programmeId, title, startsAt, endsAt, mode, location, instructorId/Name, joinLink (https), notes, status |
 | `attendance` | admin | owner, admin | not built yet |
 | `messages` | server (messaging session) | participants | not built yet |
 | `notifications/{id}` | server (`instructorNotifyFeedback` today) | owner | owner may change only `readAt`, `archivedAt` |

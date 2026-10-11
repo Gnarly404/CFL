@@ -29,7 +29,7 @@ Status key: **Done**, **Partial**, **Not started**.
 | 25 Accessibility | Partial | Focus management, labelled controls, reduced-motion tokens. No audit run |
 | 26 Performance | Not started | |
 | 27 Notifications and messaging | Partly built | Notifications: student list page, unread badge, read/archive, teacher-feedback notification. Not built: message centre (27.2), other notification sources |
-| 28 Admin and instructor product | Partial | Instructor: dashboard, assigned students, writing review queue and feedback page. Admin: add, cancel and restore classes in a Class schedule section. Missing: speaking review (needs audio upload), student progress view for instructors, an instructor's own timetable view, attendance, messaging; admin tools (content management, user management beyond the basic dashboard) |
+| 28 Admin and instructor product | Partial | Instructor: dashboard, assigned students, writing review queue, feedback page, and add/cancel/restore controls for their own classes. Admin: basic account and admissions tools. Missing: speaking review (needs audio upload), student progress view for instructors, attendance, messaging; admin tools (content management, user management beyond the basic dashboard) |
 | 29 Analytics and audit | Not started | Audit logging exists for admin actions only |
 | 30 Content management | Not started | Lesson content is JSON in the repo |
 | 31 QA | Partial | 45 test files, 426 tests (unit, page-flow, functions). Missing: rules tests, end-to-end, accessibility checks |

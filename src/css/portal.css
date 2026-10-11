@@ -1,6 +1,7 @@
 body.portal{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-body)}
 .portal-shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
-.portal-side{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:var(--s2);padding:var(--s5) var(--s4);background:var(--navy);color:#fff}
+.portal-side{position:sticky;top:0;height:100vh;height:100dvh;box-sizing:border-box;overflow-y:auto;display:flex;flex-direction:column;gap:var(--s2);padding:var(--s5) var(--s4);background:var(--navy);color:#fff}
+.portal-brand,.portal-side>.portal-nav{flex:0 0 auto}
 .portal-brand{display:flex;align-items:center;gap:var(--s3);margin-bottom:var(--s5);font:700 1.1rem var(--font-head)}
 .portal-brand img{width:36px;height:36px;object-fit:contain}
 .portal-nav{display:flex;flex-direction:column;gap:var(--s1)}
@@ -9,7 +10,7 @@ body.portal{margin:0;background:var(--bg);color:var(--text);font-family:var(--fo
 .portal-nav [aria-current="page"]{background:rgba(255,255,255,.16);color:#fff;font-weight:700}
 .portal-nav [aria-disabled="true"]{opacity:.55}
 .portal-nav small{font-size:.7rem;opacity:.8}
-.portal-spacer{flex:1}
+.portal-spacer{flex:1 0 var(--s4);min-height:var(--s4)}
 .portal-main{max-width:1120px;width:100%;padding:var(--s7) var(--s6) var(--s8);box-sizing:border-box}
 .portal-head{margin-bottom:var(--s6)}
 .portal-head h1{margin:0 0 var(--s2);font:600 1.7rem var(--font-head);color:var(--navy)}
@@ -86,6 +87,18 @@ a.skill:hover .skill-cta svg{transform:translateX(3px)}
 
 /* Daily-goal radios use the brand colour */
 .goal-opt input{accent-color:var(--navy)}
+
+.schedule-form{display:grid;gap:var(--s4);margin:var(--s4) 0 var(--s5)}
+.schedule-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:var(--s4)}
+.schedule-fields label{display:grid;align-content:start;gap:var(--s1);font-size:.9rem;font-weight:600;color:var(--navy)}
+.schedule-fields input,.schedule-fields select,.schedule-fields textarea{width:100%;min-height:44px;box-sizing:border-box;padding:var(--s2) var(--s3);border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);font:400 .95rem var(--font-body)}
+.schedule-fields textarea{resize:vertical}
+.schedule-field-wide{grid-column:1/-1}
+.schedule-table-wrap{overflow-x:auto}
+.schedule-table{width:100%;min-width:600px;border-collapse:collapse;text-align:left}
+.schedule-table th,.schedule-table td{padding:var(--s3);border-top:1px solid var(--line);vertical-align:top}
+.schedule-table th{font-size:.82rem;color:var(--muted)}
+.schedule-table td.empty{text-align:center;color:var(--muted);padding:var(--s5)}
 
 #enrolments{margin:0;padding-left:1.1rem}
 .nav-badge{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;margin-left:var(--s2);padding:0 6px;border-radius:999px;background:#fff;color:var(--navy);font:700 .75rem var(--font-head)}

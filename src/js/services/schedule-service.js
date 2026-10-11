@@ -21,22 +21,23 @@ export async function loadMyClasses(uid, now = Date.now()) {
   return { programmeIds, classes: snaps.flatMap((snap) => snap.docs.map((d) => normaliseClass(d.id, d.data()))) };
 }
 
-/** Admin: classes from yesterday onward, soonest first. */
-export async function listClasses({ now = Date.now(), max = 200 } = {}) {
+/** Classes from yesterday onward, soonest first; instructor queries are scoped to their own classes. */
+export async function listClasses({ instructorId, now = Date.now(), max = 200 } = {}) {
   const snap = await getDocs(query(
     collection(dbService(), 'schedules'),
+    ...(instructorId ? [where('instructorId', '==', instructorId)] : []),
     where('startsAt', '>=', Timestamp.fromMillis(now - DAY)), orderBy('startsAt'), limit(max),
   ));
   return snap.docs.map((d) => normaliseClass(d.id, d.data()));
 }
 
-export async function createClass(value, adminUid) {
+export async function createClass(value, createdByUid) {
   const ref = await addDoc(collection(dbService(), 'schedules'), {
     ...value,
     startsAt: Timestamp.fromDate(value.startsAt),
     endsAt: Timestamp.fromDate(value.endsAt),
     status: 'scheduled',
-    createdBy: adminUid,
+    createdBy: createdByUid,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });

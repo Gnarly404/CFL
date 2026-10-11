@@ -11,17 +11,16 @@ vi.mock('@/services/schedule-service.js', () => ({
   setClassCancelled: (...a) => setClassCancelled(...a),
 }));
 
-const users = [{ uid: 'ins1', displayName: 'Ms Otieno', role: 'instructor', status: 'active' }, { uid: 'ins2', displayName: 'Gone', role: 'instructor', status: 'disabled' }];
 const row = (extra = {}) => ({ id: 'c1', programmeId: 'english-intake', title: 'Speaking', startsAtMs: Date.now() + 86_400_000, endsAtMs: Date.now() + 90_000_000, mode: 'online', instructorName: 'Ms Otieno', cancelled: false, ...extra });
 
 async function setup(list = []) {
-  document.body.innerHTML = `<form id="classForm"><select id="classProgramme"></select><input id="classTitle"><select id="classInstructor"></select>
+  document.body.innerHTML = `<form id="classForm"><select id="classProgramme"></select><input id="classTitle">
     <input id="classDate"><input id="classStart"><input id="classEnd"><select id="classMode"><option value="in_person">a</option><option value="online">b</option></select>
-    <input id="classLocation"><input id="classLink"><input id="classNotes"><button type="submit">Add</button></form><table><tbody id="classesBody"></tbody></table>`;
+    <input id="classLocation"><input id="classLink"><textarea id="classNotes"></textarea><button type="submit">Add</button></form><table><tbody id="classesBody"></tbody></table>`;
   listClasses.mockResolvedValue(list);
   const say = vi.fn();
-  const { initSchedule } = await import('@/admin/schedule.js');
-  const ui = initSchedule({ say, getUsers: () => users, adminUid: 'adm1' });
+  const { initSchedule } = await import('@/schedule/manager.js');
+  const ui = initSchedule({ say, instructor: { uid: 'ins1', displayName: 'Ms Otieno' } });
   await ui.load();
   return say;
 }
@@ -30,10 +29,10 @@ const submit = async () => { document.getElementById('classForm').dispatchEvent(
 
 beforeEach(() => { listClasses.mockReset(); createClass.mockReset().mockResolvedValue('new'); setClassCancelled.mockReset().mockResolvedValue(); });
 
-describe('admin class schedule', () => {
-  it('lists active instructors only and shows an empty state', async () => {
+describe('instructor class schedule', () => {
+  it('loads only the current instructor’s classes and shows an empty state', async () => {
     await setup();
-    expect([...document.getElementById('classInstructor').options].map((o) => o.textContent)).toEqual(['No instructor named', 'Ms Otieno']);
+    expect(listClasses).toHaveBeenCalledWith({ instructorId: 'ins1' });
     expect(document.getElementById('classesBody').textContent).toContain('No classes scheduled yet');
   });
 
@@ -48,11 +47,11 @@ describe('admin class schedule', () => {
   it('creates a valid class with the instructor named', async () => {
     const say = await setup();
     set('classProgramme', 'english-intake'); set('classTitle', 'Speaking'); set('classDate', '2026-10-12');
-    set('classStart', '10:00'); set('classEnd', '11:00'); set('classInstructor', 'ins1');
+    set('classStart', '10:00'); set('classEnd', '11:00');
     await submit();
     expect(createClass).toHaveBeenCalledTimes(1);
     const [value, uid] = createClass.mock.calls[0];
-    expect(uid).toBe('adm1');
+    expect(uid).toBe('ins1');
     expect(value).toMatchObject({ programmeId: 'english-intake', title: 'Speaking', instructorId: 'ins1', instructorName: 'Ms Otieno', mode: 'in_person' });
     expect(say).toHaveBeenCalledWith(expect.stringContaining('Class added'), 'success');
   });

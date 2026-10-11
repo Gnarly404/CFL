@@ -23,7 +23,7 @@
       <h1>Welcome, <span id="instructorName">…</span></h1>
       <p id="instructorBio" class="muted">Loading your profile…</p>
     </header>
-    <p id="dashNote" class="form-note" role="alert" hidden></p>
+    <p id="dashNote" class="form-alert" role="status" hidden></p>
     <div class="stack">
       <section class="card" aria-labelledby="awaitTitle">
         <p class="eyebrow">Writing review</p>
@@ -33,6 +33,30 @@
       <section class="card" aria-labelledby="studentsTitle">
         <h2 id="studentsTitle">Assigned students</h2>
         <ul id="assignedStudents" class="review-list"><li>Loading students…</li></ul>
+      </section>
+      <section class="card" aria-labelledby="classesHeading">
+        <h2 id="classesHeading">Class schedule</h2>
+        <p class="muted">Classes you schedule appear on the Schedule page for students enrolled in the programme.</p>
+        <form id="classForm" class="schedule-form" novalidate>
+          <div class="schedule-fields">
+            <label>Programme<select id="classProgramme" required></select></label>
+            <label>Class title<input type="text" id="classTitle" maxlength="120" autocomplete="off" required></label>
+            <label>Date<input type="date" id="classDate" required></label>
+            <label>Starts<input type="time" id="classStart" required></label>
+            <label>Ends<input type="time" id="classEnd" required></label>
+            <label>Where<select id="classMode"><option value="in_person">In person</option><option value="online">Online</option></select></label>
+            <label>Room or address (optional)<input type="text" id="classLocation" maxlength="200" autocomplete="off"></label>
+            <label>Join link (optional, HTTPS only)<input type="url" id="classLink" autocomplete="off"></label>
+            <label class="schedule-field-wide">Notes for students (optional)<textarea id="classNotes" maxlength="500" rows="2"></textarea></label>
+          </div>
+          <button type="submit" class="btn btn-primary">Add class</button>
+        </form>
+        <div class="schedule-table-wrap">
+          <table class="schedule-table">
+            <thead><tr><th>When</th><th>Class</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="classesBody"></tbody>
+          </table>
+        </div>
       </section>
     </div>
   </main>

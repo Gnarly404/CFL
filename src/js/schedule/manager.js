@@ -1,33 +1,27 @@
 import programmes from '../../data/programmes.json';
 import { el } from '@/utils/dom.js';
-import { describeWhen, formatDay, modeLabel } from '@/schedule/state.js';
-import { buildClass } from '@/schedule/validate.js';
+import { describeWhen, formatDay, modeLabel } from './state.js';
+import { buildClass } from './validate.js';
 import { createClass, listClasses, setClassCancelled } from '@/services/schedule-service.js';
 
 const programmeName = (id) => programmes.find((p) => p.id === id)?.name ?? id;
 
-/** "Class schedule": add classes for a programme and cancel or restore them. Students in that programme see them. */
-export function initSchedule({ root = document, say, getUsers, adminUid }) {
+/** Lets an instructor schedule and manage their own classes. */
+export function initSchedule({ root = document, say, instructor }) {
   const form = root.querySelector('#classForm');
   const body = root.querySelector('#classesBody');
   if (!form || !body) return { load() {} };
   const field = (id) => form.querySelector(`#${id}`);
   const empty = (text) => el('tr', {}, el('td', { colspan: 4, class: 'empty' }, text));
-
   const programmeSelect = field('classProgramme');
+  const instructors = [{ uid: instructor.uid, displayName: instructor.displayName }];
+
   programmeSelect.replaceChildren(el('option', { value: '' }, 'Choose a programme…'), ...programmes.map((p) => el('option', { value: p.id }, p.name)));
 
-  const instructors = () => getUsers().filter((u) => u.role === 'instructor' && u.status !== 'disabled');
-  function fillInstructors() {
-    const select = field('classInstructor');
-    select.replaceChildren(el('option', { value: '' }, 'No instructor named'),
-      ...instructors().map((u) => el('option', { value: u.uid }, u.displayName || u.email || u.uid)));
-  }
-
-  async function toggle(c) {
+  async function toggle(scheduleClass) {
     try {
-      await setClassCancelled(c.id, !c.cancelled);
-      say(c.cancelled ? 'Class restored.' : 'Class cancelled. Students will see it marked as cancelled.', 'success');
+      await setClassCancelled(scheduleClass.id, !scheduleClass.cancelled);
+      say(scheduleClass.cancelled ? 'Class restored.' : 'Class cancelled. Students will see it marked as cancelled.', 'success');
       await load();
     } catch (error) {
       say(error.message || 'That did not work. Try again.', 'error');
@@ -35,28 +29,27 @@ export function initSchedule({ root = document, say, getUsers, adminUid }) {
   }
 
   async function load() {
-    fillInstructors();
     body.replaceChildren(empty('Loading classes…'));
-    let list;
+    let classes;
     try {
-      list = await listClasses();
+      classes = await listClasses({ instructorId: instructor.uid });
     } catch (error) {
       console.warn('Could not load classes', error?.code ?? error);
       body.replaceChildren(empty('Classes could not be loaded.'));
       say('Classes could not be loaded.', 'error');
       return;
     }
-    if (!list.length) { body.replaceChildren(empty('No classes scheduled yet.')); return; }
-    body.replaceChildren(...list.map((c) => el('tr', {},
-      el('td', {}, el('strong', {}, formatDay(c.startsAtMs)), el('br'), el('small', {}, describeWhen(c))),
-      el('td', {}, el('strong', {}, c.title), el('br'), el('small', {}, `${programmeName(c.programmeId)} · ${modeLabel(c.mode)}${c.instructorName ? ` · ${c.instructorName}` : ''}`)),
-      el('td', {}, c.cancelled ? 'Cancelled' : 'Scheduled'),
+    if (!classes.length) { body.replaceChildren(empty('No classes scheduled yet.')); return; }
+    body.replaceChildren(...classes.map((scheduleClass) => el('tr', {},
+      el('td', {}, el('strong', {}, formatDay(scheduleClass.startsAtMs)), el('br'), el('small', {}, describeWhen(scheduleClass))),
+      el('td', {}, el('strong', {}, scheduleClass.title), el('br'), el('small', {}, `${programmeName(scheduleClass.programmeId)} · ${modeLabel(scheduleClass.mode)}${scheduleClass.instructorName ? ` · ${scheduleClass.instructorName}` : ''}`)),
+      el('td', {}, scheduleClass.cancelled ? 'Cancelled' : 'Scheduled'),
       el('td', { class: 'actions' }, el('button', {
-        type: 'button', class: 'btn btn-sm btn-outline-secondary', 'aria-label': `${c.cancelled ? 'Restore' : 'Cancel'} ${c.title}`,
+        type: 'button', class: 'btn btn-sm btn-outline-secondary', 'aria-label': `${scheduleClass.cancelled ? 'Restore' : 'Cancel'} ${scheduleClass.title}`,
         onclick: () => {
-          if (c.cancelled || window.confirm(`Cancel "${c.title}"? Students in this programme will see it as cancelled.`)) toggle(c);
+          if (scheduleClass.cancelled || window.confirm(`Cancel "${scheduleClass.title}"? Students in this programme will see it as cancelled.`)) toggle(scheduleClass);
         },
-      }, c.cancelled ? 'Restore' : 'Cancel')))));
+      }, scheduleClass.cancelled ? 'Restore' : 'Cancel')))));
   }
 
   form.addEventListener('submit', async (event) => {
@@ -65,13 +58,13 @@ export function initSchedule({ root = document, say, getUsers, adminUid }) {
       programmeId: field('classProgramme').value, title: field('classTitle').value, date: field('classDate').value,
       start: field('classStart').value, end: field('classEnd').value, mode: field('classMode').value,
       location: field('classLocation').value, joinLink: field('classLink').value, notes: field('classNotes').value,
-      instructorId: field('classInstructor').value,
-    }, instructors());
+      instructorId: instructor.uid,
+    }, instructors);
     if (errors.length) { say(errors.join(' '), 'error'); return; }
     const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
     try {
-      await createClass(value, adminUid);
+      await createClass(value, instructor.uid);
       say('Class added. Students in that programme can see it now.', 'success');
       form.reset();
       await load();

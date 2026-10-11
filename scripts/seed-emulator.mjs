@@ -51,25 +51,7 @@ for (const person of people) {
   }
 }
 
-const applicants = [
-  ['Wanjiku', 'Kamau', 'wanjiku.parent@example.com', 'submitted'],
-  ['Otieno', 'Odhiambo', 'otieno.parent@example.com', 'under_review'],
-  ['Amina', 'Hassan', 'amina.parent@example.com', 'waitlisted'],
-];
-let n = 0;
-for (const [firstName, surname, email, status] of applicants) {
-  n += 1;
-  await db.collection('applications').doc(`seed-${n}`).set({
-    reference: `CFL-2026-9000${n}`, status, email, applicantName: `${firstName} ${surname}`, programmeId: null, userId: null,
-    applicant: {
-      firstName, middleName: '', surname, dateOfBirth: '2012-05-14', gender: 'other', email, phoneNumber: '+254712345678', nationality: 'kenyan',
-    },
-    guardian: { name: 'Guardian Example', relationship: 'parent', phoneNumber: '+254722000111', emergencyContact: 'Contact Example' },
-    consent: { version: '2026-10', acceptedAt: new Date().toISOString() }, source: 'seed',
-    createdAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp(),
-    statusHistory: [{ status, at: new Date(), by: 'seed' }],
-  });
-}
+await Promise.all(['seed-1', 'seed-2', 'seed-3'].map((id) => db.collection('applications').doc(id).delete()));
 
 console.log('Seeded demo data. Sign in with any of these (password: %s):', PASSWORD);
 for (const person of people) console.log(`  ${person.role.padEnd(10)} ${person.email}`);

@@ -2,23 +2,33 @@ import { guardPage } from '@/auth/guards.js';
 import { ROUTES } from '@/core/routes.js';
 import { loadQueue, studentName } from '@/review/queue.js';
 import { getInstructorDashboardData } from '@/services/instructor-service.js';
+import { initSchedule } from '@/schedule/manager.js';
 import { h } from '@/ui/h.js';
 import { mountInstructorShell } from '@/ui/instructor-shell.js';
 
 mountInstructorShell('dashboard');
 const session = await guardPage({ roles: ['instructor', 'admin'] });
 const $ = (id) => document.getElementById(id);
-const note = (text) => { $('dashNote').hidden = false; $('dashNote').textContent = text; };
+const note = (text, kind = 'error') => { $('dashNote').hidden = false; $('dashNote').dataset.kind = kind; $('dashNote').textContent = text; };
+let instructorName = session.user.displayName || session.user.email;
 
 try {
   const data = await getInstructorDashboardData(session.user.uid);
-  $('instructorName').textContent = data.displayName || session.user.displayName || session.user.email;
+  instructorName = data.displayName || instructorName;
+  $('instructorName').textContent = instructorName;
   $('instructorBio').textContent = data.bio || 'No biography has been added yet.';
 } catch (error) {
   console.warn('Could not load the instructor profile', error?.code ?? error);
   $('instructorName').textContent = session.user.displayName || session.user.email;
   $('instructorBio').textContent = '';
   note('Your profile could not be loaded.');
+}
+
+if (session.role === 'instructor') {
+  const schedule = initSchedule({ root: document, say: note, instructor: { uid: session.user.uid, displayName: instructorName } });
+  schedule.load();
+} else {
+  $('classesHeading')?.closest('section')?.remove();
 }
 
 try {
