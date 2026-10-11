@@ -49,6 +49,7 @@ describe('message centre', () => {
     rowFor('Ms Otieno').click(); await tick();
     expect(setUrl).toHaveBeenCalledWith('?with=ins1');
     expect([...document.querySelectorAll('.bubble-text')].map((p) => p.textContent)).toEqual(['Body 1', 'Body 2']);
+    expect(document.querySelector('.composer-recipient').textContent).toBe('ToMs Otieno');
     expect(services.markRead).toHaveBeenCalledWith(['1', '2']);
     expect(text('inboxSummary')).toBe('0 unread · 2 conversations');
     expect(document.getElementById('inbox').classList.contains('inbox--open')).toBe(true);
