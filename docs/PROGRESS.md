@@ -240,5 +240,4 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 - The four social icons stay as `#` on purpose (the Centre has no accounts); the route check reports them as a note, not a warning.
 - The homepage contact form was not connected to anything, so messages were silently lost. It now opens the visitor's own email app with the message addressed to the Centre (`js/pages/contact-form.js`) and says so. Replace with a hosted form service or an EmailJS template when wanted.
 - Footer Quick Links pointed at anchors that did not exist (`#courses`, `#gallery`); they now go to real pages. The nav motto is a `<p>` instead of a second `<h1>`, and the home headline is the page's `<h1>` (pixel-identical).
-- Footer wording still says "Centre of Foreign Languages" in places while the brand and titles say "Foreign Learning"; worth deciding which is correct.
 - Student notifications page wired into the same layer. New: `tests/unit/page-layer.test.js` fails if any page lacks `data-veil`, `fonts.css`, `motion.css` or `boot.js`, or still links Google Fonts. When adding a page, copy the head from an existing one.
