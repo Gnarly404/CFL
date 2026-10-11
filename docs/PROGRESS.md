@@ -171,7 +171,7 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 1. Run `npm run test:rules` and fix any rules bug (the lessonProgress rules are now used for real).
 2. Admin tools (assign instructors to students, content management), notifications, messaging, and the rest (teacher review for Writing and Speaking).
 3. Mistake review page and daily goal; weak-area recommendations.
-4. Remaining session 2 items: a shared public header and footer, and switching the CSP from Report-Only to enforcing after a signed-in check (see "Content-Security-Policy" below). Self-hosted fonts and the icon family are done.
+4. Remaining session 2 items: switching the CSP from Report-Only to enforcing after a signed-in check (see "Content-Security-Policy" below). Self-hosted fonts, the icon family and the shared public header and footer are done.
 
 ## Motion, page transitions and voice (added after session 2)
 
@@ -205,3 +205,12 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 - To make that possible: the homepage's inline script (a `/CFL/` GitHub Pages path rewrite that does nothing on Firebase) was removed, the dashboard's one `style=` moved into `portal.css`, and `h()` now applies styles through the CSSOM. Tests keep pages free of inline script, style and handlers.
 - **Why it is Report-Only:** I could not exercise real Firebase sign-in, Firestore or Functions traffic or the contact form's EmailJS call. After deploying, sign in, run a lesson and send a contact message with the browser console open; if no "[Report Only] Refused to..." lines appear, change the header key to `Content-Security-Policy` in `firebase.json` to enforce it.
 - Merged the instructor writing-review work (queue, feedback page, student feedback view): the three instructor pages got the same font, motion and veil wiring as every other page; all three are axe-clean (checked with the fake-data harness, empty-queue state).
+
+### Shared header and footer, Privacy and Terms, working contact form
+
+- The site header and footer now live once in `partials/site-nav.html` and `partials/site-footer.html`. Pages include them with `<!-- @include site-nav -->` / `<!-- @include site-footer -->`; the build and dev server paste them in (`scripts/html-partials.mjs`), so pages stay plain static HTML. Used by the home, programmes, privacy and terms pages. The route check parses the partials too.
+- `/privacy` and `/terms` are new, written from what the code actually does: no analytics or advertising, speaking recordings never leave the browser, verification emails go through EmailJS, the map is Google's, data is held in Firebase, Kenya's Data Protection Act 2019 and the ODPC for complaints. They were drafted by Claude, not by a lawyer: have the Centre confirm the facts (controller name, retention practice, who handles data requests) before relying on them. A test fails if a contents link has no heading.
+- The four social icons stay as `#` on purpose (the Centre has no accounts); the route check reports them as a note, not a warning.
+- The homepage contact form was not connected to anything, so messages were silently lost. It now opens the visitor's own email app with the message addressed to the Centre (`js/pages/contact-form.js`) and says so. Replace with a hosted form service or an EmailJS template when wanted.
+- Footer Quick Links pointed at anchors that did not exist (`#courses`, `#gallery`); they now go to real pages. The nav motto is a `<p>` instead of a second `<h1>`, and the home headline is the page's `<h1>` (pixel-identical).
+- Footer wording still says "Centre of Foreign Languages" in places while the brand and titles say "Foreign Learning"; worth deciding which is correct.
