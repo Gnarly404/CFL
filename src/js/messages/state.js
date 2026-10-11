@@ -13,6 +13,7 @@ export function normaliseMessage(id, data = {}, uid) {
     instructorName: String(data.instructorName ?? ''),
     senderId: String(data.senderId ?? ''),
     recipientId: String(data.recipientId ?? ''),
+    kind: String(data.kind ?? 'direct'),
     body: String(data.body ?? ''),
     createdAtMs: ms(data.createdAt),
     read: data.readAt != null,
@@ -37,6 +38,7 @@ export function buildThreads(messages, uid, role) {
       otherName: (student ? last.instructorName : last.studentName) || (student ? 'Your teacher' : 'Student'),
       messages: sorted,
       last,
+      announcementOnly: sorted.every((message) => message.kind === 'class_announcement'),
       unread: sorted.filter((m) => m.recipientId === uid && !m.read).length,
     };
   }).sort((a, b) => b.last.createdAtMs - a.last.createdAtMs);

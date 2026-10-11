@@ -181,8 +181,8 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 
 - Rules tests were run on the owner's machine for the first time after the notifications slice: **26 of 26 passed** (Firestore 21, Storage 5). Some denials log "evaluation error" instead of a plain false; these still deny, so they fail closed. The schedule rules below are covered by new tests that have **not been run**.
 - `/student/schedule`: next class, upcoming classes by day, earlier classes (last 14 days) folded away, cancelled classes marked, a Join online link only when it is a plain https link. Shows plain explanations when the student is not enrolled, when nothing is scheduled, and when loading fails. Times show in the viewer's time zone with the zone name.
-- Instructor dashboard, "Class schedule": instructors add classes for a programme (title, date, start, end, in person or online, optional room, https link and notes) and cancel or restore their own classes. Students enrolled in the programme see the class on their Schedule page.
-- Rules: students read a class only if enrolled in its programme (enrolment id `{studentId}_{programmeId}`); instructors read, create and change the status of classes assigned to themselves; admins read and manage all classes. Writes are validated (title, mode, status, end after start). Queries are scoped by programme for students and instructor for teachers.
+- Instructor dashboard, "Class schedule": instructors add classes for a programme (title, date, start, end, in person or online, optional room, https link and notes) and cancel or restore their own classes. Scheduling uses a callable to save the class and send each enrolled student a read-only message with full details and a class notification.
+- Rules: students read a class only if enrolled in its programme (enrolment id `{studentId}_{programmeId}`); instructors read their assigned classes and create them through the callable so the announcement fan-out cannot be skipped; admins read and manage all classes. Writes are validated (title, mode, status, end after start). Queries are scoped by programme for students and instructor for teachers.
 - Needs deploying: updated `firestore.rules` and `firestore.indexes.json` (indexes for `schedules: programmeId, startsAt` and `schedules: instructorId, startsAt`).
 - Not built: next class on the dashboard, attendance, calendar export, reminders.
 - 48 test files, 446 tests pass.
@@ -194,13 +194,13 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 
 ### Message centre (twelfth slice)
 
-- `/student/messages` and `/instructor/messages`: a list of conversations (latest message, unread count) and the conversation itself with a reply box (Ctrl+Enter sends). Teachers and students can start a conversation with anyone assigned to them, even before any message exists. On narrow screens the list and the conversation show one at a time.
+- `/student/messages` and `/instructor/messages`: a list of conversations (latest message, unread count) and the conversation itself with a reply box (Ctrl+Enter sends). Teachers and students can start a conversation with anyone assigned to them, even before any message exists. Class announcements appear as read-only messages for students not assigned to the instructor. On narrow screens the list and the conversation show one at a time.
 - Server: `sendMessage` and `messageContacts` callable functions. `sendMessage` checks the assignment against the student record, that both accounts are active, cleans the text, rate limits the sender, and writes the message. A student recipient gets one notification per conversation (`message_{threadId}`), refreshed and marked unread by each new message, linking to `/student/messages?with=<teacher>`.
 - Rules: messages are readable by anyone listed in `participants` (queries must use `where('participants', 'array-contains', uid)`); only the recipient can set `readAt`; nobody can create or delete from a browser. New index `messages: participants (array), createdAt desc`.
 - Teachers are not notified of student messages yet (no notification page for staff); they see unread counts in their Messages list.
 - Not built: messages from Administration or CFL, attachments, deleting or editing a message, typing indicators, search.
 - Rules tests for messages were added and **have not been run**. Needs deploying: functions `sendMessage` and `messageContacts`, updated rules, new index.
-- 55 test files, 487 tests pass.
+- 56 test files, 492 tests pass.
 
 ### Next up
 1. Run `npm run test:rules` somewhere with the Firebase emulators (needs Java 21 and access to storage.googleapis.com; the build sandbox blocks that host, so the Firestore emulator cannot be downloaded there). Fix any rules bug. Highest priority: the rules for lessonProgress, mistakes, practiceSessions, submissions and feedback are in real use and have never been exercised.

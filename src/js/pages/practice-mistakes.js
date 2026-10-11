@@ -6,9 +6,11 @@ import { SKILLS } from '@/practice/skills.js';
 import { loadMistakes } from '@/services/practice-service.js';
 import { h } from '@/ui/h.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
+import { mountNotificationBadge } from '@/ui/notification-badge.js';
 
 mountPortalShell('practice');
 const session = await guardPage({ roles: ['student'] });
+mountNotificationBadge(session.user.uid);
 
 let mistakes = {};
 try {

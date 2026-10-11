@@ -27,7 +27,7 @@ async function setup(list = []) {
 const set = (id, value) => { document.getElementById(id).value = value; };
 const submit = async () => { document.getElementById('classForm').dispatchEvent(new Event('submit', { cancelable: true })); await tick(); };
 
-beforeEach(() => { listClasses.mockReset(); createClass.mockReset().mockResolvedValue('new'); setClassCancelled.mockReset().mockResolvedValue(); });
+beforeEach(() => { listClasses.mockReset(); createClass.mockReset().mockResolvedValue({ classId: 'new', recipientCount: 2, sent: 2, failed: 0 }); setClassCancelled.mockReset().mockResolvedValue(); });
 
 describe('instructor class schedule', () => {
   it('loads only the current instructor’s classes and shows an empty state', async () => {
@@ -50,10 +50,10 @@ describe('instructor class schedule', () => {
     set('classStart', '10:00'); set('classEnd', '11:00');
     await submit();
     expect(createClass).toHaveBeenCalledTimes(1);
-    const [value, uid] = createClass.mock.calls[0];
-    expect(uid).toBe('ins1');
+    const [value] = createClass.mock.calls[0];
+    expect(value.startsAt).toBeInstanceOf(Date);
     expect(value).toMatchObject({ programmeId: 'english-intake', title: 'Speaking', instructorId: 'ins1', instructorName: 'Ms Otieno', mode: 'in_person' });
-    expect(say).toHaveBeenCalledWith(expect.stringContaining('Class added'), 'success');
+    expect(say).toHaveBeenCalledWith(expect.stringContaining('details was sent to 2 students'), 'success');
   });
 
   it('keeps the form and reports when saving fails', async () => {

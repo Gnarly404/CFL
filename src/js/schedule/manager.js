@@ -64,8 +64,14 @@ export function initSchedule({ root = document, say, instructor }) {
     const button = form.querySelector('button[type="submit"]');
     button.disabled = true;
     try {
-      await createClass(value, instructor.uid);
-      say('Class added. Students in that programme can see it now.', 'success');
+      const result = await createClass(value);
+      if (result.failed) {
+        say(`Class added, but the announcement reached only ${result.sent} of ${result.recipientCount} students.`, 'error');
+      } else if (result.recipientCount) {
+        say(`Class added. A message with the details was sent to ${result.sent} ${result.sent === 1 ? 'student' : 'students'}.`, 'success');
+      } else {
+        say('Class added. No active students are enrolled in this programme yet.', 'success');
+      }
       form.reset();
       await load();
     } catch (error) {

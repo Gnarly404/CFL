@@ -1,15 +1,16 @@
 import { ROUTES } from '@/core/routes.js';
 import { h } from './h.js';
+import { attentionBadge } from './attention-badge.js';
 
 const ITEMS = [
   { key: 'dashboard', label: 'Dashboard', href: ROUTES.instructor },
-  { key: 'review', label: 'Writing review', href: ROUTES.instructorReview },
+  { key: 'review', label: 'Writing review', href: ROUTES.instructorReview, attention: 'writing-review' },
   { key: 'messages', label: 'Messages', href: ROUTES.instructorMessages },
 ];
 
 /** Fills #portalSide and #portalBottom for instructor pages. */
 export function mountInstructorShell(active) {
-  const link = (entry) => h('a', { href: entry.href, 'aria-current': entry.key === active ? 'page' : null }, entry.label);
+  const link = (entry) => h('a', { href: entry.href, 'aria-current': entry.key === active ? 'page' : null }, entry.label, entry.attention ? attentionBadge(entry.attention) : '');
   document.getElementById('portalSide')?.replaceChildren(
     h('div', { class: 'portal-brand' }, h('img', { src: '/images/logo.png', alt: '' }), h('span', {}, 'CFL Staff')),
     h('nav', { class: 'portal-nav', 'aria-label': 'Instructor' }, ...ITEMS.map(link)),

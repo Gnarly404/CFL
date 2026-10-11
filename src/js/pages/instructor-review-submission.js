@@ -6,9 +6,11 @@ import { countWords } from '@/practice/writing.js';
 import { listAssignedStudents, loadMyFeedback, loadSubmittedWork, notifyStudent, saveFeedback } from '@/services/review-service.js';
 import { h } from '@/ui/h.js';
 import { mountInstructorShell } from '@/ui/instructor-shell.js';
+import { refreshWritingAttention } from '@/ui/instructor-attention.js';
 
 mountInstructorShell('review');
 const session = await guardPage({ roles: ['instructor', 'admin'] });
+if (session.role === 'instructor') refreshWritingAttention(session.user.uid);
 const stage = document.getElementById('stage');
 const params = new URLSearchParams(window.location.search);
 const back = h('a', { class: 'btn', href: ROUTES.instructorReview }, 'Back to the queue');

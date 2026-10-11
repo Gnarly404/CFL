@@ -85,7 +85,7 @@ export async function mountInbox({
     const bubbles = entry.messages.length
       ? entry.messages.map((m) => h('li', { class: `bubble ${m.mine ? 'mine' : 'theirs'}` },
         h('p', { class: 'bubble-text' }, m.body),
-        h('span', { class: 'bubble-time muted' }, `${m.mine ? 'You' : entry.otherName} · ${timeAgo(m.createdAtMs)}`)))
+        h('span', { class: 'bubble-time muted' }, `${m.mine ? 'You' : entry.otherName}${m.kind === 'class_announcement' ? ' · Class announcement' : ''} · ${timeAgo(m.createdAtMs)}`)))
       : [h('li', { class: 'muted' }, `No messages yet. Say hello to ${entry.otherName}.`)];
     const back = h('button', { type: 'button', class: 'btn inbox-back' }, 'All conversations');
     back.addEventListener('click', () => select(null));
@@ -104,7 +104,7 @@ export async function mountInbox({
         ? h('div', { class: 'composer' },
           h('label', { for: 'inboxMessage', class: 'eyebrow' }, `Message to ${entry.otherName}`), box,
           h('div', { class: 'actions' }, sendButton, h('span', { id: 'inboxCount', class: 'muted' }, `${draft.length} / ${MAX_BODY}`)))
-        : h('p', { class: 'muted' }, 'You can no longer send messages to this person.'),
+        : h('p', { class: 'muted' }, entry.announcementOnly ? 'Class announcements are read-only. Contact your assigned teacher if you have a question.' : 'You can no longer send messages to this person.'),
     ];
   }
 

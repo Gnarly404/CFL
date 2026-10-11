@@ -174,9 +174,7 @@ service cloud.firestore {
       allow read: if isAdmin()
                   || (isInstructor() && resource.data.get('instructorId', '') == request.auth.uid)
                   || (isStudent() && exists(/databases/$(database)/documents/enrolments/$(request.auth.uid + '_' + resource.data.programmeId)));
-        allow create: if (isAdmin() && validClass())
-              || (isInstructor() && validClass()
-                && request.resource.data.get('instructorId', '') == request.auth.uid);
+        allow create: if isAdmin() && validClass();
         allow update: if (isAdmin() && validClass())
               || (isInstructor()
                 && resource.data.get('instructorId', '') == request.auth.uid

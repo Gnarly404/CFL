@@ -10,6 +10,7 @@ import { loadPage, tick } from '../helpers.js';
 
 const save = vi.fn();
 vi.mock('@/auth/guards.js', () => ({ guardPage: vi.fn().mockResolvedValue({ user: { uid: 'u1' } }) }));
+vi.mock('@/ui/notification-badge.js', () => ({ mountNotificationBadge: vi.fn() }));
 const saveMistakes = vi.fn();
 const loadFeedback = vi.fn();
 const recordSession = vi.fn();

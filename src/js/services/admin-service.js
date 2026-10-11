@@ -1,9 +1,10 @@
 import {
-  collection, getDocs, limit, orderBy, query, where,
+  collection, getCountFromServer, getDocs, limit, orderBy, query, where,
 } from 'firebase/firestore';
 import { call } from './callable.js';
 import { AppError } from './errors.js';
 import { dbService } from './firebase-db.js';
+import { OPEN_STATUSES } from '@/utils/application-status.js';
 
 /**
  * Turns a query snapshot into plain rows. An empty answer that came from the local cache means the
@@ -22,6 +23,13 @@ export async function listApplications({ status = null, max = 100 } = {}) {
     ? query(base, where('status', '==', status), orderBy('createdAt', 'desc'), limit(max))
     : query(base, orderBy('createdAt', 'desc'), limit(max));
   return rowsFromSnapshot(await getDocs(q));
+}
+
+export async function countOpenApplications() {
+  const snap = await getCountFromServer(query(
+    collection(dbService(), 'applications'), where('status', 'in', OPEN_STATUSES),
+  ));
+  return snap.data().count;
 }
 
 export async function listUsers({ max = 200 } = {}) {

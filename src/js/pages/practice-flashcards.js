@@ -5,10 +5,12 @@ import { startTracker } from '@/practice/session-tracker.js';
 import { loadWordProgress, saveWordProgress } from '@/services/practice-service.js';
 import { h } from '@/ui/h.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
+import { mountNotificationBadge } from '@/ui/notification-badge.js';
 import { speak, speechSupported } from '@/ui/speech.js';
 
 mountPortalShell('practice');
 const session = await guardPage({ roles: ['student'] });
+mountNotificationBadge(session.user.uid);
 const uid = session.user.uid;
 const stage = document.getElementById('stage');
 const show = (...nodes) => { stage.replaceChildren(...nodes); document.getElementById('stageHeading')?.focus(); };

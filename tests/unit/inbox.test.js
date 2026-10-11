@@ -107,6 +107,16 @@ describe('message centre', () => {
     expect(text('inboxThread')).toContain('can no longer send messages');
   });
 
+  it('shows class details in a read-only thread when the teacher is not an assigned contact', async () => {
+    services.load.mockResolvedValue([m('1', { kind: 'class_announcement', body: 'Class scheduled: Grammar workshop\nDate: Monday' })]);
+    services.contacts.mockResolvedValue([]);
+    await open({ params: 'with=ins1' });
+    expect(text('inboxThread')).toContain('Class announcement');
+    expect(text('inboxThread')).toContain('Class scheduled: Grammar workshop');
+    expect(text('inboxThread')).toContain('Class announcements are read-only');
+    expect(document.getElementById('inboxMessage')).toBeNull();
+  });
+
   it('still works with existing conversations when contacts cannot load', async () => {
     services.contacts.mockRejectedValue(new Error('x'));
     await open();

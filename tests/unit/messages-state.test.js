@@ -17,6 +17,8 @@ describe('message state', () => {
 
   it('normalises a message', () => {
     expect(msg('5')).toMatchObject({ id: '5', createdAtMs: 5000, read: false, mine: false, body: 'msg 5' });
+    expect(msg('6', { kind: 'class_announcement' }).kind).toBe('class_announcement');
+    expect(msg('6').kind).toBe('direct');
     expect(msg('5', { senderId: 'stu1', readAt: {} }).mine).toBe(true);
     expect(msg('5', { readAt: {} }).read).toBe(true);
     expect(normaliseMessage('x', {}, 'u')).toMatchObject({ body: '', createdAtMs: 0, threadId: '' });
@@ -30,6 +32,12 @@ describe('message state', () => {
     expect(threads[1].messages.map((m) => m.id)).toEqual(['1', '2', '3']);
     expect(threads[1].unread).toBe(2);
     expect(threads[1].otherId).toBe('ins1');
+  });
+
+  it('marks a class-announcement-only thread as read-only', () => {
+    const thread = buildThreads([msg('1', { kind: 'class_announcement' })], 'stu1', 'student')[0];
+    expect(thread.announcementOnly).toBe(true);
+    expect(buildThreads([msg('1'), msg('2', { kind: 'class_announcement' })], 'stu1', 'student')[0].announcementOnly).toBe(false);
   });
 
   it('shows the student to a teacher, with fallbacks for missing names', () => {

@@ -1,6 +1,7 @@
 import {
-  addDoc, collection, doc, getDocs, limit, orderBy, query, serverTimestamp, Timestamp, updateDoc, where,
+  collection, doc, getDocs, limit, orderBy, query, serverTimestamp, Timestamp, updateDoc, where,
 } from 'firebase/firestore';
+import { call } from './callable.js';
 import { dbService } from './firebase-db.js';
 import { EARLIER_DAYS, normaliseClass } from '@/schedule/state.js';
 
@@ -31,17 +32,12 @@ export async function listClasses({ instructorId, now = Date.now(), max = 200 } 
   return snap.docs.map((d) => normaliseClass(d.id, d.data()));
 }
 
-export async function createClass(value, createdByUid) {
-  const ref = await addDoc(collection(dbService(), 'schedules'), {
+export async function createClass(value) {
+  return call('scheduleClass', {
     ...value,
-    startsAt: Timestamp.fromDate(value.startsAt),
-    endsAt: Timestamp.fromDate(value.endsAt),
-    status: 'scheduled',
-    createdBy: createdByUid,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+    startsAt: value.startsAt.toISOString(),
+    endsAt: value.endsAt.toISOString(),
   });
-  return ref.id;
 }
 
 export const setClassCancelled = (id, cancelled) => updateDoc(doc(dbService(), 'schedules', id), {

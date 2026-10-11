@@ -3,13 +3,14 @@ import {
   availableDecisions, DECISION_LABELS, STATUS_LABELS,
 } from '@/utils/application-status.js';
 import { initAssignments } from './assignments.js';
+import { setAttentionBadge } from '@/ui/attention-badge.js';
 import { validateEmail, validateName } from '@/utils/validation.js';
 import { formatDate } from '@/utils/format.js';
 import {
   el, setBusy, setFieldError, showMessage,
 } from '@/utils/dom.js';
 import {
-  createUser, decideApplication, listApplications, listUsers, resendInvite, setUserDisabled, setUserRole,
+  countOpenApplications, createUser, decideApplication, listApplications, listUsers, resendInvite, setUserDisabled, setUserRole,
 } from '@/services/admin-service.js';
 import { sendAccountInvitation } from '@/services/email.js';
 import { deliverInvitation as deliverInvitationTo } from './invitation.js';
@@ -32,6 +33,14 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
     showMessage(message, text, kind);
     message?.scrollIntoView?.({ block: 'nearest' });
   };
+
+  async function updateApplicationAttention() {
+    try {
+      setAttentionBadge('applications', await countOpenApplications(), root);
+    } catch (error) {
+      console.warn('Could not load pending application count', error?.code ?? error);
+    }
+  }
 
   const assignments = initAssignments({ root, say, getUsers: () => knownUsers });
 
@@ -154,6 +163,7 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
       appsBody.replaceChildren(emptyRow(6, 'Applications could not be loaded.'));
       say(error.message || 'Applications could not be loaded.', 'error');
     }
+    await updateApplicationAttention();
   }
 
   async function loadUsers() {

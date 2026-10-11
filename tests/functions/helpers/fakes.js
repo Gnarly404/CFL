@@ -43,6 +43,14 @@ export function fakeDb() {
         },
       };
     },
+    batch() {
+      const writes = [];
+      const current = {
+        set: (document, data) => { writes.push([document, data]); return current; },
+        commit: async () => { await Promise.all(writes.map(([document, data]) => document.set(data))); },
+      };
+      return current;
+    },
     runTransaction: async (fn) => fn({
       get: (r) => r.get(), set: (r, d, o) => r.set(d, o), update: (r, p) => r.update(p),
     }),

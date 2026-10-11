@@ -73,10 +73,10 @@ Written by "server" means Cloud Functions (Admin SDK); rules deny browser writes
 | `practiceSessions`, `questionAttempts`, `lessonProgress`, `skillProgress`, `mistakes` | the student (own rows) | owner, admin | English Practice session |
 | `submissions` | student (drafts, then submit) | owner, admin, assigned instructor (submitted only) | locked after submit |
 | `feedback/{submissionId}` | assigned instructor | the student, the writing instructor, admin | overall, notes (quote + comment), never edits the submission |
-| `schedules/{id}` | admin; instructor creates own classes and changes their status | admin; students enrolled in `programmeId`; the instructor in `instructorId` | class: programmeId, title, startsAt, endsAt, mode, location, instructorId/Name, joinLink (https), notes, status |
+| `schedules/{id}` | admin; instructor callable creates own classes and fans out announcements, then changes status | admin; students enrolled in `programmeId`; the instructor in `instructorId` | class: programmeId, title, startsAt, endsAt, mode, location, instructorId/Name, joinLink (https), notes, status |
 | `attendance` | admin | owner, admin | not built yet |
-| `messages/{id}` | server (`sendMessage`) | the two `participants` | one student and one assigned teacher; threadId `{studentId}_{instructorId}`; recipient may set `readAt` only |
-| `notifications/{id}` | server (`instructorNotifyFeedback` today) | owner | owner may change only `readAt`, `archivedAt` |
+| `messages/{id}` | server (`sendMessage`, `scheduleClass`) | the two `participants` | assigned teacher/student chats and read-only class announcements; threadId `{studentId}_{instructorId}`; recipient may set `readAt` only |
+| `notifications/{id}` | server (`instructorNotifyFeedback`, `scheduleClass`) | owner | owner may change only `readAt`, `archivedAt` |
 | `payments`, `certificates` | server | owner, admin | |
 | `auditLogs` | server | admin | who did what, to what, when |
 | `analyticsEvents` | signed-in user (own) | admin | |

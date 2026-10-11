@@ -278,10 +278,10 @@ describe('class schedule', () => {
     await assertSucceeds(getDoc(doc(as.admin(), 'schedules/c2')));
   });
 
-  it('instructors create only their own valid classes and only change their class status', async () => {
+  it('only admins write schedule documents directly; instructors schedule through the callable', async () => {
     await assertSucceeds(addDoc(collection(as.admin(), 'schedules'), classDoc()));
     await assertFails(addDoc(collection(as.student('stu1'), 'schedules'), classDoc()));
-    await assertSucceeds(addDoc(collection(as.instructor('ins1'), 'schedules'), classDoc({ instructorId: 'ins1' })));
+    await assertFails(addDoc(collection(as.instructor('ins1'), 'schedules'), classDoc({ instructorId: 'ins1' })));
     await assertFails(addDoc(collection(as.instructor('ins1'), 'schedules'), classDoc({ instructorId: 'ins2' })));
     await assertFails(addDoc(collection(as.instructor('ins1'), 'schedules'), classDoc({ instructorId: '' })));
     await assertFails(addDoc(collection(as.admin(), 'schedules'), classDoc({ title: '' })));
@@ -289,7 +289,7 @@ describe('class schedule', () => {
     await assertFails(addDoc(collection(as.admin(), 'schedules'), classDoc({ endsAt: Timestamp.fromMillis(1_999_999_000_000) })));
     await assertSucceeds(updateDoc(doc(as.admin(), 'schedules/c1'), { status: 'cancelled' }));
     await assertFails(updateDoc(doc(as.admin(), 'schedules/c1'), { status: 'deleted' }));
-    await assertSucceeds(updateDoc(doc(as.instructor('ins1'), 'schedules/c1'), { status: 'cancelled' }));
+    await assertFails(updateDoc(doc(as.instructor('ins1'), 'schedules/c1'), { status: 'cancelled' }));
     await assertFails(updateDoc(doc(as.instructor('ins1'), 'schedules/c1'), { title: 'Changed' }));
     await assertFails(updateDoc(doc(as.instructor('ins2'), 'schedules/c1'), { status: 'cancelled' }));
     await assertFails(updateDoc(doc(as.student('stu1'), 'schedules/c1'), { status: 'cancelled' }));

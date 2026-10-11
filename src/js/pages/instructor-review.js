@@ -3,6 +3,7 @@ import { ROUTES } from '@/core/routes.js';
 import { loadQueue, studentName } from '@/review/queue.js';
 import { countWords } from '@/practice/writing.js';
 import { h } from '@/ui/h.js';
+import { setAttentionBadge } from '@/ui/attention-badge.js';
 import { mountInstructorShell } from '@/ui/instructor-shell.js';
 
 mountInstructorShell('review');
@@ -23,6 +24,7 @@ try {
 if (result) {
   const { items, failed } = result;
   const waiting = items.filter((i) => !i.feedback);
+  setAttentionBadge('writing-review', waiting.length);
   const done = items.filter((i) => i.feedback);
   $('queueSummary').textContent = items.length ? `${waiting.length} waiting · ${done.length} with feedback` : 'No submitted writing yet.';
   if (failed.length) {

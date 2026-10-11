@@ -71,7 +71,8 @@ describe('instructor dashboard', () => {
   it('shows the waiting count and assigned students', async () => {
     await open('instructor/dashboard.html', '@/pages/instructor-dashboard.js');
     expect(text('instructorName')).toBe('Ms Otieno');
-    expect(text('awaitTitle')).toBe('2 pieces of writing waiting for feedback');
+    expect(document.querySelector('[data-attention-key="writing-review"]').textContent).toContain('2');
+    expect(document.getElementById('awaitTitle')).toBeNull();
     expect(text('assignedStudents')).toContain('Brian O');
   });
 });

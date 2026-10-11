@@ -11,9 +11,11 @@ import { h } from '@/ui/h.js';
 import { createAudioPlayer, speak, speechSupported } from '@/ui/speech.js';
 import { clipsSupported } from '@/ui/voice.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
+import { mountNotificationBadge } from '@/ui/notification-badge.js';
 
 mountPortalShell('practice');
 const session = await guardPage({ roles: ['student'] });
+mountNotificationBadge(session.user.uid);
 
 const params = new URLSearchParams(window.location.search);
 const isReview = params.get('skill') === 'review';

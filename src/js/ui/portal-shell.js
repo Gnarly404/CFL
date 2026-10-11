@@ -10,7 +10,7 @@ const ITEMS = [
   { key: 'messages', label: 'Messages', short: 'Messages', href: ROUTES.messages },
 ];
 
-const badgeNode = () => h('span', { class: 'nav-badge', 'data-notification-count': true, hidden: true });
+const badgeNode = () => h('span', { class: 'nav-attention', 'data-attention-key': 'notifications', 'data-notification-count': true, hidden: true }, h('span', { 'aria-hidden': 'true' }), h('span', { class: 'visually-hidden' }));
 
 function item({ key, label, href, badge }, active) {
   if (!href) return h('span', { 'aria-disabled': 'true' }, label, h('small', {}, 'Soon'));
