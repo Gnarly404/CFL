@@ -2,6 +2,7 @@ import { ROLE_LABELS, ROLES } from '@/utils/roles.js';
 import {
   availableDecisions, DECISION_LABELS, STATUS_LABELS,
 } from '@/utils/application-status.js';
+import { initAssignments } from './assignments.js';
 import { validateEmail, validateName } from '@/utils/validation.js';
 import { formatDate } from '@/utils/format.js';
 import {
@@ -24,10 +25,13 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
   const filter = root.querySelector('#applicationFilter');
   const createForm = root.querySelector('#createUserForm');
 
+  let knownUsers = [];
   const say = (text, kind = 'info') => {
     showMessage(message, text, kind);
     message?.scrollIntoView?.({ block: 'nearest' });
   };
+
+  const assignments = initAssignments({ root, say, getUsers: () => knownUsers });
 
   async function run(label, work, { reload = ['applications', 'users'] } = {}) {
     try {
@@ -123,11 +127,14 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
     usersBody.replaceChildren(emptyRow(5, 'Loading accounts…'));
     try {
       const users = await listUsers();
+      knownUsers = users;
       usersBody.replaceChildren(...(users.length ? users.map(userRow) : [emptyRow(5, 'No accounts yet.')]));
     } catch (error) {
       usersBody.replaceChildren(emptyRow(5, 'Accounts could not be loaded.'));
       say(error.message || 'Accounts could not be loaded.', 'error');
+      return;
     }
+    assignments.load();
   }
 
   filter?.addEventListener('change', loadApplications);
