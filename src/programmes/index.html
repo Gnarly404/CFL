@@ -14,20 +14,7 @@
 <script type="module" src="/js/motion/boot.js"></script>
 </head>
 <body>
-<nav class="navbar">
-    <div class="nav-container">
-        <div class="logo-section">
-            <img src="/images/logo.png" alt="CFL Logo" class="logo">
-            <h1 class="motto gradient-text">Knowledge to Empower</h1>
-        </div>
-        <div class="nav-links">
-            <a href="/gallery" class="nav-link">Gallery</a>
-            <a href="/#contacts" class="nav-link">Contacts</a>
-            <a href="/programmes" class="nav-link">Intakes</a>
-            <a href="/login" class="nav-link join-us">Join us</a>
-        </div>
-    </div>
-</nav>
+<!-- @include site-nav -->
 
 <main class="pc-main">
   <header class="pc-head">
@@ -51,108 +38,6 @@
   <div class="pc-actions"><a class="pc-btn pc-btn-primary" href="/register">Apply now</a></div>
 </dialog>
 
-<footer>
-        <div class="footer-content">
-            <div class="footer-container">
-                <!-- Contact Form Section -->
-                <div class="footer-section">
-                    <h2>Contact Us</h2>
-                    <form class="contact-form">
-                        <div class="form-group">
-                            <input type="text" placeholder="Your Name" required />
-                        </div>
-                        <div class="form-group">
-                            <input type="email" placeholder="Your Email" required />
-                        </div>
-                        <div class="form-group">
-                            <textarea placeholder="Your Message" rows="4" required></textarea>
-                        </div>
-                        <button type="submit" class="submit-button">Send Message</button>
-                    </form>
-                </div>
-
-                <!-- Quick Links Section -->
-                <div class="footer-section">
-                    <h2>Quick Links</h2>
-                    <ul class="footer-links">
-                        <li><a href="#about">About Us</a></li>
-                        <li><a href="#courses">Our Courses</a></li>
-                        <li><a href="#gallery">Gallery</a></li>
-                        <li><a href="/programmes">Upcoming Intakes</a></li>
-                    </ul>
-                    
-                    <h2 class="mt-6">Connect With Us</h2>
-                    <div class="social-links">
-                        <a href="#" class="social-icon" aria-label="Facebook">
-                            <img src="/images/facebook.svg" alt="Facebook" />
-                        </a>
-                        <a href="#" class="social-icon" aria-label="Twitter">
-                            <img src="/images/twitter.svg" alt="Twitter" />
-                        </a>
-                        <a href="#" class="social-icon" aria-label="Instagram">
-                            <img src="/images/instagram.svg" alt="Instagram" />
-                        </a>
-                        <a href="#" class="social-icon" aria-label="LinkedIn">
-                            <img src="/images/linkedin.svg" alt="LinkedIn" />
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Get in Touch Section -->
-                <div class="footer-section">
-                    <h2>Get in Touch</h2>
-                    <div class="contact-info">
-                        <div class="info-item">
-                            <img src="/images/email.svg" class="info-icon" alt="Email" />
-                            <div>
-                                <h3>Email Us</h3>
-                                <p>cfllearning33@gmail.com</p>
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <img src="/images/location.svg" class="info-icon" alt="Location" />
-                            <div>
-                                <h3>Visit Us</h3>
-                                <p>Centre of Foreign Languages</p>
-                            </div>
-                        </div>
-                        <div class="info-item">
-                            <img src="/images/phone.svg" class="info-icon" alt="Phone" />
-                            <div>
-                                <h3>Call Us</h3>
-                                <p>0722840989</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="map-section">
-                        <div class="map-header">
-                            <img src="/images/location.svg" alt="Location Icon" class="map-icon">
-                            <h3 class="map-title">Find Us On Map</h3>
-                        </div>
-                        <div class="map-container">
-                            <iframe 
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.818309899662!2d36.815943314754804!3d-1.2826624359827428!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f10d22f42bf35%3A0x449d7ec7b378dfdb!2sCentre%20for%20Foreign%20Languages!5e0!3m2!1sen!2ske!4v1644830239041!5m2!1sen!2ske" 
-                                allowfullscreen="" 
-                                loading="lazy" 
-                                referrerpolicy="no-referrer-when-downgrade"
-                                title="CFL Location Map"
-                            ></iframe>
-                            <div class="map-overlay"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <div class="footer-container">
-                <p>© 2024 Centre of Foreign Languages. All rights reserved.</p>
-                <div class="footer-legal">
-                    <a href="#">Privacy Policy</a>
-                    <a href="#">Terms of Service</a>
-                </div>
-            </div>
-        </div>
-    </footer>
+<!-- @include site-footer -->
 </body>
 </html>
