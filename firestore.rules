@@ -178,7 +178,7 @@ service cloud.firestore {
     }
     match /notifications/{notificationId} {
       allow read: if isUser(resource.data.userId);
-      allow update: if isUser(resource.data.userId) && changesOnly(['readAt']);
+      allow update: if isUser(resource.data.userId) && changesOnly(['readAt', 'archivedAt']);
       allow create, delete: if false;
     }
 

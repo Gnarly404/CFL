@@ -1,4 +1,5 @@
 import { collection, doc, getDocs, query, serverTimestamp, setDoc, updateDoc, where } from 'firebase/firestore';
+import { call } from './callable.js';
 import { dbService } from './firebase-db.js';
 
 const millis = (value) => value?.toMillis?.() ?? 0;
@@ -35,4 +36,9 @@ export async function saveFeedback(instructorId, submission, value, existing) {
     studentId: submission.studentId, submissionId: submission.id, instructorId, skill: submission.skill, promptId: submission.promptId,
     overall: value.overall, notes: value.notes, createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
   });
+}
+
+/** Asks the server to tell the student their feedback is ready. Safe to repeat. */
+export async function notifyStudent(submissionId) {
+  return call('instructorNotifyFeedback', { submissionId });
 }

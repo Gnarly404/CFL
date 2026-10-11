@@ -10,10 +10,12 @@ import { mountToday } from '@/practice/today.js';
 import { SKILLS } from '@/practice/skills.js';
 import { h } from '@/ui/h.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
+import { mountNotificationBadge } from '@/ui/notification-badge.js';
 import { skillCard } from '@/ui/skill-card.js';
 
 mountPortalShell('dashboard');
 const session = await guardPage({ roles: ['student'] });
+mountNotificationBadge(session.user.uid);
 const hour = new Date().getHours();
 const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 const dayMessage = document.getElementById('dayMessage');

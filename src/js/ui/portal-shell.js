@@ -4,14 +4,17 @@ import { h } from './h.js';
 const ITEMS = [
   { key: 'dashboard', label: 'Dashboard', short: 'Home', href: ROUTES.student },
   { key: 'practice', label: 'English Practice', short: 'Practice', href: ROUTES.practice },
+  { key: 'notifications', label: 'Notifications', short: 'Alerts', href: ROUTES.notifications, badge: true },
   { key: 'schedule', label: 'Schedule', short: 'Schedule' },
   { key: 'progress', label: 'Progress', short: 'Progress' },
   { key: 'messages', label: 'Messages', short: 'Messages' },
 ];
 
-function item({ key, label, href }, active) {
+const badgeNode = () => h('span', { class: 'nav-badge', 'data-notification-count': true, hidden: true });
+
+function item({ key, label, href, badge }, active) {
   if (!href) return h('span', { 'aria-disabled': 'true' }, label, h('small', {}, 'Soon'));
-  return h('a', { href, 'aria-current': key === active ? 'page' : null }, label);
+  return h('a', { href, 'aria-current': key === active ? 'page' : null }, label, badge ? badgeNode() : '');
 }
 
 /** Fills #portalSide and #portalBottom, which each portal page provides. */
@@ -25,10 +28,7 @@ export function mountPortalShell(active) {
     h('nav', { class: 'portal-nav', 'aria-label': 'Account' }, h('a', { href: ROUTES.login, 'data-action': 'sign-out' }, 'Sign out')),
   );
   bottom?.replaceChildren(
-    ...ITEMS.filter((entry) => ['dashboard', 'practice'].includes(entry.key)).map((entry) => {
-      const link = h('a', { href: entry.href, 'aria-current': entry.key === active ? 'page' : null }, entry.short);
-      return link;
-    }),
+    ...ITEMS.filter((entry) => ['dashboard', 'practice', 'notifications'].includes(entry.key)).map((entry) => h('a', { href: entry.href, 'aria-current': entry.key === active ? 'page' : null }, entry.short, entry.badge ? badgeNode() : '')),
     h('span', { 'aria-disabled': 'true' }, 'Progress'),
     h('a', { href: ROUTES.login, 'data-action': 'sign-out' }, 'Sign out'),
   );

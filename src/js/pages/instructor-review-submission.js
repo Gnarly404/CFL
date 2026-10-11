@@ -3,7 +3,7 @@ import { ROUTES } from '@/core/routes.js';
 import { cleanFeedback, MAX_NOTE, MAX_NOTES, MAX_OVERALL, segments } from '@/review/feedback.js';
 import { studentName, taskFor } from '@/review/queue.js';
 import { countWords } from '@/practice/writing.js';
-import { listAssignedStudents, loadMyFeedback, loadSubmittedWork, saveFeedback } from '@/services/review-service.js';
+import { listAssignedStudents, loadMyFeedback, loadSubmittedWork, notifyStudent, saveFeedback } from '@/services/review-service.js';
 import { h } from '@/ui/h.js';
 import { mountInstructorShell } from '@/ui/instructor-shell.js';
 
@@ -42,6 +42,7 @@ function run() {
   let status = '';
   let errors = [];
   let saving = false;
+  let notifyNeeded = false;
 
   const original = () => h('blockquote', { class: 'submitted-text' }, ...segments(text, notes).map((part) => (part.note === null
     ? part.text
@@ -70,6 +71,8 @@ function run() {
     const save = h('button', { class: 'btn btn-primary', type: 'button', id: 'saveFeedback' }, existing ? 'Update feedback' : 'Send feedback');
     save.disabled = saving;
     save.addEventListener('click', submit);
+    const retry = notifyNeeded ? h('button', { class: 'btn', type: 'button', id: 'retryNotify' }, 'Notify student') : '';
+    if (retry) retry.addEventListener('click', () => { saving = true; status = 'Notifying…'; draw(); tellStudent(); });
 
     stage.replaceChildren(
       h('header', { class: 'portal-head' }, h('h1', { id: 'stageHeading', tabindex: '-1' }, studentName(student)),
@@ -81,7 +84,7 @@ function run() {
         h('h3', {}, 'Notes'), ...noteRows, add,
         errors.length ? h('ul', { class: 'form-note', role: 'alert' }, ...errors.map((e) => h('li', {}, e))) : '',
         h('p', { class: 'muted', role: 'status' }, status),
-        h('div', { class: 'actions' }, save, back)),
+        h('div', { class: 'actions' }, save, retry, back)),
     );
   }
 
@@ -94,9 +97,24 @@ function run() {
       await saveFeedback(session.user.uid, submission, value, existing);
       existing = { ...(existing ?? {}), ...value };
       status = 'Feedback saved. The student can see it now.';
+      notifyNeeded = true;
+      await tellStudent();
+      return;
     } catch (error) {
       console.warn('Could not save feedback', error?.code ?? error);
       status = 'Your feedback could not be saved. Your text is still here. Try again.';
+    }
+    saving = false;
+    draw();
+  }
+
+  async function tellStudent() {
+    try {
+      await notifyStudent(submission.id);
+      notifyNeeded = false;
+    } catch (error) {
+      console.warn('Could not notify the student', error?.code ?? error);
+      status = 'Feedback saved, but the student has not been notified yet. Use "Notify student" to try again.';
     }
     saving = false;
     draw();

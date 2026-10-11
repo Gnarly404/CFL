@@ -193,6 +193,19 @@ describe('messages, notifications and money', () => {
     await assertFails(addDoc(collection(as.student('stu1'), 'notifications'), { userId: 'stu1' }));
   });
 
+  it('students can mark their notifications read or archived but never change their content', async () => {
+    const mine = doc(as.student('stu1'), 'notifications/n1');
+    await assertSucceeds(updateDoc(mine, { archivedAt: 2 }));
+    await assertSucceeds(updateDoc(mine, { readAt: 3, archivedAt: 3 }));
+    await assertFails(updateDoc(mine, { title: 'Changed' }));
+    await assertFails(updateDoc(mine, { userId: 'stu2' }));
+    await assertFails(updateDoc(mine, { link: 'https://evil.example' }));
+    await assertFails(updateDoc(doc(as.student('stu2'), 'notifications/n1'), { readAt: 1 }));
+    await assertFails(deleteDoc(mine));
+    await assertSucceeds(getDocs(query(collection(as.student('stu1'), 'notifications'), where('userId', '==', 'stu1'))));
+    await assertFails(getDocs(query(collection(as.student('stu2'), 'notifications'), where('userId', '==', 'stu1'))));
+  });
+
   it('payments are visible to the payer and admins, and never writable from a browser', async () => {
     await assertSucceeds(getDoc(doc(as.student('stu1'), 'payments/p1')));
     await assertFails(getDoc(doc(as.student('stu2'), 'payments/p1')));

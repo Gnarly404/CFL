@@ -7,6 +7,7 @@ const loadMistakes = vi.fn();
 const loadLessonProgress = vi.fn();
 const loadSessions = vi.fn();
 const loadWordProgress = vi.fn();
+vi.mock('@/ui/notification-badge.js', () => ({ mountNotificationBadge: vi.fn() }));
 vi.mock('@/auth/guards.js', () => ({ guardPage: vi.fn().mockResolvedValue({ user: { uid: 'u1' } }) }));
 vi.mock('@/services/practice-service.js', () => ({
   loadLessonProgress: (...args) => loadLessonProgress(...args),

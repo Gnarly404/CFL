@@ -25,7 +25,7 @@ Firebase Hosting  --  Cloud Functions (Node 22)  --  Firestore / Auth Admin / Se
 Old addresses (`/Programs.html`, `/Login.html`, `/public/...`, and so on) redirect with a 301; `/student`, `/instructor`
 and `/admin` redirect to their dashboards. The table lives in `src/js/core/routes.js` and `firebase.json`;
 `npm run check:routes` proves every link and redirect resolves. Planned: `/programmes/:id`, `/admissions/status`,
-`/student/learning`, `/student/practice/...`.
+`/student/learning`, `/student/practice/...`, `/student/notifications`.
 
 ## Accounts and roles
 
@@ -74,7 +74,8 @@ Written by "server" means Cloud Functions (Admin SDK); rules deny browser writes
 | `submissions` | student (drafts, then submit) | owner, admin, assigned instructor (submitted only) | locked after submit |
 | `feedback/{submissionId}` | assigned instructor | the student, the writing instructor, admin | overall, notes (quote + comment), never edits the submission |
 | `schedules`, `attendance` | admin | signed in / owner | |
-| `messages`, `notifications` | server (messaging session) | participants / owner | recipient may set `readAt` |
+| `messages` | server (messaging session) | participants | not built yet |
+| `notifications/{id}` | server (`instructorNotifyFeedback` today) | owner | owner may change only `readAt`, `archivedAt` |
 | `payments`, `certificates` | server | owner, admin | |
 | `auditLogs` | server | admin | who did what, to what, when |
 | `analyticsEvents` | signed-in user (own) | admin | |
