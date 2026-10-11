@@ -8,7 +8,7 @@ upload the latest zip and say "continue with session N"; this file is the handof
 | # | Session | Status |
 | --- | --- | --- |
 | 1 | Foundation: clean repo, auth and roles, admissions backend, rules, tests | **Done (this checkpoint)** |
-| 2 | Design system and app shell | **Partly done**: tokens, components, student portal shell. Still open: self-hosted fonts and icons, CSP, shared public header/footer, admin and instructor shells |
+| 2 | Design system and app shell | **Partly done**: tokens, components, student portal shell. Still open: CSP enforcement, admin shell |
 | 3 | Student portal and dashboard | **Started**: Continue Learning and skill cards use real lesson progress. Still open: schedule, materials, fees from real data, profile and settings pages, email change |
 | 4 | English Practice (hub, engine, six skills, results, mistake review) | **Started**: hub, lesson shell, Grammar (5 starter lessons) work end to end. Vocabulary also works (4 starter lessons). Still open: Listening, Speaking, Reading, Writing, a cross-lesson mistake review page, daily goal, recommendations |
 | 5 | Public site, programmes, admissions pages | Planned |
