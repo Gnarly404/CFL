@@ -13,6 +13,7 @@ import {
   createUser, decideApplication, listApplications, listUsers, resendInvite, setUserDisabled, setUserRole,
 } from '@/services/admin-service.js';
 import { sendAccountInvitation } from '@/services/email.js';
+import { deliverInvitation as deliverInvitationTo } from './invitation.js';
 
 const CONFIRM = {
   approve: 'Approve this application? A student account is created and an invitation email is sent.',
@@ -49,38 +50,7 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
     }
   }
 
-  async function deliverInvitation(result, {
-    email,
-    displayName,
-    role,
-  }) {
-    if (!result?.activationUrl) {
-      say(
-        'The account operation completed, but no local activation link was returned. Check the Firebase emulator configuration.',
-        'error',
-      );
-      return false;
-    }
-
-    try {
-      await sendAccountInvitation({
-        email,
-        displayName,
-        role,
-        activationUrl: result.activationUrl,
-      });
-
-      say(`Invitation email sent successfully to ${email}.`, 'success');
-      return true;
-    } catch (error) {
-      console.error('EmailJS invitation failed:', error);
-      say(
-        `The account operation succeeded, but the invitation email failed for ${email}. Check your EmailJS configuration and try resending.`,
-        'error',
-      );
-      return false;
-    }
-  }
+  const deliverInvitation = (result, person) => deliverInvitationTo(result, person, { send: sendAccountInvitation, say });
 
   const statusBadge = (status) => el('span', { class: `badge-status badge-${status}` }, STATUS_LABELS[status] ?? status);
 

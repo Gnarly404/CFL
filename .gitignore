@@ -16,3 +16,6 @@ functions/.env.*.local
 functions/.secret.local
 *.pem
 serviceAccount*.json
+
+# Editor and tool backups
+*.bak

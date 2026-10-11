@@ -1,6 +1,7 @@
-﻿{
-    "projects":  {
-                     "default":  "centre-of-foreign-learni-82491",
-                     "production":  "centre-of-foreign-learni-82491"
-                 }
+{
+  "projects": {
+    "default": "REPLACE_WITH_STAGING_PROJECT_ID",
+    "staging": "REPLACE_WITH_STAGING_PROJECT_ID",
+    "production": "centre-of-foreign-learni-82491"
+  }
 }

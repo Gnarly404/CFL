@@ -187,6 +187,11 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 - Not built: next class on the dashboard, an instructor's own timetable, attendance, calendar export, reminders.
 - 48 test files, 446 tests pass.
 
+### Invitation emails and deploy aliases (after the owner's local-setup commits)
+
+- Local emulator: the server returns the activation link and the admin page sends it through EmailJS, so the whole flow can be tried locally. Real project: the server emails the invitation itself (`SMTP_PASS`) and returns no link; the admin page now says "sent by the server" instead of showing an emulator error. The EmailJS path is covered by tests; the real-project path depends on the mail secret being set and **has not been tried against a live project**.
+- `.firebaserc`: `default` points at staging again (a placeholder until a staging project exists), so a plain `firebase deploy` cannot reach production. Deploy with `firebase use production && firebase deploy` until staging exists. Backup files (`*.bak`) are now git-ignored.
+
 ### Next up
 1. Run `npm run test:rules` somewhere with the Firebase emulators (needs Java 21 and access to storage.googleapis.com; the build sandbox blocks that host, so the Firestore emulator cannot be downloaded there). Fix any rules bug. Highest priority: the rules for lessonProgress, mistakes, practiceSessions, submissions and feedback are in real use and have never been exercised.
 2. Messaging (message centre) and more notification sources.
