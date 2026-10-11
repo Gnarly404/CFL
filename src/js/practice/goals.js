@@ -106,7 +106,7 @@ export function badges({ sessions, entries, now = new Date() }) {
   const list = [];
   if (sessions.length) list.push({ id: 'first-lesson', label: 'First lesson', detail: 'You finished a practice session.' });
   const { longest } = streaks(sessions, now);
-  if (longest >= 7) list.push({ id: 'streak-7', label: '7 day streak', detail: `Your best run in the last ${HISTORY_DAYS} days is ${longest} days.` });
+  if (longest >= 7) list.push({ id: 'streak-7', label: '7-day streak', detail: `Your best run in the last ${HISTORY_DAYS} days is ${longest} days.` });
   for (const entry of entries) {
     if (entry.lessons.length && entry.done === entry.lessons.length) list.push({ id: `skill-${entry.skill.id}`, label: `${entry.skill.label} complete`, detail: `All ${entry.lessons.length} ${entry.skill.label} lessons are finished.` });
   }

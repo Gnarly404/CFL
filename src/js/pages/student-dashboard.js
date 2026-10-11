@@ -8,6 +8,7 @@ import { pickContinue } from '@/practice/engine.js';
 import { loadOverview } from '@/practice/overview.js';
 import { mountToday } from '@/practice/today.js';
 import { SKILLS } from '@/practice/skills.js';
+import { STATUS_LABELS } from '@/utils/application-status.js';
 import { h } from '@/ui/h.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
 import { mountNotificationBadge } from '@/ui/notification-badge.js';
@@ -28,6 +29,10 @@ const profileStatusEl = document.getElementById('profileStatus');
 const applicationStatusEl = document.getElementById('applicationStatus');
 const studentDetailsEl = document.getElementById('studentDetails');
 const enrolmentsEl = document.getElementById('enrolments');
+const formatStatus = (status, fallback = 'Pending') => {
+  if (typeof status !== 'string' || !status) return fallback;
+  return STATUS_LABELS[status] ?? status.replaceAll('_', ' ').replace(/^[a-z]/, (letter) => letter.toUpperCase());
+};
 
 const shownName = session.user.displayName || session.user.email;
 if (nameEl) nameEl.textContent = shownName;
@@ -50,11 +55,11 @@ try {
   if (nameEl) nameEl.textContent = profileName;
   if (chipEl) chipEl.textContent = profileName;
   if (regEl) regEl.textContent = profile.profile?.applicationReference ?? '—';
-  if (profileStatusEl) profileStatusEl.textContent = profile.status ?? 'Account active';
+  if (profileStatusEl) profileStatusEl.textContent = formatStatus(profile.status, 'Account active');
 
   const application = applicationSnap.docs[0]?.data() ?? null;
   if (applicationStatusEl) {
-    applicationStatusEl.textContent = application ? application.status : 'No application found';
+    applicationStatusEl.textContent = application ? formatStatus(application.status, 'Unknown') : 'No application found';
     applicationStatusEl.title = application ? `Reference: ${application.reference}` : 'No application record';
   }
 
@@ -68,7 +73,7 @@ try {
   if (enrolmentsEl) {
     const enrolments = enrolmentSnap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     enrolmentsEl.replaceChildren(...(enrolments.length
-      ? enrolments.map((enrolment) => el('li', {}, `${enrolment.programmeId ?? 'Programme'} · ${enrolment.status ?? 'Pending'}`))
+      ? enrolments.map((enrolment) => el('li', {}, `${enrolment.programmeId ?? 'Programme'} · ${formatStatus(enrolment.status)}`))
       : [el('li', {}, 'No enrolments recorded yet.')])
     );
   }
@@ -88,8 +93,8 @@ try {
   const textEl = document.getElementById('continueText');
   const actionEl = document.getElementById('continueAction');
   const gridEl = document.getElementById('skillGrid');
-  if (titleEl) titleEl.textContent = pick ? pick.next.title : 'All available lessons complete';
-  if (textEl) textEl.textContent = pick ? `${pick.skill.label}: ${pick.done} of ${pick.lessons.length} lessons completed. ${pick.next.summary}` : 'You can review any lesson in English Practice.';
+  if (titleEl) titleEl.textContent = pick ? pick.next.title : 'All available lessons are complete';
+  if (textEl) textEl.textContent = pick ? `${pick.skill.label}: You have completed ${pick.done} of ${pick.lessons.length} lessons. ${pick.next.summary}` : 'You can review any lesson in English Practice.';
   if (actionEl) {
     actionEl.replaceChildren(h('a', { class: 'btn btn-primary', href: pick ? lessonUrl(pick.skill.id, pick.next.id) : ROUTES.practice }, pick ? (pick.done ? 'Continue' : 'Start lesson') : 'Open English Practice'));
   }
