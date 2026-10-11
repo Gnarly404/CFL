@@ -23,7 +23,13 @@ for (const person of people) {
   let user;
   try {
     user = await auth.getUserByEmail(person.email);
-  } catch {
+    user = await auth.updateUser(user.uid, {
+      emailVerified: true,
+      displayName: person.displayName,
+      password: PASSWORD,
+    });
+  } catch (error) {
+    if (error.code !== 'auth/user-not-found') throw error;
     user = await auth.createUser({
       email: person.email, displayName: person.displayName, password: PASSWORD, emailVerified: true,
     });
