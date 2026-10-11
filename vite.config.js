@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import { readdirSync, statSync } from 'node:fs';
 import { resolve, join, relative, sep } from 'node:path';
+import { includePartials } from './scripts/html-partials.mjs';
 
 const projectRoot = import.meta.dirname;
 const srcRoot = resolve(projectRoot, 'src');
@@ -24,6 +25,7 @@ function htmlEntries(dir) {
 
 export default defineConfig({
   root: srcRoot,
+  plugins: [includePartials(resolve(projectRoot, 'partials'))],
   publicDir: resolve(projectRoot, 'public'),
   envDir: projectRoot,
   resolve: { alias: { '@': resolve(srcRoot, 'js') } },

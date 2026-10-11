@@ -5,7 +5,7 @@ import {
   assertFails, assertSucceeds, initializeTestEnvironment,
 } from '@firebase/rules-unit-testing';
 import {
-  addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, updateDoc, where,
+  addDoc, collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, setDoc, Timestamp, updateDoc, where,
 } from 'firebase/firestore';
 import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
 
@@ -49,6 +49,9 @@ beforeEach(async () => {
     await setDoc(doc(db, 'submissions/s1'), { studentId: 'stu1', status: 'draft', content: 'a' });
     await setDoc(doc(db, 'submissions/s2'), { studentId: 'stu1', status: 'submitted', content: 'a' });
     await setDoc(doc(db, 'enrolments/e1'), { studentId: 'stu1', instructorIds: ['ins1'] });
+    await setDoc(doc(db, 'enrolments/stu1_open'), { studentId: 'stu1', programmeId: 'open', status: 'pending_start', instructorIds: [] });
+    await setDoc(doc(db, 'schedules/c1'), { programmeId: 'open', title: 'Speaking', startsAt: Timestamp.fromMillis(2_000_000_000_000), endsAt: Timestamp.fromMillis(2_000_003_600_000), mode: 'online', status: 'scheduled', instructorId: 'ins1' });
+    await setDoc(doc(db, 'schedules/c2'), { programmeId: 'other', title: 'Other course', startsAt: Timestamp.fromMillis(2_000_000_000_000), endsAt: Timestamp.fromMillis(2_000_003_600_000), mode: 'in_person', status: 'scheduled' });
   });
 });
 
@@ -216,6 +219,45 @@ describe('messages, notifications and money', () => {
     await assertSucceeds(getDoc(doc(as.admin(), 'auditLogs/a1')));
     await assertFails(getDoc(doc(as.student(), 'auditLogs/a1')));
     await assertFails(addDoc(collection(as.admin(), 'auditLogs'), { action: 'forged' }));
+  });
+});
+
+describe('class schedule', () => {
+  const classDoc = (extra = {}) => ({
+    programmeId: 'open', title: 'Grammar', mode: 'in_person', status: 'scheduled',
+    startsAt: Timestamp.fromMillis(2_000_000_000_000), endsAt: Timestamp.fromMillis(2_000_003_600_000), ...extra,
+  });
+
+  it('an enrolled student reads their programme\'s classes, by naming the programme', async () => {
+    await assertSucceeds(getDoc(doc(as.student('stu1'), 'schedules/c1')));
+    await assertSucceeds(getDocs(query(collection(as.student('stu1'), 'schedules'), where('programmeId', '==', 'open'), where('startsAt', '>=', Timestamp.fromMillis(0)), orderBy('startsAt'))));
+  });
+
+  it('a student cannot read another programme\'s classes, and strangers read nothing', async () => {
+    await assertFails(getDoc(doc(as.student('stu1'), 'schedules/c2')));
+    await assertFails(getDoc(doc(as.student('stu2'), 'schedules/c1')));
+    await assertFails(getDocs(collection(as.student('stu1'), 'schedules')));
+    await assertFails(getDoc(doc(as.anon(), 'schedules/c1')));
+    await assertFails(getDoc(doc(as.noRole('nor1'), 'schedules/c1')));
+  });
+
+  it('the named instructor and admins read; another instructor does not', async () => {
+    await assertSucceeds(getDoc(doc(as.instructor('ins1'), 'schedules/c1')));
+    await assertFails(getDoc(doc(as.instructor('ins2'), 'schedules/c1')));
+    await assertFails(getDoc(doc(as.instructor('ins1'), 'schedules/c2')));
+    await assertSucceeds(getDoc(doc(as.admin(), 'schedules/c2')));
+  });
+
+  it('only admins write, and only valid classes', async () => {
+    await assertSucceeds(addDoc(collection(as.admin(), 'schedules'), classDoc()));
+    await assertFails(addDoc(collection(as.student('stu1'), 'schedules'), classDoc()));
+    await assertFails(addDoc(collection(as.instructor('ins1'), 'schedules'), classDoc()));
+    await assertFails(addDoc(collection(as.admin(), 'schedules'), classDoc({ title: '' })));
+    await assertFails(addDoc(collection(as.admin(), 'schedules'), classDoc({ mode: 'moon' })));
+    await assertFails(addDoc(collection(as.admin(), 'schedules'), classDoc({ endsAt: Timestamp.fromMillis(1_999_999_000_000) })));
+    await assertSucceeds(updateDoc(doc(as.admin(), 'schedules/c1'), { status: 'cancelled' }));
+    await assertFails(updateDoc(doc(as.admin(), 'schedules/c1'), { status: 'deleted' }));
+    await assertFails(updateDoc(doc(as.student('stu1'), 'schedules/c1'), { status: 'cancelled' }));
   });
 });
 

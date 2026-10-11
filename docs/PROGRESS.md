@@ -8,7 +8,7 @@ upload the latest zip and say "continue with session N"; this file is the handof
 | # | Session | Status |
 | --- | --- | --- |
 | 1 | Foundation: clean repo, auth and roles, admissions backend, rules, tests | **Done (this checkpoint)** |
-| 2 | Design system and app shell | **Partly done**: tokens, components, student portal shell. Still open: self-hosted fonts and icons, CSP, shared public header/footer, admin and instructor shells |
+| 2 | Design system and app shell | **Partly done**: tokens, components, student portal shell. Still open: CSP enforcement, admin shell |
 | 3 | Student portal and dashboard | **Started**: Continue Learning and skill cards use real lesson progress. Still open: schedule, materials, fees from real data, profile and settings pages, email change |
 | 4 | English Practice (hub, engine, six skills, results, mistake review) | **Started**: hub, lesson shell, Grammar (5 starter lessons) work end to end. Vocabulary also works (4 starter lessons). Still open: Listening, Speaking, Reading, Writing, a cross-lesson mistake review page, daily goal, recommendations |
 | 5 | Public site, programmes, admissions pages | Planned |
@@ -177,11 +177,21 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 - Needs deploying: the `instructorNotifyFeedback` function and the updated Firestore rules. The `notifications (userId, createdAt desc)` index already exists.
 - 43 test files, 393 tests pass.
 
+### Schedule (eleventh slice)
+
+- Rules tests were run on the owner's machine for the first time after the notifications slice: **26 of 26 passed** (Firestore 21, Storage 5). Some denials log "evaluation error" instead of a plain false; these still deny, so they fail closed. The schedule rules below are covered by new tests that have **not been run**.
+- `/student/schedule`: next class, upcoming classes by day, earlier classes (last 14 days) folded away, cancelled classes marked, a Join online link only when it is a plain https link. Shows plain explanations when the student is not enrolled, when nothing is scheduled, and when loading fails. Times show in the viewer's time zone with the zone name.
+- Admin console, "Class schedule": add a class (programme, title, date, start, end, in person or online, optional room, https link, notes and instructor) and cancel or restore it. Nothing is invented; with no classes the student sees "No upcoming classes yet".
+- Rules: `schedules` was readable by any signed-in user. Now a student reads a class only if enrolled in its programme (enrolment id `{studentId}_{programmeId}`), an instructor only if named on it, admins always. Admin writes are validated (title, mode, status, end after start). The student query names one programme per query, the same pattern as the writing-review rules; if the page says "could not be loaded" after deploy, run `npm run test:rules` and look at the schedule tests first.
+- Needs deploying: updated `firestore.rules` and `firestore.indexes.json` (new index `schedules: programmeId, startsAt`).
+- Not built: next class on the dashboard, an instructor's own timetable, attendance, calendar export, reminders.
+- 48 test files, 446 tests pass.
+
 ### Next up
 1. Run `npm run test:rules` somewhere with the Firebase emulators (needs Java 21 and access to storage.googleapis.com; the build sandbox blocks that host, so the Firestore emulator cannot be downloaded there). Fix any rules bug. Highest priority: the rules for lessonProgress, mistakes, practiceSessions, submissions and feedback are in real use and have never been exercised.
 2. Messaging (message centre) and more notification sources.
 3. Content management (lessons are JSON in the repo today), an instructor view of student progress, speaking review (needs an audio upload path, rules and consent wording).
-4. A shared public header and footer, and switching the CSP from Report-Only to enforcing after a signed-in check (see "Content-Security-Policy" below). Self-hosted fonts and the icon family are done.
+4. Switching the CSP from Report-Only to enforcing after a signed-in check (see "Content-Security-Policy" below). Self-hosted fonts, the icon family and the shared public header and footer are done.
 
 > Teaching assignments: the admin console has a "Teaching assignments" section (`src/js/admin/assignments.js`) backed by the `adminAssignInstructor` Cloud Function, which audits every change. It was added to the repository in the commit after the redesign merge; an earlier note claiming it already existed was wrong, because the code had been sitting uncommitted in a working copy.
 
@@ -217,3 +227,13 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 - To make that possible: the homepage's inline script (a `/CFL/` GitHub Pages path rewrite that does nothing on Firebase) was removed, the dashboard's one `style=` moved into `portal.css`, and `h()` now applies styles through the CSSOM. Tests keep pages free of inline script, style and handlers.
 - **Why it is Report-Only:** I could not exercise real Firebase sign-in, Firestore or Functions traffic or the contact form's EmailJS call. After deploying, sign in, run a lesson and send a contact message with the browser console open; if no "[Report Only] Refused to..." lines appear, change the header key to `Content-Security-Policy` in `firebase.json` to enforce it.
 - Merged the instructor writing-review work (queue, feedback page, student feedback view): the three instructor pages got the same font, motion and veil wiring as every other page; all three are axe-clean (checked with the fake-data harness, empty-queue state).
+
+### Shared header and footer, Privacy and Terms, working contact form
+
+- The site header and footer now live once in `partials/site-nav.html` and `partials/site-footer.html`. Pages include them with `<!-- @include site-nav -->` / `<!-- @include site-footer -->`; the build and dev server paste them in (`scripts/html-partials.mjs`), so pages stay plain static HTML. Used by the home, programmes, privacy and terms pages. The route check parses the partials too.
+- `/privacy` and `/terms` are new, written from what the code actually does: no analytics or advertising, speaking recordings never leave the browser, verification emails go through EmailJS, the map is Google's, data is held in Firebase, Kenya's Data Protection Act 2019 and the ODPC for complaints. They were drafted by Claude, not by a lawyer: have the Centre confirm the facts (controller name, retention practice, who handles data requests) before relying on them. A test fails if a contents link has no heading.
+- The four social icons stay as `#` on purpose (the Centre has no accounts); the route check reports them as a note, not a warning.
+- The homepage contact form was not connected to anything, so messages were silently lost. It now opens the visitor's own email app with the message addressed to the Centre (`js/pages/contact-form.js`) and says so. Replace with a hosted form service or an EmailJS template when wanted.
+- Footer Quick Links pointed at anchors that did not exist (`#courses`, `#gallery`); they now go to real pages. The nav motto is a `<p>` instead of a second `<h1>`, and the home headline is the page's `<h1>` (pixel-identical).
+- Footer wording still says "Centre of Foreign Languages" in places while the brand and titles say "Foreign Learning"; worth deciding which is correct.
+- Student notifications page wired into the same layer. New: `tests/unit/page-layer.test.js` fails if any page lacks `data-veil`, `fonts.css`, `motion.css` or `boot.js`, or still links Google Fonts. When adding a page, copy the head from an existing one.

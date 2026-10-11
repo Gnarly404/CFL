@@ -6,7 +6,7 @@
 //  - every page under /student, /admin and /instructor ships hidden until the sign-in guard runs.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, resolve, sep } from 'node:path';
-import { parse } from 'parse5';
+import { parse, parseFragment } from 'parse5';
 
 const root = resolve(import.meta.dirname, '..');
 const dist = join(root, 'dist');
@@ -30,9 +30,10 @@ function walk(dir, found = []) {
 const rel = (file, base = root) => relative(base, file).split(sep).join('/');
 
 // 0. markup must parse cleanly (stray quotes and unclosed attributes silently break pages)
-for (const file of walk(join(root, 'src')).filter((f) => f.endsWith('.html'))) {
+for (const file of [...walk(join(root, 'src')), ...walk(join(root, 'partials'))].filter((f) => f.endsWith('.html'))) {
   const source = readFileSync(file, 'utf8');
-  parse(source, {
+  const read = file.includes(`${sep}partials${sep}`) ? parseFragment : parse; // partials are fragments, not documents
+  read(source, {
     sourceCodeLocationInfo: true,
     onParseError: (error) => problems.push(`markup: ${rel(file)}:${error.startLine}:${error.startCol} ${error.code}`),
   });
@@ -66,9 +67,14 @@ for (const { source, destination } of hosting.redirects ?? []) {
 const pages = walk(dist).filter((file) => file.endsWith('.html'));
 let checked = 0;
 let placeholders = 0;
+let intentional = 0; // social icons: the Centre has no accounts yet, so they stay as # on purpose
 for (const page of pages) {
   const name = rel(page, dist);
   const html = readFileSync(page, 'utf8');
+
+  const socials = (html.match(/<a\b[^>]*class="social-icon"[^>]*>/g) ?? []).filter((tag) => /href="#"/.test(tag)).length;
+  intentional += socials;
+  placeholders -= socials;
 
   for (const match of html.matchAll(/\s(?:href|src|action)=["']([^"']*)["']/g)) {
     const ref = match[1];
@@ -87,7 +93,8 @@ for (const page of pages) {
     problems.push(`${name}: protected page must start with <html data-auth="pending">`);
   }
 }
-if (placeholders) warnings.push(`${placeholders} placeholder links (href="#") across pages: replaced when each page is redesigned`);
+if (intentional) console.log(`  note: ${intentional} social-icon links are intentionally left as # (no accounts yet)`);
+if (placeholders > 0) warnings.push(`${placeholders} placeholder links (href="#") across pages: replaced when each page is redesigned`);
 
 console.log(`Checked ${pages.length} pages and ${checked} references.`);
 for (const warning of warnings) console.log(`  warning: ${warning}`);

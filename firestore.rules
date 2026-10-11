@@ -160,9 +160,22 @@ service cloud.firestore {
     }
 
     // ---------- operations ----------
+    // A class is visible to the students enrolled in its programme, to the instructor it names, and to admins.
+    // Queries must name the programme (students) or the instructor (instructors).
+    function validClass() {
+      let d = request.resource.data;
+      return d.programmeId is string && d.programmeId.size() > 0
+        && d.title is string && d.title.size() > 0 && d.title.size() <= 120
+        && d.startsAt is timestamp && d.endsAt is timestamp && d.endsAt > d.startsAt
+        && d.mode in ['in_person', 'online']
+        && d.status in ['scheduled', 'cancelled'];
+    }
     match /schedules/{scheduleId} {
-      allow read: if signedIn();
-      allow write: if isAdmin();
+      allow read: if isAdmin()
+                  || (isInstructor() && resource.data.get('instructorId', '') == request.auth.uid)
+                  || (isStudent() && exists(/databases/$(database)/documents/enrolments/$(request.auth.uid + '_' + resource.data.programmeId)));
+      allow create, update: if isAdmin() && validClass();
+      allow delete: if isAdmin();
     }
     match /attendance/{recordId} {
       allow read: if isUser(resource.data.studentId) || isAdmin();
