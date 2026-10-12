@@ -22,6 +22,12 @@ export async function loadMyClasses(uid, now = Date.now()) {
   return { programmeIds, classes: snaps.flatMap((snap) => snap.docs.map((d) => normaliseClass(d.id, d.data()))) };
 }
 
+/** The ids of the programmes an administrator has assigned this instructor to. */
+export async function listMyProgrammeIds(uid) {
+  const snap = await getDocs(query(collection(dbService(), 'programmeStaff'), where('instructorIds', 'array-contains', uid)));
+  return snap.docs.map((d) => d.id);
+}
+
 /** Classes from yesterday onward, soonest first; instructor queries are scoped to their own classes. */
 export async function listClasses({ instructorId, now = Date.now(), max = 200 } = {}) {
   const snap = await getDocs(query(

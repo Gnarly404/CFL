@@ -44,6 +44,11 @@ function parseClass(data) {
 
 export async function scheduleClassCore(deps, { actor, data }) {
   const value = parseClass(data);
+  const staff = await deps.db.collection('programmeStaff').doc(value.programmeId).get();
+  const staffIds = staff.exists && Array.isArray(staff.data().instructorIds) ? staff.data().instructorIds : [];
+  if (!staffIds.includes(actor.uid)) {
+    throw new HttpsError('permission-denied', 'You can schedule classes only for programmes you are assigned to. Ask an administrator to assign you.');
+  }
   const instructorSnap = await deps.db.collection('users').doc(actor.uid).get();
   const instructorName = instructorSnap.exists && instructorSnap.data().displayName || actor.email || 'Instructor';
   const classRef = deps.db.collection('schedules').doc();

@@ -35,6 +35,7 @@ beforeEach(async () => {
     await setDoc(doc(db, 'users/stu1'), { uid: 'stu1', role: 'student', status: 'active' });
     await setDoc(doc(db, 'users/stu2'), { uid: 'stu2', role: 'student', status: 'active' });
     await setDoc(doc(db, 'students/stu1'), { uid: 'stu1', profile: {}, preferences: {}, instructorIds: ['ins1'] });
+    await setDoc(doc(db, 'programmeStaff/open'), { programmeId: 'open', instructorIds: ['ins1', 'ins3'] });
     await setDoc(doc(db, 'programmes/open'), { active: true, title: 'General English' });
     await setDoc(doc(db, 'programmes/hidden'), { active: false, title: 'Draft' });
     await setDoc(doc(db, 'lessons/live'), { published: true, title: 'Greetings' });
@@ -294,6 +295,29 @@ describe('class schedule', () => {
     await assertFails(updateDoc(doc(as.instructor('ins2'), 'schedules/c1'), { status: 'cancelled' }));
     await assertFails(updateDoc(doc(as.student('stu1'), 'schedules/c1'), { status: 'cancelled' }));
     await assertFails(deleteDoc(doc(as.instructor('ins1'), 'schedules/c1')));
+  });
+});
+
+describe('programme staff', () => {
+  it('admins read every record; an instructor reads only a programme they are on', async () => {
+    await assertSucceeds(getDoc(doc(as.admin(), 'programmeStaff/open')));
+    await assertSucceeds(getDoc(doc(as.instructor('ins1'), 'programmeStaff/open')));
+    await assertFails(getDoc(doc(as.instructor('ins2'), 'programmeStaff/open')));
+    await assertSucceeds(getDocs(query(collection(as.instructor('ins1'), 'programmeStaff'), where('instructorIds', 'array-contains', 'ins1'))));
+    await assertFails(getDocs(collection(as.instructor('ins1'), 'programmeStaff')));
+  });
+
+  it('students and strangers read nothing', async () => {
+    await assertFails(getDoc(doc(as.student('stu1'), 'programmeStaff/open')));
+    await assertFails(getDoc(doc(as.anon(), 'programmeStaff/open')));
+    await assertFails(getDoc(doc(as.noRole('nor1'), 'programmeStaff/open')));
+  });
+
+  it('nobody writes from the browser, not even an admin or a listed instructor', async () => {
+    await assertFails(setDoc(doc(as.admin(), 'programmeStaff/open'), { instructorIds: [] }));
+    await assertFails(setDoc(doc(as.instructor('ins2'), 'programmeStaff/open'), { instructorIds: ['ins2'] }));
+    await assertFails(updateDoc(doc(as.instructor('ins1'), 'programmeStaff/open'), { instructorIds: ['ins1', 'ins2'] }));
+    await assertFails(deleteDoc(doc(as.admin(), 'programmeStaff/open')));
   });
 });
 

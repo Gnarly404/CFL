@@ -3,6 +3,7 @@ import {
   availableDecisions, DECISION_LABELS, STATUS_LABELS,
 } from '@/utils/application-status.js';
 import { initAssignments } from './assignments.js';
+import { initProgrammeStaff } from './programme-staff.js';
 import { setAttentionBadge } from '@/ui/attention-badge.js';
 import { validateEmail, validateName } from '@/utils/validation.js';
 import { formatDate } from '@/utils/format.js';
@@ -43,6 +44,7 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
   }
 
   const assignments = initAssignments({ root, say, getUsers: () => knownUsers });
+  const programmeStaff = initProgrammeStaff({ root, say, getUsers: () => knownUsers });
 
   async function run(label, work, { reload = ['applications', 'users'] } = {}) {
     try {
@@ -178,6 +180,7 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
       return;
     }
     assignments.load();
+    programmeStaff.load();
   }
 
   filter?.addEventListener('change', loadApplications);

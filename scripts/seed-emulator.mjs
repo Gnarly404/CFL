@@ -2,6 +2,7 @@
 //   npm run emulators          (terminal 1)
 //   npm run seed               (terminal 2)
 // Refuses to run unless the emulator environment variables are set, so it can never touch a real project.
+import { readFileSync } from 'node:fs';
 import { connect } from './lib/admin.mjs';
 
 if (!process.env.FIREBASE_AUTH_EMULATOR_HOST || !process.env.FIRESTORE_EMULATOR_HOST) {
@@ -50,6 +51,13 @@ for (const person of people) {
     });
   }
 }
+
+// Let the demo instructor schedule classes: assign them to the first few programmes.
+const demoInstructor = await auth.getUserByEmail(people.find((person) => person.role === 'instructor').email);
+const programmeList = JSON.parse(readFileSync(new URL('../src/data/programmes.json', import.meta.url), 'utf8'));
+await Promise.all(programmeList.slice(0, 3).map((programme) => db.collection('programmeStaff').doc(programme.id).set({
+  programmeId: programme.id, instructorIds: [demoInstructor.uid], updatedAt: FieldValue.serverTimestamp(),
+}, { merge: true })));
 
 await Promise.all(['seed-1', 'seed-2', 'seed-3'].map((id) => db.collection('applications').doc(id).delete()));
 

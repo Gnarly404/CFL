@@ -20,6 +20,7 @@ function setup() {
   db.store.set('users/stu1', { role: 'student', status: 'active', displayName: 'Amina K' });
   db.store.set('users/stu2', { role: 'student', status: 'disabled', displayName: 'Disabled Student' });
   db.store.set('users/stu3', { role: 'student', status: 'active', displayName: 'Other Programme Student' });
+  db.store.set('programmeStaff/english-intake', { instructorIds: ['ins1'] });
   db.store.set('enrolments/e1', { studentId: 'stu1', programmeId: 'english-intake' });
   db.store.set('enrolments/e1-copy', { studentId: 'stu1', programmeId: 'english-intake' });
   db.store.set('enrolments/e2', { studentId: 'stu2', programmeId: 'english-intake' });
@@ -41,6 +42,14 @@ describe('scheduleClass', () => {
     });
     expect(messages(deps)).toHaveLength(0);
     expect(notifications(deps)).toHaveLength(0);
+  });
+
+  it('rejects a programme the instructor is not assigned to', async () => {
+    const deps = setup();
+    deps.db.store.set('programmeStaff/maths', { instructorIds: ['someone-else'] });
+    await expect(scheduleClassCore(deps, { actor, data: { ...input, programmeId: 'maths' } })).rejects.toMatchObject({ code: 'permission-denied' });
+    await expect(scheduleClassCore(deps, { actor, data: { ...input, programmeId: 'unstaffed' } })).rejects.toMatchObject({ code: 'permission-denied' });
+    expect([...deps.db.store.keys()].some((key) => key.startsWith('schedules/'))).toBe(false);
   });
 
   it('rejects unsafe join links before creating a class', async () => {

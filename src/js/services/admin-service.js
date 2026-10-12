@@ -41,9 +41,16 @@ export const createUser = ({ email, displayName, role }) => call('adminCreateUse
 export const setUserDisabled = ({ uid, disabled }) => call('adminSetUserStatus', { uid, disabled });
 export const setUserRole = ({ uid, role }) => call('adminSetUserRole', { uid, role });
 export const assignInstructor = ({ studentId, instructorId, assigned }) => call('adminAssignInstructor', { studentId, instructorId, assigned });
+export const assignProgramme = ({ programmeId, instructorId, assigned }) => call('adminAssignProgramme', { programmeId, instructorId, assigned });
 export const resendInvite = ({ uid }) => call('adminResendInvite', { uid });
 
 /** Student records (admins can read them all): uid, instructorIds. Names and emails come from the user list. */
 export async function listStudents({ max = 500 } = {}) {
   return rowsFromSnapshot(await getDocs(query(collection(dbService(), 'students'), limit(max)))).map(({ id, instructorIds }) => ({ uid: id, instructorIds: instructorIds ?? [] }));
+}
+
+/** Who teaches each programme (admins can read every record): a map of programmeId to instructor ids. */
+export async function listProgrammeStaff({ max = 500 } = {}) {
+  const rows = rowsFromSnapshot(await getDocs(query(collection(dbService(), 'programmeStaff'), limit(max))));
+  return new Map(rows.map(({ id, instructorIds }) => [id, instructorIds ?? []]));
 }

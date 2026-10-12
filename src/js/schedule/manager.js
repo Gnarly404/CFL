@@ -2,7 +2,7 @@ import programmes from '../../data/programmes.json';
 import { el } from '@/utils/dom.js';
 import { describeWhen, formatDay, modeLabel } from './state.js';
 import { buildClass } from './validate.js';
-import { createClass, listClasses, manageScheduledClass } from '@/services/schedule-service.js';
+import { createClass, listClasses, listMyProgrammeIds, manageScheduledClass } from '@/services/schedule-service.js';
 
 const programmeName = (id) => programmes.find((p) => p.id === id)?.name ?? id;
 
@@ -16,7 +16,30 @@ export function initSchedule({ root = document, say, instructor }) {
   const programmeSelect = field('classProgramme');
   const instructors = [{ uid: instructor.uid, displayName: instructor.displayName }];
 
-  programmeSelect.replaceChildren(el('option', { value: '' }, 'Choose a programme…'), ...programmes.map((p) => el('option', { value: p.id }, p.name)));
+  const submitButton = form.querySelector('button[type="submit"]');
+  const programmeNote = root.querySelector('#classProgrammeNote');
+
+  /** Only programmes an administrator has assigned to this instructor can be scheduled. */
+  async function loadProgrammes() {
+    let ids = [];
+    try {
+      ids = await listMyProgrammeIds(instructor.uid);
+    } catch (error) {
+      console.warn('Could not load assigned programmes', error?.code ?? error);
+      say('Your assigned programmes could not be loaded.', 'error');
+    }
+    const mine = programmes.filter((p) => ids.includes(p.id));
+    programmeSelect.replaceChildren(
+      el('option', { value: '' }, mine.length ? 'Choose a programme…' : 'No programmes assigned'),
+      ...mine.map((p) => el('option', { value: p.id }, p.name)),
+    );
+    programmeSelect.disabled = !mine.length;
+    if (submitButton) submitButton.disabled = !mine.length;
+    if (programmeNote) {
+      programmeNote.hidden = Boolean(mine.length);
+      programmeNote.textContent = mine.length ? '' : 'You are not assigned to any programme yet. Ask an administrator to assign you before you schedule classes.';
+    }
+  }
 
   async function changeClass(scheduleClass, action) {
     try {
@@ -34,6 +57,7 @@ export function initSchedule({ root = document, say, instructor }) {
   }
 
   async function load() {
+    await loadProgrammes();
     body.replaceChildren(empty('Loading classes…'));
     let classes;
     try {
@@ -80,7 +104,7 @@ export function initSchedule({ root = document, say, instructor }) {
       instructorId: instructor.uid,
     }, instructors);
     if (errors.length) { say(errors.join(' '), 'error'); return; }
-    const button = form.querySelector('button[type="submit"]');
+    const button = submitButton;
     button.disabled = true;
     button.textContent = 'Adding…';
     try {

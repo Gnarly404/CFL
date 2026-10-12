@@ -5,19 +5,22 @@ import { tick } from '../helpers.js';
 const listClasses = vi.fn();
 const createClass = vi.fn();
 const manageScheduledClass = vi.fn();
+const listMyProgrammeIds = vi.fn();
 vi.mock('@/services/schedule-service.js', () => ({
   listClasses: (...a) => listClasses(...a),
   createClass: (...a) => createClass(...a),
   manageScheduledClass: (...a) => manageScheduledClass(...a),
+  listMyProgrammeIds: (...a) => listMyProgrammeIds(...a),
 }));
 
 const row = (extra = {}) => ({ id: 'c1', programmeId: 'english-intake', title: 'Speaking', startsAtMs: Date.now() + 86_400_000, endsAtMs: Date.now() + 90_000_000, mode: 'online', instructorName: 'Ms Otieno', cancelled: false, ...extra });
 
-async function setup(list = []) {
+async function setup(list = [], assigned = ['english-intake']) {
   document.body.innerHTML = `<form id="classForm"><select id="classProgramme"></select><input id="classTitle">
     <input id="classDate"><input id="classStart"><input id="classEnd"><select id="classMode"><option value="in_person">a</option><option value="online">b</option></select>
-    <input id="classLocation"><input id="classLink"><textarea id="classNotes"></textarea><button type="submit">Add</button></form><table><tbody id="classesBody"></tbody></table>`;
+    <input id="classLocation"><input id="classLink"><textarea id="classNotes"></textarea><p id="classProgrammeNote" hidden></p><button type="submit">Add</button></form><table><tbody id="classesBody"></tbody></table>`;
   listClasses.mockResolvedValue(list);
+  listMyProgrammeIds.mockResolvedValue(assigned);
   const say = vi.fn();
   const { initSchedule } = await import('@/schedule/manager.js');
   const ui = initSchedule({ say, instructor: { uid: 'ins1', displayName: 'Ms Otieno' } });
@@ -27,13 +30,28 @@ async function setup(list = []) {
 const set = (id, value) => { document.getElementById(id).value = value; };
 const submit = async () => { document.getElementById('classForm').dispatchEvent(new Event('submit', { cancelable: true })); await tick(); };
 
-beforeEach(() => { listClasses.mockReset(); createClass.mockReset().mockResolvedValue({ classId: 'new' }); manageScheduledClass.mockReset().mockResolvedValue(); });
+beforeEach(() => { listMyProgrammeIds.mockReset(); listClasses.mockReset(); createClass.mockReset().mockResolvedValue({ classId: 'new' }); manageScheduledClass.mockReset().mockResolvedValue(); });
 
 describe('instructor class schedule', () => {
   it('loads only the current instructor’s classes and shows an empty state', async () => {
     await setup();
     expect(listClasses).toHaveBeenCalledWith({ instructorId: 'ins1' });
     expect(document.getElementById('classesBody').textContent).toContain('No classes scheduled yet');
+  });
+
+  it('offers only the programmes the instructor is assigned to', async () => {
+    await setup([], ['english-intake']);
+    const options = [...document.querySelectorAll('#classProgramme option')].map((o) => o.value);
+    expect(options).toContain('english-intake');
+    expect(options.filter(Boolean)).toHaveLength(1);
+  });
+
+  it('blocks scheduling and explains when no programme is assigned', async () => {
+    await setup([], []);
+    expect(document.getElementById('classProgramme').disabled).toBe(true);
+    expect(document.querySelector('#classForm button').disabled).toBe(true);
+    expect(document.getElementById('classProgrammeNote').hidden).toBe(false);
+    expect(document.getElementById('classProgrammeNote').textContent).toContain('not assigned to any programme');
   });
 
   it('refuses an invalid class and says why', async () => {

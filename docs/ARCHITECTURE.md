@@ -75,6 +75,7 @@ Written by "server" means Cloud Functions (Admin SDK); rules deny browser writes
 | `feedback/{submissionId}` | assigned instructor | the student, the writing instructor, admin | overall, notes (quote + comment), never edits the submission |
 | `schedules/{id}` | admin; instructor callables create, cancel, restore or delete their own classes | admin; students enrolled in `programmeId`; the instructor in `instructorId` | creates are checked for instructor time conflicts; schedule change trigger sends enrolled students announcements and notifications |
 | `attendance` | admin | owner, admin | not built yet |
+| `programmeStaff/{programmeId}` | server (`adminAssignProgramme`, admin only, audited) | admins; an instructor listed in `instructorIds` | many-to-many instructor↔programme link; `scheduleClass` rejects a programme the instructor is not on |
 | `messages/{id}` | server (`sendMessage`, `scheduleClass`) | the two `participants` | assigned teacher/student chats and read-only class announcements; threadId `{studentId}_{instructorId}`; recipient may set `readAt` only |
 | `notifications/{id}` | server (`instructorNotifyFeedback`, `scheduleClass`) | owner | owner may change only `readAt`, `archivedAt` |
 | `payments`, `certificates` | server | owner, admin | |
