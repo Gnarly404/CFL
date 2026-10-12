@@ -45,14 +45,25 @@ export async function submitApplicationCore(deps, { data, ip, now = () => new Da
       email: value.email,
       phoneNumber: value.phoneNumber,
       nationality: value.nationality,
+      identityDocument: { type: value.identificationType, number: value.identificationNumber },
+      residentialAddress: value.residentialAddress,
+      countryOfResidence: value.countryOfResidence,
+      academicBackground: {
+        highestQualification: value.highestQualification,
+        institutionAttended: value.institutionAttended,
+        completionYear: value.completionYear,
+      },
     },
-    guardian: {
-      name: value.guardianName,
-      relationship: value.relationship,
-      phoneNumber: value.guardianPhone,
-      emergencyContact: value.emergencyContact,
+    contactPerson: {
+      name: value.contactName,
+      relationship: value.contactRelationship,
+      phoneNumber: value.contactPhone,
     },
-    consent: { version: CONSENT_VERSION, acceptedAt: now().toISOString() },
+    consent: {
+      version: CONSENT_VERSION,
+      acceptedAt: now().toISOString(),
+      guardianConsent: value.guardianConsent === true,
+    },
     source: 'web',
   }, now().getUTCFullYear());
 

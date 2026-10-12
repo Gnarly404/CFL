@@ -7,9 +7,12 @@ import {
 const NOW = new Date('2026-10-06T12:00:00Z');
 const valid = {
   firstName: 'Wanjiku', middleName: '', surname: 'Kamau', dateOfBirth: '2012-05-14', gender: 'female',
-  email: ' Parent@Example.com ', phoneNumber: '0712 345 678', nationality: 'kenyan',
-  guardianName: 'Grace Kamau', relationship: 'parent', guardianPhone: '0722000111',
-  emergencyContact: 'Peter Kamau', consent: true, website: '',
+  email: ' Parent@Example.com ', phoneNumber: '0712 345 678', nationality: 'Kenyan',
+  identificationType: 'national_id', identificationNumber: '12345678',
+  residentialAddress: '12 Valley Road, Nairobi', countryOfResidence: 'Kenya',
+  contactName: 'Grace Kamau', contactRelationship: 'parent', contactPhone: '0722000111', guardianConsent: true,
+  highestQualification: 'secondary', institutionAttended: 'Nairobi School', completionYear: '2020',
+  programmeId: 'english-intake', consent: true, website: '',
 };
 
 function deps(overrides = {}) {
@@ -29,12 +32,18 @@ describe('submitApplication', () => {
     expect(stored).toMatchObject({
       email: 'parent@example.com',
       applicantName: 'Wanjiku Kamau',
-      programmeId: null,
-      applicant: { phoneNumber: '+254712345678', gender: 'female' },
-      guardian: { name: 'Grace Kamau', phoneNumber: '+254722000111' },
+      programmeId: 'english-intake',
+      applicant: {
+        phoneNumber: '+254712345678', gender: 'female', nationality: 'Kenyan',
+        identityDocument: { type: 'national_id', number: '12345678' },
+        residentialAddress: '12 Valley Road, Nairobi', countryOfResidence: 'Kenya',
+        academicBackground: { highestQualification: 'secondary', institutionAttended: 'Nairobi School', completionYear: 2020 },
+      },
+      contactPerson: { name: 'Grace Kamau', relationship: 'parent', phoneNumber: '+254722000111' },
       source: 'web',
     });
     expect(stored.consent.acceptedAt).toBe('2026-10-06T12:00:00.000Z');
+    expect(stored.consent.guardianConsent).toBe(true);
   });
 
   it('emails a confirmation containing the reference', async () => {

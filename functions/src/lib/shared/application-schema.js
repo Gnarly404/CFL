@@ -5,22 +5,52 @@ import {
 } from './validation.js';
 
 export const GENDERS = Object.freeze(['male', 'female', 'other']);
-export const NATIONALITIES = Object.freeze(['kenyan', 'other']);
 export const RELATIONSHIPS = Object.freeze(['parent', 'guardian', 'sibling', 'other']);
-export const CONSENT_VERSION = '2026-10';
+export const IDENTIFICATION_TYPES = Object.freeze(['national_id', 'passport', 'birth_certificate']);
+export const QUALIFICATIONS = Object.freeze(['none', 'primary', 'secondary', 'certificate', 'diploma', 'bachelors', 'postgraduate', 'other']);
+export const CONSENT_VERSION = '2026-10-v2';
 
 /** Which fields belong to which step of the form (the last step is review and consent). */
 export const STEP_FIELDS = Object.freeze([
   ['firstName', 'middleName', 'surname', 'dateOfBirth'],
-  ['gender', 'email', 'phoneNumber', 'nationality'],
-  ['guardianName', 'relationship', 'guardianPhone', 'emergencyContact'],
-  ['consent'],
+  ['gender', 'nationality'],
+  ['identificationType', 'identificationNumber'],
+  ['email', 'phoneNumber', 'residentialAddress', 'countryOfResidence'],
+  ['contactName', 'contactRelationship', 'contactPhone', 'guardianConsent'],
+  ['highestQualification', 'institutionAttended', 'completionYear', 'programmeId', 'consent'],
 ]);
 
 const PROGRAMME_ID_RE = /^[a-z0-9][a-z0-9-]{0,59}$/;
 
 function oneOf(value, allowed, message) {
   return allowed.includes(value) ? null : message;
+}
+
+export function applicantIsUnder18(raw, now = new Date()) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(typeof raw === 'string' ? raw : '');
+  if (!match) return false;
+  const [year, month, day] = match.slice(1).map(Number);
+  const birth = new Date(Date.UTC(year, month - 1, day));
+  if (birth.getUTCFullYear() !== year || birth.getUTCMonth() !== month - 1 || birth.getUTCDate() !== day || birth > now) return false;
+  let age = now.getUTCFullYear() - year;
+  if (now.getUTCMonth() < month - 1 || (now.getUTCMonth() === month - 1 && now.getUTCDate() < day)) age -= 1;
+  return age < 18;
+}
+
+function validateIdentificationNumber(raw) {
+  const value = cleanText(raw);
+  if (!value) return 'Enter the identification number.';
+  if (value.length < 3 || value.length > 64 || !/^[\p{L}\p{N}][\p{L}\p{N} ./-]*[\p{L}\p{N}]$/u.test(value)) {
+    return 'Enter a valid identification number.';
+  }
+  return null;
+}
+
+function validateAddress(raw) {
+  const value = cleanText(raw);
+  if (!value) return 'Enter the residential address.';
+  if (value.length < 5 || value.length > 200 || !/[\p{L}\p{N}]/u.test(value)) return 'Enter a valid residential address.';
+  return null;
 }
 
 /**
@@ -42,17 +72,39 @@ export function validateApplication(input, { now = new Date() } = {}) {
   check('surname', validateName(str('surname'), { label: 'Surname' }), cleanText(str('surname')));
   check('dateOfBirth', validateDateOfBirth(str('dateOfBirth'), { now }), str('dateOfBirth'));
   check('gender', oneOf(str('gender'), GENDERS, 'Select a gender.'), str('gender'));
+  check('nationality', validateName(str('nationality'), { label: 'Nationality' }), cleanText(str('nationality')));
+  check('identificationType', oneOf(str('identificationType'), IDENTIFICATION_TYPES, 'Select an identification type.'), str('identificationType'));
+  check('identificationNumber', validateIdentificationNumber(str('identificationNumber')), cleanText(str('identificationNumber')));
   check('email', validateEmail(str('email')), normaliseEmail(str('email')));
   check('phoneNumber', validatePhone(str('phoneNumber')), normalisePhone(str('phoneNumber')));
-  check('nationality', oneOf(str('nationality'), NATIONALITIES, 'Select a nationality.'), str('nationality'));
-  check('guardianName', validateName(str('guardianName'), { label: 'Guardian name' }), cleanText(str('guardianName')));
-  check('relationship', oneOf(str('relationship'), RELATIONSHIPS, 'Select the relationship.'), str('relationship'));
-  check('guardianPhone', validatePhone(str('guardianPhone'), { label: "Guardian's phone number" }), normalisePhone(str('guardianPhone')));
-  check('emergencyContact', validateName(str('emergencyContact'), { label: 'Emergency contact name' }), cleanText(str('emergencyContact')));
+  check('residentialAddress', validateAddress(str('residentialAddress')), cleanText(str('residentialAddress')));
+  check('countryOfResidence', validateName(str('countryOfResidence'), { label: 'Country of residence' }), cleanText(str('countryOfResidence')));
+  check('contactName', validateName(str('contactName'), { label: 'Contact person name' }), cleanText(str('contactName')));
+  check('contactRelationship', oneOf(str('contactRelationship'), RELATIONSHIPS, 'Select the contact person relationship.'), str('contactRelationship'));
+  check('contactPhone', validatePhone(str('contactPhone'), { label: "Contact person's phone number" }), normalisePhone(str('contactPhone')));
+
+  const under18 = applicantIsUnder18(str('dateOfBirth'), now);
+  if (under18 && !['parent', 'guardian'].includes(str('contactRelationship'))) {
+    errors.contactRelationship = 'For applicants under 18, the contact person must be a parent or legal guardian.';
+  }
+  if (under18) {
+    if (src.guardianConsent !== true) errors.guardianConsent = 'Parent or legal guardian consent is required for applicants under 18.';
+    else value.guardianConsent = true;
+  }
+
+  const qualification = str('highestQualification');
+  check('highestQualification', oneOf(qualification, QUALIFICATIONS, 'Select your highest relevant qualification.'), qualification);
+  const noQualification = qualification === 'none';
+  check('institutionAttended', validateName(str('institutionAttended'), { label: 'Institution attended', required: !noQualification }), cleanText(str('institutionAttended')));
+  const completionYear = str('completionYear');
+  const validYear = /^\d{4}$/.test(completionYear) && Number(completionYear) >= 1900 && Number(completionYear) <= now.getUTCFullYear();
+  const yearError = noQualification ? null : !completionYear ? 'Enter the completion year.' : !validYear ? `Enter a year from 1900 to ${now.getUTCFullYear()}.` : null;
+  check('completionYear', yearError, noQualification || !completionYear ? null : Number(completionYear));
 
   const programmeId = str('programmeId');
-  if (programmeId && !PROGRAMME_ID_RE.test(programmeId)) errors.programmeId = 'That programme is not recognised.';
-  else value.programmeId = programmeId || null;
+  if (!programmeId) errors.programmeId = 'Select a programme.';
+  else if (!PROGRAMME_ID_RE.test(programmeId)) errors.programmeId = 'That programme is not recognised.';
+  else value.programmeId = programmeId;
 
   if (src.consent !== true) errors.consent = 'Confirm that the details are correct and that CFL may process them.';
   else value.consent = true;

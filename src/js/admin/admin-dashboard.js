@@ -5,6 +5,7 @@ import {
 import { initAssignments } from './assignments.js';
 import { initProgrammeStaff } from './programme-staff.js';
 import { initProgrammes } from './programmes.js';
+import { applicationDetails } from './application-details.js';
 import { setAttentionBadge } from '@/ui/attention-badge.js';
 import { validateEmail, validateName } from '@/utils/validation.js';
 import { formatDate } from '@/utils/format.js';
@@ -12,7 +13,8 @@ import {
   el, setBusy, setFieldError, showMessage,
 } from '@/utils/dom.js';
 import {
-  countOpenApplications, createUser, decideApplication, listApplications, listUsers, resendInvite, setUserDisabled, setUserRole,
+  countOpenApplications, createUser, decideApplication, listApplications, listPrivacyRequests, listUsers,
+  resendInvite, reviewPrivacyRequest, setUserDisabled, setUserRole,
 } from '@/services/admin-service.js';
 import { sendAccountInvitation } from '@/services/email.js';
 import { deliverInvitation as deliverInvitationTo } from './invitation.js';
@@ -28,6 +30,8 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
   const appsBody = root.querySelector('#applicationsBody');
   const usersBody = root.querySelector('#usersBody');
   const filter = root.querySelector('#applicationFilter');
+  const privacyRequestsList = root.querySelector('#privacyRequestsList');
+  const privacyRequestFilter = root.querySelector('#privacyRequestFilter');
   const createForm = root.querySelector('#createUserForm');
 
   let knownUsers = [];
@@ -91,7 +95,7 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
     }, DECISION_LABELS[decision]));
     return el('tr', {},
       el('td', {}, app.reference),
-      el('td', {}, el('strong', {}, app.applicantName), el('br'), el('small', {}, app.email)),
+      el('td', {}, el('strong', {}, app.applicantName), el('br'), el('small', {}, app.email), applicationDetails(app)),
       el('td', {}, app.programmeId ?? '—'),
       el('td', {}, formatDate(app.createdAt)),
       el('td', {}, statusBadge(app.status)),
@@ -157,6 +161,90 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
 
   const emptyRow = (cols, text) => el('tr', {}, el('td', { colspan: cols, class: 'empty' }, text));
 
+  const privacyRequestTypes = {
+    data_access: 'Request my data', correction: 'Request a correction', deletion: 'Request deletion',
+    objection: 'Object to data processing', restriction: 'Restrict data processing',
+  };
+  const privacyRequestStatuses = {
+    submitted: 'Submitted', under_review: 'Under review', needs_student: 'Action needed', completed: 'Completed', declined: 'Closed',
+  };
+  const privacyRequestDate = (value) => {
+    const date = value?.toDate?.() ?? (value ? new Date(value) : null);
+    return date && !Number.isNaN(date.getTime()) ? formatDate(date) : 'Date unavailable';
+  };
+
+  function privacyRequestItem(request) {
+    const summary = el('summary', {},
+      el('div', {},
+        el('strong', {}, privacyRequestTypes[request.requestType] ?? 'Privacy request'),
+        el('span', { class: 'privacy-review-meta' }, `${request.studentEmail ?? request.studentId} · ${privacyRequestDate(request.createdAt)}`)),
+      el('span', { class: 'badge-status', 'data-status': request.status }, privacyRequestStatuses[request.status] ?? request.status));
+    const response = el('textarea', { class: 'form-control', rows: 3, maxlength: '3000', 'aria-label': 'CFL response' }, request.response ?? '');
+    const nextAction = el('textarea', { class: 'form-control', rows: 2, maxlength: '1000', 'aria-label': 'Required student action' }, request.nextAction ?? '');
+    const nextActionGroup = el('label', { class: 'privacy-review-field' }, 'What must the student do next?', nextAction);
+    const status = el('select', { class: 'form-select', 'aria-label': 'Privacy request status' },
+      ...['under_review', 'needs_student', 'completed', 'declined'].map((value) => el('option', { value, selected: value === (request.status === 'submitted' ? 'under_review' : request.status) }, privacyRequestStatuses[value])));
+    const updateConditionalAction = () => {
+      const required = status.value === 'needs_student';
+      nextActionGroup.hidden = !required;
+      nextAction.required = required;
+    };
+    status.addEventListener('change', updateConditionalAction);
+    updateConditionalAction();
+
+    const form = el('form', { class: 'privacy-review-form' },
+      el('div', { class: 'privacy-review-fields' },
+        el('label', { class: 'privacy-review-field' }, 'Review status', status),
+        el('label', { class: 'privacy-review-field' }, 'Response to student', response),
+        nextActionGroup),
+      el('div', { class: 'privacy-review-actions' },
+        el('span', { class: 'privacy-review-meta' }, `Request ${request.id}`),
+        el('button', { type: 'submit', class: 'btn btn-primary btn-sm' }, 'Save review')));
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (status.value !== 'under_review' && response.value.trim().length < 3) {
+        response.setCustomValidity('Add a response before closing or requesting more information.');
+        response.reportValidity();
+        response.addEventListener('input', () => response.setCustomValidity(''), { once: true });
+        return;
+      }
+      if (!form.reportValidity()) return;
+      const button = form.querySelector('button[type="submit"]');
+      setBusy(button, true, 'Saving…');
+      try {
+        await reviewPrivacyRequest({ requestId: request.id, status: status.value, response: response.value, nextAction: nextAction.value });
+        say('Privacy request review saved.', 'success');
+        await loadPrivacyQueue();
+      } catch (error) {
+        say(error.message || 'The privacy request could not be updated.', 'error');
+        setBusy(button, false);
+      }
+    });
+
+    const item = el('details', { class: 'privacy-review-item' }, summary,
+      el('div', { class: 'privacy-review-content' },
+        el('p', {}, el('strong', {}, 'Student request: '), request.details || 'Copy of personal data requested.'),
+        request.correctionCategory ? el('p', {}, el('strong', {}, 'Correction category: '), request.correctionCategory.replaceAll('_', ' ')) : '',
+        request.response ? el('p', {}, el('strong', {}, 'Previous response: '), request.response) : '',
+        form));
+    return item;
+  }
+
+  async function loadPrivacyQueue() {
+    if (!privacyRequestsList) return;
+    privacyRequestsList.replaceChildren(el('p', { class: 'text-secondary' }, 'Loading privacy requests…'));
+    try {
+      const requests = await listPrivacyRequests();
+      const status = privacyRequestFilter?.value ?? '';
+      const filtered = requests.filter((request) => !status || request.status === status);
+      privacyRequestsList.replaceChildren(...(filtered.length
+        ? filtered.map(privacyRequestItem)
+        : [el('p', { class: 'privacy-review-empty' }, 'No privacy requests match this filter.')]));
+    } catch (error) {
+      privacyRequestsList.replaceChildren(el('p', { class: 'text-danger' }, error.message || 'Privacy requests could not be loaded.'));
+    }
+  }
+
   async function loadApplications() {
     appsBody.replaceChildren(emptyRow(6, 'Loading applications…'));
     try {
@@ -187,7 +275,9 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
   }
 
   filter?.addEventListener('change', loadApplications);
-  root.querySelector('#refreshAll')?.addEventListener('click', () => { loadApplications(); loadUsers(); programmes.load(); });
+  privacyRequestFilter?.addEventListener('change', loadPrivacyQueue);
+  root.querySelector('#refreshPrivacyQueue')?.addEventListener('click', loadPrivacyQueue);
+  root.querySelector('#refreshAll')?.addEventListener('click', () => { loadApplications(); loadUsers(); programmes.load(); loadPrivacyQueue(); });
 
   createForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -232,4 +322,5 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
 
   loadApplications();
   loadUsers();
+  loadPrivacyQueue();
 }

@@ -6,8 +6,11 @@ import { fill, loadPage, tick } from '../helpers.js';
 const NOW = new Date('2026-10-06T12:00:00Z');
 const OTP_SESSION = { email: 'parent@example.com', code: '482731', expiresAt: Date.now() + 10 * 60 * 1000, attempts: 0, maxAttempts: 5, resendAvailableAt: Date.now() + 60 * 1000 };
 const step1 = { firstName: 'Wanjiku', surname: 'Kamau', dateOfBirth: '2012-05-14' };
-const step2 = { gender: 'female', email: 'parent@example.com', phoneNumber: '0712345678', nationality: 'kenyan' };
-const step3 = { guardianName: 'Grace Kamau', relationship: 'parent', guardianPhone: '0722000111', emergencyContact: 'Peter Kamau' };
+const step2 = { gender: 'female', nationality: 'Kenyan' };
+const step3 = { identificationType: 'national_id', identificationNumber: '12345678' };
+const step4 = { email: 'parent@example.com', phoneNumber: '0712345678', residentialAddress: '12 Valley Road, Nairobi', countryOfResidence: 'Kenya' };
+const step5 = { contactName: 'Grace Kamau', contactRelationship: 'parent', contactPhone: '0722000111', guardianConsent: true };
+const step6 = { highestQualification: 'secondary', institutionAttended: 'Nairobi School', completionYear: '2020', programmeId: 'english-intake' };
 
 function memoryStore(initial = null) {
   let draft = initial;
@@ -30,6 +33,7 @@ function setup({
   verifySession = vi.fn(() => ({ success: true })),
   canResend = vi.fn(() => true),
   refreshSession = vi.fn((session) => ({ ...session, code: '999999', resendAvailableAt: NOW.getTime() + 60 * 1000 })),
+  programmes,
 } = {}) {
   loadPage('register.html');
   const controller = initRegistration({
@@ -45,6 +49,7 @@ function setup({
     verifySession,
     canResend,
     refreshSession,
+    programmes,
   });
   const form = document.querySelector('#registrationForm');
   return { controller, form, submit, store, sendVerificationCode, saveSession, clearSession, verifySession, canResend, refreshSession };
@@ -58,6 +63,9 @@ function completeAllSteps(form) {
   fill(form, step1); clickNext();
   fill(form, step2); clickNext();
   fill(form, step3); clickNext();
+  fill(form, step4); clickNext();
+  fill(form, step5); clickNext();
+  fill(form, step6);
 }
 
 afterEach(() => { vi.useRealTimers(); });
@@ -92,15 +100,41 @@ describe('application form', () => {
   it('walks through all steps and shows a readable review', () => {
     const { form, controller } = setup();
     completeAllSteps(form);
-    expect(activeStep()).toBe(4);
-    expect(controller.step).toBe(3);
+    fill(form, { consent: true });
+    clickNext();
+    expect(activeStep()).toBe(7);
+    expect(controller.step).toBe(6);
     const review = document.querySelector('#reviewList').textContent;
     expect(review).toContain('Wanjiku');
     expect(review).toContain('Female');
     expect(review).toContain('Kenyan');
     expect(review).toContain('Parent');
+    expect(review).toContain('National ID');
+    expect(review).toContain('Ending 5678');
+    expect(review).toContain('English Language (Intake)');
+    const idLabel = [...document.querySelectorAll('#reviewList dt')].find((node) => node.textContent === 'Identification number');
+    expect(idLabel.nextElementSibling.textContent).toBe('Ending 5678');
     expect(document.querySelector('.btn-submit').hidden).toBe(false);
     expect(document.querySelector('.btn-next').hidden).toBe(true);
+  });
+
+  it('requires a parent or legal guardian contact and consent for applicants under 18', () => {
+    const { form } = setup();
+    expect(document.getElementById('guardianConsentGroup').hidden).toBe(true);
+    fill(form, step1);
+    expect(document.getElementById('guardianConsentGroup').hidden).toBe(false);
+    clickNext();
+    fill(form, step2); clickNext();
+    fill(form, step3); clickNext();
+    fill(form, step4); clickNext();
+    fill(form, { ...step5, contactRelationship: 'sibling', guardianConsent: false });
+    clickNext();
+    expect(activeStep()).toBe(5);
+    const errors = [...document.querySelectorAll('.field-error')].map((node) => node.textContent);
+    const invalidFields = [...form.querySelectorAll('[aria-invalid="true"]')].map((node) => node.id);
+    expect(errors, JSON.stringify({ step: activeStep(), invalidFields, dob: form.querySelector('#dateOfBirth').value })).toEqual(expect.arrayContaining([
+      expect.stringMatching(/parent or legal guardian/i), expect.stringMatching(/required/i),
+    ]));
   });
 
   it('Back returns to the previous step', () => {
@@ -121,7 +155,7 @@ describe('application form', () => {
 
   it('sends the application, shows the reference and discards the draft after valid email verification', async () => {
     const { form, submit, store } = setup({
-      search: '?programme=general-english',
+      search: '?programme=english-intake',
       getSession: () => OTP_SESSION,
       verifySession: vi.fn(() => ({ success: true })),
     });
@@ -134,7 +168,7 @@ describe('application form', () => {
     await vi.waitFor(() => expect(document.querySelector('#confirmation').hidden).toBe(false));
     expect(submit).toHaveBeenCalledOnce();
     expect(submit.mock.calls[0][0]).toMatchObject({
-      firstName: 'Wanjiku', email: 'parent@example.com', programmeId: 'general-english', consent: true, website: '',
+      firstName: 'Wanjiku', email: 'parent@example.com', programmeId: 'english-intake', guardianConsent: true, consent: true, website: '',
     });
     expect(document.querySelector('#referenceNumber').textContent).toBe('CFL-2026-00001');
     expect(form.hidden).toBe(true);
@@ -242,7 +276,7 @@ describe('application form', () => {
     document.querySelector('#verifyOtpButton').click();
     await vi.waitFor(() => expect(document.querySelector('#formError').hidden).toBe(false));
     expect(form.hidden).toBe(false);
-    expect(activeStep()).toBe(2);
+    expect(activeStep()).toBe(4);
     expect(document.querySelector('#email-error').textContent).toBe('That email address is not accepted.');
     expect(document.querySelector('#verifyOtpButton').disabled).toBe(false);
   });
@@ -273,17 +307,37 @@ describe('application form', () => {
     expect(document.querySelector('#draftNotice').hidden).toBe(false);
   });
 
-  it('saves drafts without consent, the honeypot or the programme', () => {
+  it('migrates a legacy guardian and emergency draft into one contact person', () => {
+    const store = memoryStore({
+      data: { ...step1, guardianName: 'Grace Kamau', relationship: 'parent', guardianPhone: '0722000111', emergencyContact: 'Peter Kamau' },
+      step: 2,
+    });
+    setup({ store });
+    expect(activeStep()).toBe(5);
+    expect(document.getElementById('contactName').value).toBe('Grace Kamau');
+    expect(document.getElementById('contactRelationship').value).toBe('parent');
+    expect(document.getElementById('contactPhone').value).toBe('0722000111');
+  });
+
+  it('preselects a requested programme from the active catalogue', () => {
+    setup({ search: '?programme=summer-english', programmes: [{ id: 'summer-english', name: 'Summer English' }] });
+    const programme = document.getElementById('programmeId');
+    expect(programme.value).toBe('summer-english');
+    expect(programme.selectedOptions[0].textContent).toBe('Summer English');
+  });
+
+  it('saves the requested programme but not consent or the honeypot', () => {
     vi.useFakeTimers();
-    const { form, store } = setup({ search: '?programme=general-english' });
-    fill(form, { ...step1, consent: true });
+    const { form, store } = setup();
+    fill(form, { ...step1, programmeId: 'english-intake', consent: true, guardianConsent: true });
     vi.advanceTimersByTime(500);
     expect(store.save).toHaveBeenCalled();
     const [data, step] = store.save.mock.calls.at(-1);
     expect(data).toMatchObject({ firstName: 'Wanjiku' });
     expect(data).not.toHaveProperty('consent');
+    expect(data).not.toHaveProperty('guardianConsent');
     expect(data).not.toHaveProperty('website');
-    expect(data).not.toHaveProperty('programmeId');
+    expect(data.programmeId).toBe('english-intake');
     expect(step).toBe(0);
   });
 

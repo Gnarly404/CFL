@@ -1,5 +1,6 @@
-import { STEP_FIELDS } from '@/utils/application-schema.js';
+import { applicantIsUnder18, STEP_FIELDS } from '@/utils/application-schema.js';
 import { submitApplication } from '@/services/application-service.js';
+import fallbackProgrammes from '../../data/programmes.json';
 import { sendVerificationCode } from '@/services/email.js';
 import {
   debounce, el, setBusy, setFieldError, showMessage,
@@ -21,24 +22,37 @@ const LABELS = {
   surname: 'Surname',
   dateOfBirth: 'Date of birth',
   gender: 'Gender',
-  email: 'Email',
-  phoneNumber: 'Phone number',
   nationality: 'Nationality',
-  guardianName: 'Guardian name',
-  relationship: 'Relationship',
-  guardianPhone: "Guardian's phone",
-  emergencyContact: 'Emergency contact',
+  identificationType: 'Identification type',
+  identificationNumber: 'Identification number',
+  email: 'Email',
+  phoneNumber: 'Current phone number',
+  residentialAddress: 'Residential address',
+  countryOfResidence: 'Country of residence',
+  contactName: "Contact person's name",
+  contactRelationship: 'Relationship to applicant',
+  contactPhone: "Contact person's phone number",
+  guardianConsent: 'Parent or legal guardian consent',
+  highestQualification: 'Highest relevant previous qualification',
+  institutionAttended: 'Institution attended',
+  completionYear: 'Completion year',
+  programmeId: 'Requested programme',
+  consent: 'Applicant confirmation and privacy notice',
 };
 
 const DISPLAY = {
   gender: { male: 'Male', female: 'Female', other: 'Other' },
-  nationality: { kenyan: 'Kenyan', other: 'Other' },
-  relationship: {
+  identificationType: { national_id: 'National ID', passport: 'Passport', birth_certificate: 'Birth certificate' },
+  contactRelationship: {
     parent: 'Parent', guardian: 'Guardian', sibling: 'Sibling', other: 'Other',
+  },
+  highestQualification: {
+    none: 'No formal qualification yet', primary: 'Primary school certificate', secondary: 'Secondary school certificate',
+    certificate: 'Certificate', diploma: 'Diploma', bachelors: "Bachelor's degree", postgraduate: 'Postgraduate qualification', other: 'Other qualification',
   },
 };
 
-const NOT_SAVED = new Set(['consent', 'website', 'programmeId']);
+const NOT_SAVED = new Set(['consent', 'guardianConsent', 'website']);
 
 /**
  * One controller for the whole application form: step navigation, validation, draft recovery,
@@ -58,6 +72,7 @@ export function initRegistration({
   verifySession = verifyOtp,
   canResend = canResendOtp,
   refreshSession = refreshOtpSession,
+  programmes = fallbackProgrammes,
 } = {}) {
   const form = root.querySelector('#registrationForm');
   if (!form) return null;
@@ -72,6 +87,15 @@ export function initRegistration({
   const draftNotice = root.querySelector('#draftNotice');
   const confirmation = root.querySelector('#confirmation');
   const reviewList = root.querySelector('#reviewList');
+  const programmeField = form.querySelector('[name="programmeId"]');
+  const birthDate = form.querySelector('#dateOfBirth');
+  const guardianConsentGroup = root.querySelector('#guardianConsentGroup');
+  const guardianConsent = form.querySelector('[name="guardianConsent"]');
+  const qualificationField = form.querySelector('[name="highestQualification"]');
+  const institutionField = form.querySelector('[name="institutionAttended"]');
+  const institutionGroup = root.querySelector('#institutionGroup');
+  const completionYearField = form.querySelector('[name="completionYear"]');
+  const completionYearGroup = root.querySelector('#completionYearGroup');
   const otpVerification = root.querySelector('#otpVerification');
   const otpEmail = root.querySelector('#otpEmail');
   const otpError = root.querySelector('#otpError');
@@ -84,12 +108,43 @@ export function initRegistration({
 
   // A programme can be chosen before arriving here: /register?programme=general-english
   const programme = new URLSearchParams(search).get('programme') ?? '';
-  const programmeField = form.querySelector('[name="programmeId"]');
-  if (programmeField && /^[a-z0-9][a-z0-9-]{0,59}$/.test(programme)) programmeField.value = programme;
+  if (programmeField?.tagName === 'SELECT') {
+    const placeholder = programmeField.querySelector('option');
+    programmeField.replaceChildren(...(placeholder ? [placeholder] : []));
+    const seen = new Set();
+    for (const entry of programmes) {
+      if (!entry?.id || !/^[a-z0-9][a-z0-9-]{0,59}$/.test(entry.id) || seen.has(entry.id)) continue;
+      seen.add(entry.id);
+      const option = document.createElement('option');
+      option.value = entry.id;
+      option.textContent = entry.name || entry.id;
+      programmeField.append(option);
+    }
+    if (programme && seen.has(programme)) programmeField.value = programme;
+  } else if (programmeField && /^[a-z0-9][a-z0-9-]{0,59}$/.test(programme)) programmeField.value = programme;
 
-  // No future birth dates in the date picker.
-  const birthDate = form.querySelector('#dateOfBirth');
+  // No future birth dates or completion years in the form.
   if (birthDate) birthDate.max = now().toISOString().slice(0, 10);
+  if (completionYearField) completionYearField.max = String(now().getUTCFullYear());
+
+  function updateConditionalFields() {
+    const under18 = applicantIsUnder18(birthDate?.value, now());
+    if (guardianConsentGroup) guardianConsentGroup.hidden = !under18;
+    if (guardianConsent) {
+      guardianConsent.required = under18;
+      if (!under18) guardianConsent.checked = false;
+    }
+    const noQualification = qualificationField?.value === 'none';
+    if (institutionGroup) institutionGroup.hidden = Boolean(noQualification);
+    if (completionYearGroup) completionYearGroup.hidden = Boolean(noQualification);
+    if (institutionField) institutionField.required = !noQualification;
+    if (completionYearField) completionYearField.required = !noQualification;
+    root.querySelectorAll('[data-required-for]').forEach((mark) => { mark.hidden = Boolean(noQualification); });
+  }
+  birthDate?.addEventListener('input', updateConditionalFields);
+  birthDate?.addEventListener('change', updateConditionalFields);
+  qualificationField?.addEventListener('change', updateConditionalFields);
+  updateConditionalFields();
 
   const fieldsNamed = (name) => [...form.querySelectorAll(`[name="${name}"]`)];
 
@@ -126,9 +181,13 @@ export function initRegistration({
   function renderReview() {
     if (!reviewList) return;
     const data = collectFormData(form);
-    reviewList.replaceChildren(...Object.keys(LABELS).flatMap((name) => {
+    const names = Object.keys(LABELS).filter((name) => name !== 'guardianConsent' || applicantIsUnder18(data.dateOfBirth, now()));
+    reviewList.replaceChildren(...names.flatMap((name) => {
       const raw = data[name] ?? '';
-      const text = DISPLAY[name]?.[raw] ?? raw;
+      let text = DISPLAY[name]?.[raw] ?? raw;
+      if (name === 'identificationNumber' && raw) text = `Ending ${String(raw).replace(/\s/g, '').slice(-4)}`;
+      if (name === 'programmeId') text = programmeField?.selectedOptions[0]?.textContent ?? raw;
+      if (name === 'consent' || name === 'guardianConsent') text = raw === true ? 'Confirmed' : '—';
       return [el('dt', {}, LABELS[name]), el('dd', {}, text || '—')];
     }));
   }
@@ -212,7 +271,18 @@ export function initRegistration({
     store.save(data, current);
   }, 400);
 
-  const draft = store.load();
+  const storedDraft = store.load();
+  const legacyDraft = storedDraft && Object.hasOwn(storedDraft.data, 'guardianName');
+  const draft = storedDraft ? {
+    ...storedDraft,
+    data: legacyDraft ? {
+      ...storedDraft.data,
+      contactName: storedDraft.data.guardianName || storedDraft.data.emergencyContact || '',
+      contactRelationship: storedDraft.data.relationship || '',
+      contactPhone: storedDraft.data.guardianPhone || '',
+    } : storedDraft.data,
+    step: legacyDraft ? [0, 2, 4, 5][Math.min(storedDraft.step, 3)] : storedDraft.step,
+  } : null;
   if (draft) {
     for (const [name, value] of Object.entries(draft.data)) {
       const fields = fieldsNamed(name);
@@ -221,6 +291,7 @@ export function initRegistration({
     }
     showMessage(draftNotice, 'We restored the details you had started. They are kept on this device for 7 days.', 'info');
   }
+  updateConditionalFields();
   showStep(draft ? draft.step : 0);
 
   form.addEventListener('input', saveDraft);

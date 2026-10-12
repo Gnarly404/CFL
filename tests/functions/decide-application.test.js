@@ -9,7 +9,7 @@ const application = {
   applicant: {
     firstName: 'Wanjiku', middleName: '', surname: 'Kamau', dateOfBirth: '2012-05-14', gender: 'female', phoneNumber: '+254712345678', nationality: 'kenyan',
   },
-  guardian: { name: 'Grace Kamau', relationship: 'parent', phoneNumber: '+254722000111', emergencyContact: 'Peter Kamau' },
+  contactPerson: { name: 'Grace Kamau', relationship: 'parent', phoneNumber: '+254722000111' },
 };
 const actor = { uid: 'admin1', role: 'admin' };
 
@@ -35,11 +35,27 @@ describe('decideApplication', () => {
     expect(result).toEqual({ status: 'approved', userId: 'student1' });
     expect(d.provision).toHaveBeenCalledWith(expect.objectContaining({
       email: 'parent@example.com', displayName: 'Wanjiku Kamau', role: 'student', createdBy: 'admin1', applicationId: 'app1',
-      profile: expect.objectContaining({ applicationReference: 'CFL-2026-00001', guardian: application.guardian }),
+      profile: expect.objectContaining({
+        applicationReference: 'CFL-2026-00001',
+        guardian: { name: 'Grace Kamau', relationship: 'parent', phoneNumber: '+254722000111', emergencyContact: 'Grace Kamau' },
+      }),
     }));
     expect(d.db.store.get('enrolments/student1_general-english')).toMatchObject({ studentId: 'student1', status: 'pending_start' });
     expect(d.repo.applyDecision).toHaveBeenCalledWith('app1', expect.objectContaining({ status: 'approved', by: 'admin1', userId: 'student1' }));
     expect(d.audit).toHaveBeenCalledWith(expect.objectContaining({ action: 'application.approve', resource: { type: 'application', id: 'app1' } }));
+  });
+
+  it('keeps the contact details from applications submitted with the legacy guardian shape', async () => {
+    const legacy = {
+      ...application,
+      contactPerson: undefined,
+      guardian: { name: 'Grace Kamau', relationship: 'parent', phoneNumber: '+254722000111', emergencyContact: 'Peter Kamau' },
+    };
+    const d = deps({ repo: fakeRepo([legacy]) });
+    await decide(d, { applicationId: 'app1', decision: 'approve' });
+    expect(d.provision.mock.calls[0][0].profile.guardian).toMatchObject({
+      name: 'Grace Kamau', relationship: 'parent', phoneNumber: '+254722000111', emergencyContact: 'Peter Kamau',
+    });
   });
 
   it('does not enrol anyone when no programme was chosen', async () => {

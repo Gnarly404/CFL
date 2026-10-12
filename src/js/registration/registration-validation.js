@@ -7,6 +7,7 @@ export function collectFormData(form) {
     if (typeof value === 'string') data[key] = value;
   }
   data.consent = form.querySelector('[name="consent"]')?.checked === true;
+  data.guardianConsent = form.querySelector('[name="guardianConsent"]')?.checked === true;
   return data;
 }
 

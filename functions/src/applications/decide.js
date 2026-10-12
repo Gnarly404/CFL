@@ -26,6 +26,7 @@ export async function decideApplicationCore(deps, { actor, data }) {
   let accountActivationUrl = null;
   if (target === 'approved') {
     const { applicant } = application;
+    const contact = application.contactPerson ?? application.guardian;
     const account = await provision({
       email: application.email,
       displayName: `${applicant.firstName} ${applicant.surname}`,
@@ -39,7 +40,12 @@ export async function decideApplicationCore(deps, { actor, data }) {
         phoneNumber: applicant.phoneNumber,
         nationality: applicant.nationality,
         applicationReference: application.reference,
-        guardian: application.guardian,
+        guardian: {
+          name: contact.name,
+          relationship: contact.relationship,
+          phoneNumber: contact.phoneNumber,
+          emergencyContact: contact.emergencyContact ?? contact.name,
+        },
       },
       createdBy: actor.uid,
       applicationId,

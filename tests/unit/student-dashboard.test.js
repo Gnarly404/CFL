@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import programmes from '../../src/data/programmes.json';
 import { loadPage, tick } from '../helpers.js';
 
@@ -12,8 +12,11 @@ const updateStudentDoc = vi.fn();
 const sendEmailVerification = vi.fn();
 const requestPasswordReset = vi.fn();
 const uploadBytes = vi.fn();
+const deleteObject = vi.fn();
 const getDownloadURL = vi.fn();
 const storageRef = vi.fn();
+const listMyPrivacyRequests = vi.fn();
+const submitPrivacyRequest = vi.fn();
 let studentRecord;
 let accountRecord;
 let applicationRecord;
@@ -31,6 +34,7 @@ vi.mock('firebase/firestore', () => ({
 }));
 vi.mock('firebase/auth', () => ({ sendEmailVerification: (...args) => sendEmailVerification(...args) }));
 vi.mock('firebase/storage', () => ({
+  deleteObject: (...args) => deleteObject(...args),
   getDownloadURL: (...args) => getDownloadURL(...args),
   ref: (...args) => storageRef(...args),
   uploadBytes: (...args) => uploadBytes(...args),
@@ -42,6 +46,10 @@ vi.mock('@/services/password-service.js', () => ({ requestPasswordReset: (...arg
 vi.mock('@/services/schedule-service.js', () => ({ loadMyClasses: (...args) => loadMyClasses(...args) }));
 vi.mock('@/services/programme-service.js', () => ({ listPublicProgrammes: (...args) => listPublicProgrammes(...args) }));
 vi.mock('@/practice/overview.js', () => ({ loadOverview: (...args) => loadOverview(...args) }));
+vi.mock('@/services/privacy-request-service.js', () => ({
+  listMyPrivacyRequests: (...args) => listMyPrivacyRequests(...args),
+  submitPrivacyRequest: (...args) => submitPrivacyRequest(...args),
+}));
 vi.mock('@/practice/engine.js', () => ({ pickContinue: vi.fn().mockReturnValue(null) }));
 vi.mock('@/ui/portal-shell.js', () => ({ mountPortalShell: vi.fn() }));
 vi.mock('@/ui/notification-badge.js', () => ({ mountNotificationBadge: vi.fn() }));
@@ -88,14 +96,75 @@ beforeEach(() => {
   sendEmailVerification.mockReset().mockResolvedValue();
   requestPasswordReset.mockReset().mockResolvedValue();
   uploadBytes.mockReset().mockResolvedValue({ ref: { id: 'avatar-ref' } });
+  deleteObject.mockReset().mockResolvedValue();
   getDownloadURL.mockReset().mockResolvedValue('https://storage.example.test/student-avatar');
   storageRef.mockReset().mockReturnValue({ path: 'users/stu1/avatar/profile' });
   loadOverview.mockReset().mockResolvedValue({ entries: [] });
   loadMyClasses.mockReset().mockResolvedValue({ classes: [futureClass()], programmeIds: ['english-beginner-1'] });
   listPublicProgrammes.mockReset().mockResolvedValue(programmes);
+  listMyPrivacyRequests.mockReset().mockResolvedValue([]);
+  submitPrivacyRequest.mockReset().mockResolvedValue({ requestId: 'request12345678', status: 'submitted' });
 });
 
+afterEach(() => { vi.restoreAllMocks(); });
+
 describe('student dashboard', () => {
+  it('omits the academic record and student documents sections', async () => {
+    await open();
+    expect(document.getElementById('academicRecordTitle')).toBeNull();
+    expect(document.getElementById('documentsTitle')).toBeNull();
+    expect(document.getElementById('completionTitle')).toBeNull();
+    expect(document.getElementById('feesTitle')).not.toBeNull();
+  });
+
+  it('opens Privacy & Data and submits a personal-data access request', async () => {
+    await open();
+    document.getElementById('openPrivacyData').click();
+    expect(document.getElementById('studentSettingsContent').hidden).toBe(true);
+    expect(document.getElementById('privacyDataPanel').hidden).toBe(false);
+    document.querySelector('[data-privacy-request="data_access"]').click();
+    expect(document.getElementById('privacyRequestTitle').textContent).toBe('Request my data');
+    expect(document.getElementById('privacyRequestDetails').required).toBe(false);
+    document.getElementById('privacyRequestForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    await vi.waitFor(() => expect(submitPrivacyRequest).toHaveBeenCalledWith({ requestType: 'data_access', correctionCategory: '', details: '' }));
+    expect(document.getElementById('privacyPanelNote').textContent).toContain('submitted for CFL review');
+  });
+
+  it('submits correction category and details, and shows review status and next action', async () => {
+    listMyPrivacyRequests.mockResolvedValue([{
+      id: 'request12345678', requestType: 'correction', correctionCategory: 'legal_identity', details: 'Correct my surname',
+      status: 'needs_student', response: 'Please provide a verified document.', nextAction: 'Reply with proof of legal name.',
+      createdAt: new Date('2026-10-01T00:00:00Z'),
+      updates: [{ status: 'needs_student', response: 'Please provide a verified document.', nextAction: 'Reply with proof of legal name.', reviewedAt: new Date('2026-10-02T00:00:00Z') }],
+    }]);
+    await open();
+    document.getElementById('openPrivacyData').click();
+    document.querySelector('[data-privacy-request="correction"]').click();
+    document.getElementById('correctionCategory').value = 'legal_identity';
+    document.getElementById('privacyRequestDetails').value = 'Correct my legal surname';
+    document.getElementById('privacyRequestForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    await vi.waitFor(() => expect(submitPrivacyRequest).toHaveBeenCalledWith({
+      requestType: 'correction', correctionCategory: 'legal_identity', details: 'Correct my legal surname',
+    }));
+    await vi.waitFor(() => expect(document.getElementById('privacyRequestList').textContent).toContain('Reply with proof of legal name.'));
+    expect(document.getElementById('privacyRequestList').textContent).toContain('Action needed');
+    expect(document.getElementById('privacyRequestList').textContent).toContain('Please provide a verified document.');
+    expect(document.getElementById('privacyRequestList').textContent).toContain('Action needed');
+  });
+
+  it('lets a student choose a deletion, objection, or restriction request', async () => {
+    await open();
+    document.getElementById('openPrivacyData').click();
+    document.querySelector('[data-privacy-request="other"]').click();
+    expect(document.getElementById('otherPrivacyTypeGroup').hidden).toBe(false);
+    document.getElementById('otherPrivacyType').value = 'restriction';
+    document.getElementById('privacyRequestDetails').value = 'Please restrict processing of my contact details.';
+    document.getElementById('privacyRequestForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    await vi.waitFor(() => expect(submitPrivacyRequest).toHaveBeenCalledWith({
+      requestType: 'restriction', correctionCategory: '', details: 'Please restrict processing of my contact details.',
+    }));
+  });
+
   it('opens account settings when entered from the Settings navigation link', async () => {
     const showModal = vi.fn(function show() { this.open = true; });
     Object.defineProperty(HTMLDialogElement.prototype, 'showModal', { configurable: true, value: showModal });
@@ -217,5 +286,31 @@ describe('student dashboard', () => {
       expect.objectContaining({ profile: expect.objectContaining({ photoURL: 'https://storage.example.test/student-avatar' }) }),
     );
     expect(document.getElementById('studentAvatar').hidden).toBe(false);
+  });
+
+  it('removes the profile photo object and clears its saved URL after confirmation', async () => {
+    studentRecord.profile.photoURL = 'https://storage.example.test/student-avatar';
+    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    await open();
+    const button = document.getElementById('removeStudentAvatar');
+    expect(button.hidden).toBe(false);
+    button.click();
+    await vi.waitFor(() => expect(deleteObject).toHaveBeenCalledWith(expect.objectContaining({ path: 'users/stu1/avatar/profile' })));
+    await vi.waitFor(() => expect(updateStudentDoc).toHaveBeenCalledWith(
+      expect.objectContaining({ path: 'students/stu1' }),
+      expect.objectContaining({ profile: expect.not.objectContaining({ photoURL: expect.anything() }) }),
+    ));
+    await vi.waitFor(() => expect(button.hidden).toBe(true));
+    expect(document.getElementById('studentAvatar').hidden).toBe(true);
+    expect(document.getElementById('studentAvatarInitials').hidden).toBe(false);
+  });
+
+  it('keeps the profile photo when removal is cancelled', async () => {
+    studentRecord.profile.photoURL = 'https://storage.example.test/student-avatar';
+    vi.spyOn(window, 'confirm').mockReturnValue(false);
+    await open();
+    document.getElementById('removeStudentAvatar').click();
+    expect(deleteObject).not.toHaveBeenCalled();
+    expect(updateStudentDoc).not.toHaveBeenCalled();
   });
 });

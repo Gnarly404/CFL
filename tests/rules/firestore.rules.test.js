@@ -44,6 +44,8 @@ beforeEach(async () => {
     await setDoc(doc(db, 'lessons/live'), { published: true, title: 'Greetings' });
     await setDoc(doc(db, 'lessons/draft'), { published: false, title: 'Unfinished' });
     await setDoc(doc(db, 'applications/app1'), { email: 'p@example.com', status: 'submitted' });
+    await setDoc(doc(db, 'privacyRequests/pr1'), { studentId: 'stu1', requestType: 'correction', status: 'submitted' });
+    await setDoc(doc(db, 'privacyRequests/pr2'), { studentId: 'stu2', requestType: 'data_access', status: 'submitted' });
     await setDoc(doc(db, 'lessonProgress/stu1_live'), { studentId: 'stu1', lessonId: 'live', percent: 40 });
     await setDoc(doc(db, 'questionAttempts/att1'), { studentId: 'stu1', correct: true });
     await setDoc(doc(db, 'messages/m1'), { senderId: 'ins1', recipientId: 'stu1', body: 'Hello' });
@@ -94,6 +96,20 @@ describe('admissions', () => {
     await assertFails(getDoc(doc(as.anon(), 'applications/app1')));
     await assertFails(setDoc(doc(as.anon(), 'applications/new'), { email: 'x@y.co' }));
     await assertFails(updateDoc(doc(as.admin(), 'applications/app1'), { status: 'approved' }));
+  });
+});
+
+describe('privacy requests', () => {
+  it('allows students to read only their own requests and admins to review all; browser writes are denied', async () => {
+    await assertSucceeds(getDoc(doc(as.student(), 'privacyRequests/pr1')));
+    await assertFails(getDoc(doc(as.student(), 'privacyRequests/pr2')));
+    await assertSucceeds(getDocs(query(collection(as.student(), 'privacyRequests'), where('studentId', '==', 'stu1'))));
+    await assertFails(getDocs(collection(as.student(), 'privacyRequests')));
+    await assertSucceeds(getDoc(doc(as.admin(), 'privacyRequests/pr2')));
+    await assertFails(getDoc(doc(as.instructor(), 'privacyRequests/pr1')));
+    await assertFails(setDoc(doc(as.student(), 'privacyRequests/new'), { studentId: 'stu1' }));
+    await assertFails(updateDoc(doc(as.admin(), 'privacyRequests/pr1'), { status: 'completed' }));
+    await assertFails(deleteDoc(doc(as.admin(), 'privacyRequests/pr1')));
   });
 });
 

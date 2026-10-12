@@ -43,6 +43,17 @@ export const setUserRole = ({ uid, role }) => call('adminSetUserRole', { uid, ro
 export const assignInstructor = ({ studentId, instructorId, assigned }) => call('adminAssignInstructor', { studentId, instructorId, assigned });
 export const assignProgramme = ({ programmeId, instructorId, assigned }) => call('adminAssignProgramme', { programmeId, instructorId, assigned });
 export const resendInvite = ({ uid }) => call('adminResendInvite', { uid });
+export const reviewPrivacyRequest = ({ requestId, status, response, nextAction = '' }) => call('adminReviewPrivacyRequest', { requestId, status, response, nextAction });
+
+export async function listPrivacyRequests({ max = 200 } = {}) {
+  const rows = rowsFromSnapshot(await getDocs(query(collection(dbService(), 'privacyRequests'), limit(max))));
+  return rows.sort((left, right) => toMillis(right.createdAt) - toMillis(left.createdAt));
+}
+
+const toMillis = (value) => {
+  const timestamp = value?.toMillis?.() ?? Date.parse(value ?? '');
+  return Number.isFinite(timestamp) ? timestamp : 0;
+};
 
 /** Student records (admins can read them all): uid, instructorIds. Names and emails come from the user list. */
 export async function listStudents({ max = 500 } = {}) {

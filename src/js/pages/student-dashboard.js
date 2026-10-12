@@ -1,9 +1,9 @@
 import { sendEmailVerification } from 'firebase/auth';
-import { getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage';
+import { deleteObject, getDownloadURL, ref as storageRef, uploadBytes } from 'firebase/storage';
 import { collection, doc, getDoc, getDocs, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 import { guardPage } from '@/auth/guards.js';
 import { dbService } from '@/services/firebase-db.js';
-import { el } from '@/utils/dom.js';
+import { el, setBusy } from '@/utils/dom.js';
 import { ROUTES } from '@/core/routes.js';
 import { lessonUrl } from '@/practice/content.js';
 import { pickContinue } from '@/practice/engine.js';
@@ -21,6 +21,7 @@ import { h } from '@/ui/h.js';
 import { icon } from '@/ui/icons.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
 import { mountNotificationBadge } from '@/ui/notification-badge.js';
+import { listMyPrivacyRequests, submitPrivacyRequest } from '@/services/privacy-request-service.js';
 
 mountPortalShell('dashboard');
 const session = await guardPage({ roles: ['student'] });
@@ -52,10 +53,6 @@ const emailVerificationEl = document.getElementById('emailVerification');
 const studentDetailsEl = document.getElementById('studentDetails');
 const privateStudentDetailsEl = document.getElementById('privateStudentDetails');
 const sensitiveDetailsEl = document.getElementById('sensitiveDetails');
-const academicFactsEl = document.getElementById('academicFacts');
-const identityDocumentStatusEl = document.getElementById('identityDocumentStatus');
-const identityDocumentDetailsEl = document.getElementById('identityDocumentDetails');
-const consentStatusEl = document.getElementById('consentStatus');
 const profileCompletionEl = document.getElementById('profileCompletion');
 const profileCompletionTextEl = document.getElementById('profileCompletionText');
 const enrolmentPickerWrapEl = document.getElementById('enrolmentPickerWrap');
@@ -70,6 +67,7 @@ const dashboardNoteEl = document.getElementById('studentDashboardNote');
 const avatarEl = document.getElementById('studentAvatar');
 const avatarInitialsEl = document.getElementById('studentAvatarInitials');
 const avatarUploadEl = document.getElementById('studentAvatarUpload');
+const removeAvatarButtonEl = document.getElementById('removeStudentAvatar');
 const accountSettingsNoteEl = document.getElementById('accountSettingsNote');
 const formatStatus = (status, fallback = 'Pending') => {
   if (typeof status !== 'string' || !status) return fallback;
@@ -115,7 +113,7 @@ try {
 
 const savedProfile = studentRecord?.profile ?? {};
 const registrationApplicant = application?.applicant ?? {};
-const registrationGuardian = application?.guardian ?? {};
+const registrationGuardian = application?.contactPerson ?? application?.guardian ?? {};
 const registrationField = (source, key, fallback) => (typeof source[key] === 'string' && source[key].trim() ? source[key] : fallback);
 const profile = {
   ...savedProfile,
@@ -135,7 +133,6 @@ const profile = {
     emergencyContact: registrationField(registrationGuardian, 'emergencyContact', savedProfile.guardian?.emergencyContact),
   },
 };
-const academicBackground = registrationApplicant.academicBackground ?? savedProfile.academicBackground ?? {};
 const legalStudentName = legalName(profile, studentRecord?.displayName || accountRecord.displayName || session.user.displayName || 'Student');
 const preferredName = profile.preferredName || studentRecord?.displayName || session.user.displayName || legalStudentName;
 if (nameEl) nameEl.textContent = preferredName.split(' ')[0] || 'Student';
@@ -169,42 +166,17 @@ const privateFacts = [
 if (privateStudentDetailsEl) privateStudentDetailsEl.replaceChildren(...privateFacts);
 if (sensitiveDetailsEl) sensitiveDetailsEl.hidden = privateFacts.length === 0;
 
-if (academicFactsEl) {
-  academicFactsEl.replaceChildren(
-    ...fact('Previous qualifications', academicBackground.previousQualifications || 'Not on file'),
-    ...fact('Language proficiency', academicBackground.languageProficiency || 'Not assessed'),
-    ...fact('Certificates submitted', academicBackground.certificates?.length ? `${academicBackground.certificates.length} record(s)` : 'No records'),
-  );
-}
-
-const identityDocument = studentRecord?.identityDocuments?.[0] ?? profile.identityDocument ?? application?.identityDocument ?? null;
-if (identityDocumentStatusEl && identityDocument) {
-  const rawNumber = identityDocument.nationalId ?? identityDocument.passportNumber ?? identityDocument.number ?? '';
-  const suffix = String(rawNumber).replace(/\s/g, '').slice(-4);
-  identityDocumentStatusEl.textContent = 'Identification record on file. Number is masked.';
-  identityDocumentDetailsEl.hidden = false;
-  identityDocumentDetailsEl.replaceChildren(
-    ...fact('Type', identityDocument.type ?? (identityDocument.passportNumber ? 'Passport' : 'National ID')),
-    ...fact('Number', suffix ? `**** ${suffix}` : 'Not provided'),
-    ...fact('Verification', identityDocument.verified === true ? 'Verified' : 'Pending verification'),
-    ...fact('Expiry date', displayDate(identityDocument.expiryDate) || 'Not recorded'),
-  );
-}
-if (consentStatusEl) {
-  const consent = application?.consent;
-  consentStatusEl.textContent = consent?.acceptedAt
-    ? `Registration consent recorded${consent.version ? ` · version ${consent.version}` : ''} · ${displayDate(consent.acceptedAt)}`
-    : 'No registration consent record is linked to this account.';
-}
-
 function setAvatar(url) {
   let validUrl = '';
-  try {
-    const parsed = new URL(url, window.location.origin);
-    if (['https:', 'http:'].includes(parsed.protocol)) validUrl = parsed.href;
-  } catch { /* an invalid or missing photo uses initials */ }
+  if (typeof url === 'string' && url.trim()) {
+    try {
+      const parsed = new URL(url, window.location.origin);
+      if (['https:', 'http:'].includes(parsed.protocol)) validUrl = parsed.href;
+    } catch { /* an invalid or missing photo uses initials */ }
+  }
   const initials = legalStudentName.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0].toUpperCase()).join('');
   if (avatarInitialsEl) avatarInitialsEl.textContent = initials || '?';
+  if (removeAvatarButtonEl) removeAvatarButtonEl.hidden = !validUrl;
   if (!avatarEl) return;
   avatarEl.hidden = !validUrl;
   if (avatarInitialsEl) avatarInitialsEl.hidden = Boolean(validUrl);
@@ -249,6 +221,38 @@ avatarUploadEl?.addEventListener('change', async () => {
   }
 });
 
+removeAvatarButtonEl?.addEventListener('click', async () => {
+  if (!studentRecord || !studentRecord.profile?.photoURL) {
+    accountNote('There is no profile photo to remove.', 'info');
+    return;
+  }
+  if (!window.confirm('Remove your profile photo? Your initials will be shown instead.')) return;
+  removeAvatarButtonEl.disabled = true;
+  accountNote('Removing profile photo…');
+  const nextProfile = { ...studentRecord.profile };
+  delete nextProfile.photoURL;
+  let objectDeleted = false;
+  try {
+    await deleteObject(storageRef(storageService(), `users/${session.user.uid}/avatar/profile`));
+    objectDeleted = true;
+    await updateDoc(doc(dbService(), 'students', session.user.uid), { profile: nextProfile, updatedAt: serverTimestamp() });
+    studentRecord = { ...studentRecord, profile: nextProfile };
+    setAvatar('');
+    accountNote('Profile photo removed.', 'success');
+  } catch (error) {
+    console.warn('Could not remove profile photo', error?.code ?? error);
+    if (objectDeleted) {
+      studentRecord = { ...studentRecord, profile: nextProfile };
+      setAvatar('');
+      accountNote('The photo file was deleted, but its profile reference could not be saved. Refresh and contact the Centre if the old photo returns.', 'error');
+    } else {
+      accountNote('Profile photo could not be removed. Check your connection and try again.', 'error');
+    }
+  } finally {
+    removeAvatarButtonEl.disabled = false;
+  }
+});
+
 document.getElementById('sendVerificationEmail')?.addEventListener('click', async (event) => {
   const button = event.currentTarget;
   button.disabled = true;
@@ -278,6 +282,21 @@ document.getElementById('sendPasswordReset')?.addEventListener('click', async (e
 });
 
 const preferencesForm = document.getElementById('studentPreferencesForm');
+const settingsContent = document.getElementById('studentSettingsContent');
+const privacyPanel = document.getElementById('privacyDataPanel');
+const privacyPanelNote = document.getElementById('privacyPanelNote');
+const privacyRequestForm = document.getElementById('privacyRequestForm');
+const privacyRequestTitle = document.getElementById('privacyRequestTitle');
+const privacyRequestDescription = document.getElementById('privacyRequestDescription');
+const privacyRequestDetails = document.getElementById('privacyRequestDetails');
+const correctionCategoryGroup = document.getElementById('correctionCategoryGroup');
+const correctionCategory = document.getElementById('correctionCategory');
+const otherPrivacyTypeGroup = document.getElementById('otherPrivacyTypeGroup');
+const otherPrivacyType = document.getElementById('otherPrivacyType');
+const privacyRequestNote = document.getElementById('privacyRequestNote');
+const privacyRequestHistory = document.getElementById('privacyRequestHistory');
+const privacyHistoryNote = document.getElementById('privacyHistoryNote');
+const privacyRequestList = document.getElementById('privacyRequestList');
 const savedPreferences = studentRecord?.preferences ?? {};
 const preferredLanguageEl = document.getElementById('preferredLanguage');
 const emailUpdatesEl = document.getElementById('emailUpdates');
@@ -315,6 +334,145 @@ preferencesForm?.addEventListener('submit', async (event) => {
     accountNote('Preferences could not be saved. Check your connection and try again.', 'error');
   } finally {
     button.disabled = false;
+  }
+});
+
+const PRIVACY_REQUEST_LABELS = {
+  data_access: 'Request my data', correction: 'Request a correction', deletion: 'Request deletion',
+  objection: 'Object to data processing', restriction: 'Restrict data processing',
+};
+const PRIVACY_STATUS_LABELS = {
+  submitted: 'Submitted', under_review: 'Under review', needs_student: 'Action needed', completed: 'Completed', declined: 'Closed',
+};
+const CORRECTION_LABELS = {
+  legal_identity: 'Legal name or date of birth', contact_residence: 'Contact or residence details', education: 'Education details', other: 'Other student record',
+};
+let activePrivacyType = '';
+
+function privacyNote(text, kind = 'info') {
+  if (!privacyPanelNote) return;
+  privacyPanelNote.textContent = text;
+  privacyPanelNote.hidden = !text;
+  privacyPanelNote.dataset.kind = kind;
+}
+
+function startPrivacyRequest(type) {
+  activePrivacyType = type;
+  privacyRequestForm.reset();
+  privacyRequestNote.hidden = true;
+  privacyPanelNote.hidden = true;
+  privacyRequestForm.hidden = false;
+  privacyRequestHistory.hidden = true;
+  correctionCategoryGroup.hidden = type !== 'correction';
+  otherPrivacyTypeGroup.hidden = type !== 'other';
+  correctionCategory.required = type === 'correction';
+  privacyRequestDetails.required = type !== 'data_access';
+  privacyRequestTitle.textContent = type === 'other' ? 'Other privacy request' : PRIVACY_REQUEST_LABELS[type];
+  privacyRequestDescription.textContent = type === 'data_access'
+    ? 'Ask CFL for a copy of the personal information held about you. You can add details about the records you need.'
+    : type === 'correction'
+      ? 'Describe what is inaccurate and what the correct information should be. Official changes may need staff verification.'
+      : 'Deletion, objection, and restriction requests are reviewed by CFL. Explain which information or processing your request concerns.';
+  privacyRequestDetails.placeholder = type === 'correction'
+    ? 'Tell us what is inaccurate and what it should say. Do not include passwords or verification codes.'
+    : 'Describe the records or processing this request concerns. Do not include passwords or verification codes.';
+  privacyRequestDetails.focus();
+}
+
+function requestDate(value) {
+  return displayDate(value) || 'Date not available';
+}
+
+function privacyRequestCard(request) {
+  const typeLabel = PRIVACY_REQUEST_LABELS[request.requestType] ?? request.requestType ?? 'Privacy request';
+  const statusLabel = PRIVACY_STATUS_LABELS[request.status] ?? 'Status unavailable';
+  const updates = Array.isArray(request.updates) ? request.updates : [];
+  return h('article', { class: 'privacy-request-item' },
+    h('div', { class: 'privacy-request-item-header' },
+      h('div', {},
+        h('h4', {}, typeLabel),
+        h('span', { class: 'privacy-request-date' }, `Request ${request.id.slice(0, 8).toUpperCase()} · ${requestDate(request.createdAt)}`)),
+      h('span', { class: 'privacy-request-status', 'data-status': request.status }, statusLabel)),
+    request.correctionCategory ? h('p', { class: 'privacy-request-detail' }, `${CORRECTION_LABELS[request.correctionCategory] ?? 'Record'}: ${request.details}`) :
+      (request.details ? h('p', { class: 'privacy-request-detail' }, request.details) : ''),
+    request.response ? h('p', { class: 'privacy-request-response' }, h('strong', {}, 'CFL response: '), request.response) :
+      h('p', { class: 'privacy-request-response muted' }, 'CFL has not responded yet.'),
+    request.status === 'needs_student' && request.nextAction
+      ? h('p', { class: 'privacy-request-next' }, h('strong', {}, 'Your next action: '), request.nextAction) : '',
+    updates.length ? h('ul', { class: 'privacy-request-timeline', 'aria-label': 'Request updates' }, ...updates.map((update) => h('li', {},
+      `${PRIVACY_STATUS_LABELS[update.status] ?? update.status} · ${requestDate(update.reviewedAt)}${update.response ? `: ${update.response}` : ''}${update.nextAction ? ` Next: ${update.nextAction}` : ''}`))) : '',
+  );
+}
+
+async function loadPrivacyHistory() {
+  privacyRequestHistory.hidden = false;
+  privacyHistoryNote.textContent = 'Loading your requests…';
+  privacyRequestList.replaceChildren();
+  try {
+    const requests = await listMyPrivacyRequests(session.user.uid);
+    privacyRequestList.replaceChildren(...(requests.length
+      ? requests.map(privacyRequestCard)
+      : [h('p', { class: 'privacy-request-empty' }, 'You have not submitted any privacy requests yet.')]));
+    privacyHistoryNote.textContent = requests.length ? `${requests.length} ${requests.length === 1 ? 'request' : 'requests'} · newest first` : '';
+  } catch (error) {
+    console.warn('Could not load privacy request history', error?.code ?? error);
+    privacyHistoryNote.textContent = 'Your requests could not be loaded. Check your connection and try again.';
+    privacyRequestList.replaceChildren();
+  }
+}
+
+document.getElementById('openPrivacyData')?.addEventListener('click', () => {
+  settingsContent.hidden = true;
+  privacyPanel.hidden = false;
+  privacyPanel.querySelector('#privacyDataTitle')?.focus();
+});
+document.getElementById('backToSettings')?.addEventListener('click', () => {
+  privacyPanel.hidden = true;
+  settingsContent.hidden = false;
+  document.getElementById('openPrivacyData')?.focus();
+});
+privacyPanel?.querySelectorAll('[data-privacy-request]')?.forEach((button) => {
+  button.addEventListener('click', () => startPrivacyRequest(button.dataset.privacyRequest));
+});
+document.getElementById('showPrivacyRequests')?.addEventListener('click', () => {
+  privacyRequestForm.hidden = true;
+  privacyPanelNote.hidden = true;
+  loadPrivacyHistory();
+});
+document.getElementById('refreshPrivacyRequests')?.addEventListener('click', loadPrivacyHistory);
+document.getElementById('cancelPrivacyRequest')?.addEventListener('click', () => {
+  privacyRequestForm.hidden = true;
+  privacyRequestNote.hidden = true;
+  privacyPanelNote.hidden = true;
+});
+privacyRequestForm?.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  privacyRequestNote.hidden = true;
+  const details = privacyRequestDetails.value.trim();
+  if (activePrivacyType !== 'data_access' && details.length < 12) {
+    privacyRequestNote.textContent = 'Add a few details so the Centre can review your request.';
+    privacyRequestNote.hidden = false;
+    privacyRequestDetails.focus();
+    return;
+  }
+  const requestType = activePrivacyType === 'other' ? otherPrivacyType.value : activePrivacyType;
+  const submitButton = privacyRequestForm.querySelector('button[type="submit"]');
+  setBusy(submitButton, true, 'Submitting…');
+  try {
+    const result = await submitPrivacyRequest({
+      requestType,
+      correctionCategory: activePrivacyType === 'correction' ? correctionCategory.value : '',
+      details,
+    });
+    privacyRequestForm.hidden = true;
+    privacyNote(`Request ${result.requestId.slice(0, 8).toUpperCase()} submitted for CFL review. No data changes are made automatically.`, 'success');
+    await loadPrivacyHistory();
+  } catch (error) {
+    console.warn('Could not submit privacy request', error?.code ?? error);
+    privacyRequestNote.textContent = error.message || 'Your request could not be submitted. Check your connection and try again.';
+    privacyRequestNote.hidden = false;
+  } finally {
+    setBusy(submitButton, false);
   }
 });
 

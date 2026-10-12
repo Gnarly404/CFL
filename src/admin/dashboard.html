@@ -16,6 +16,7 @@
         <h1>Admin console</h1>
         <nav class="admin-nav" aria-label="Admin sections">
             <a href="#applications">Applications<span class="nav-attention" data-attention-key="applications" hidden role="status" aria-live="polite" aria-atomic="true"><span aria-hidden="true"></span></span></a>
+            <a href="#privacy-requests">Privacy requests</a>
             <a href="#create-account">Create account</a>
             <a href="#teaching-assignments">Teaching assignments</a>
             <a href="#programmes">Programmes</a>
@@ -53,6 +54,30 @@
                     <thead><tr><th>Reference</th><th>Applicant</th><th>Programme</th><th>Submitted</th><th>Status</th><th>Actions</th></tr></thead>
                     <tbody id="applicationsBody"></tbody>
                 </table>
+            </div>
+        </section>
+
+        <section class="card admin-section" id="privacy-requests" aria-labelledby="privacyRequestsHeading">
+            <div class="card-header d-flex justify-content-between align-items-center gap-2 flex-wrap">
+                <div>
+                    <h2 id="privacyRequestsHeading">Privacy requests</h2>
+                    <p class="login-help mb-0">Review personal-data requests. Record a response and any action the student needs to take; requests are never actioned automatically.</p>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <label for="privacyRequestFilter" class="visually-hidden">Filter privacy requests by status</label>
+                    <select id="privacyRequestFilter" class="form-select form-select-sm">
+                        <option value="">All requests</option>
+                        <option value="submitted">Submitted</option>
+                        <option value="under_review">Under review</option>
+                        <option value="needs_student">Action needed</option>
+                        <option value="completed">Completed</option>
+                        <option value="declined">Closed</option>
+                    </select>
+                    <button id="refreshPrivacyQueue" type="button" class="btn btn-outline-secondary btn-sm">Refresh requests</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="privacyRequestsList" class="privacy-review-list" aria-live="polite"></div>
             </div>
         </section>
 

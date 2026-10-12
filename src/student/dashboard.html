@@ -125,29 +125,6 @@
         </section>
       </div>
 
-      <section class="card" aria-labelledby="academicRecordTitle">
-        <div class="student-card-heading">
-          <div><p class="eyebrow">Academic record</p><h2 id="academicRecordTitle">Background and identification</h2></div>
-        </div>
-        <div class="student-record-grid">
-          <div>
-            <h3>Academic background</h3>
-            <dl id="academicFacts" class="student-facts"></dl>
-          </div>
-          <div>
-            <h3>Identification documents</h3>
-            <p id="identityDocumentStatus" class="muted">No ID or passport record is linked to this account.</p>
-            <dl id="identityDocumentDetails" class="student-facts" hidden></dl>
-            <p class="student-record-note">Identification numbers are hidden by default. Contact the Centre to add or verify an official document.</p>
-          </div>
-          <div>
-            <h3>Consent record</h3>
-            <p id="consentStatus" class="muted">Registration consent not available.</p>
-            <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Student%20data%20access%20request">Request access to my data</a>
-          </div>
-        </div>
-      </section>
-
       <div class="student-dashboard-grid">
         <section class="card" aria-labelledby="feesTitle">
           <div class="student-card-heading"><div><p class="eyebrow">Financial record</p><h2 id="feesTitle">Fees and payments</h2></div></div>
@@ -158,19 +135,11 @@
           <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Student%20fees%20or%20payment%20question">Contact Finance</a>
         </section>
 
-        <section class="card" aria-labelledby="documentsTitle">
-          <div class="student-card-heading"><div><p class="eyebrow">Student records</p><h2 id="documentsTitle">Documents</h2></div></div>
-          <div id="documentsSummary" class="student-empty-state">
-            <strong>No official documents are available online.</strong>
-            <p>Admission letters, receipts, transcripts, and certificates are not linked to this account yet.</p>
-          </div>
-          <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Request%20for%20a%20student%20document">Request a document</a>
-        </section>
       </div>
 
       <section class="card" aria-labelledby="requestsTitle">
         <div class="student-card-heading"><div><p class="eyebrow">Student services</p><h2 id="requestsTitle">Requests and support</h2></div></div>
-        <p class="muted">Online request tracking is not available yet. Email the Centre to request a change or service; reference numbers and response history will be added when requests move into the portal.</p>
+        <p class="muted">Manage personal-information requests in Privacy &amp; Data. Other service requests are handled by the Centre.</p>
         <div class="student-request-links">
           <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Programme%20transfer%20request">Programme transfer</a>
           <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Deferment%20or%20withdrawal%20request">Deferment or withdrawal</a>
@@ -179,19 +148,6 @@
           <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Transcript%20request">Transcript request</a>
           <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Payment%20dispute">Payment dispute</a>
         </div>
-        <p class="student-request-history" id="requestHistory">No online service requests are recorded.</p>
-      </section>
-
-      <section class="card" aria-labelledby="completionTitle">
-        <div class="student-card-heading"><div><p class="eyebrow">Programme completion</p><h2 id="completionTitle">Completion and certificate status</h2></div></div>
-        <p id="completionSummary" class="muted">Official completion eligibility has not been assessed in this portal.</p>
-        <ul class="student-checklist">
-          <li><span>Attendance compliance</span><strong>Not tracked online</strong></li>
-          <li><span>Outstanding academic requirements</span><strong>Not available</strong></li>
-          <li><span>Financial clearance</span><strong>Not connected</strong></li>
-          <li><span>Certificate processing</span><strong>No record</strong></li>
-        </ul>
-        <p class="student-record-note">Completing online practice does not automatically award an official qualification.</p>
       </section>
 
       <dialog id="studentSettingsDialog" class="student-settings-dialog" aria-labelledby="accountSettingsTitle">
@@ -199,13 +155,14 @@
           <p class="eyebrow">Account</p>
           <form method="dialog"><button type="submit" class="student-dashboard-action">Close settings</button></form>
         </div>
-        <section class="student-settings-content" aria-labelledby="accountSettingsTitle">
+        <section id="studentSettingsContent" class="student-settings-content" aria-labelledby="accountSettingsTitle">
         <div class="student-card-heading"><div><p class="eyebrow">Account and privacy</p><h2 id="accountSettingsTitle">Account settings</h2></div></div>
         <div class="student-account-layout">
           <div class="student-photo-control">
             <div>
               <label class="student-dashboard-action" for="studentAvatarUpload">Change profile photo</label>
               <input id="studentAvatarUpload" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+              <button id="removeStudentAvatar" class="student-dashboard-action student-dashboard-action--danger" type="button" hidden>Remove photo</button>
               <p class="student-record-note">PNG, JPEG, or WebP; maximum 2 MB.</p>
             </div>
           </div>
@@ -224,7 +181,62 @@
           <button class="student-dashboard-action student-dashboard-action--primary" type="submit">Save preferences</button>
           <p id="accountSettingsNote" class="student-record-note" role="status"></p>
         </form>
-        <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Privacy%20or%20data%20request">Privacy and data request</a>
+        <button id="openPrivacyData" class="student-dashboard-action" type="button">Privacy &amp; Data</button>
+        </section>
+        <section id="privacyDataPanel" class="privacy-data-panel" aria-labelledby="privacyDataTitle" hidden>
+          <header class="privacy-data-header">
+            <button id="backToSettings" class="student-dashboard-action" type="button">Back to settings</button>
+            <p class="eyebrow">Account privacy</p>
+            <h2 id="privacyDataTitle" tabindex="-1">Privacy &amp; Data</h2>
+            <p class="muted">Manage requests concerning your personal information.</p>
+          </header>
+          <div class="privacy-data-actions" aria-label="Personal data actions">
+            <button class="privacy-action" type="button" data-privacy-request="data_access">Request my data</button>
+            <button class="privacy-action" type="button" data-privacy-request="correction">Request a correction</button>
+            <button class="privacy-action" type="button" data-privacy-request="other">Other privacy requests</button>
+            <button id="showPrivacyRequests" class="privacy-action" type="button">My requests</button>
+          </div>
+          <p id="privacyPanelNote" class="form-note" role="status" hidden></p>
+          <form id="privacyRequestForm" class="privacy-request-form" hidden>
+            <h3 id="privacyRequestTitle"></h3>
+            <p id="privacyRequestDescription" class="muted"></p>
+            <div id="correctionCategoryGroup" class="privacy-field" hidden>
+              <label for="correctionCategory">Which information needs correction?</label>
+              <select id="correctionCategory" class="form-select">
+                <option value="">Select a category</option>
+                <option value="legal_identity">Legal name or date of birth</option>
+                <option value="contact_residence">Contact or residence details</option>
+                <option value="education">Education details</option>
+                <option value="other">Other student record</option>
+              </select>
+            </div>
+            <div id="otherPrivacyTypeGroup" class="privacy-field" hidden>
+              <label for="otherPrivacyType">Request type</label>
+              <select id="otherPrivacyType" class="form-select">
+                <option value="deletion">Request deletion</option>
+                <option value="objection">Object to data processing</option>
+                <option value="restriction">Restrict data processing</option>
+              </select>
+            </div>
+            <label class="privacy-field" for="privacyRequestDetails">
+              <span id="privacyDetailsLabel">Details <span class="required">*</span></span>
+              <textarea id="privacyRequestDetails" name="details" maxlength="3000" rows="4" placeholder="Describe your request. Do not include passwords or verification codes."></textarea>
+            </label>
+            <p class="privacy-review-note">Requests are reviewed by CFL. Data will not be deleted, changed, or restricted automatically.</p>
+            <div class="privacy-form-actions">
+              <button id="cancelPrivacyRequest" class="student-dashboard-action" type="button">Cancel</button>
+              <button class="student-dashboard-action student-dashboard-action--primary" type="submit">Submit request</button>
+            </div>
+            <p id="privacyRequestNote" class="student-record-note" role="status" hidden></p>
+          </form>
+          <section id="privacyRequestHistory" class="privacy-request-history" aria-labelledby="privacyHistoryTitle" hidden>
+            <div class="student-card-heading">
+              <div><p class="eyebrow">Tracking</p><h3 id="privacyHistoryTitle">My requests</h3></div>
+              <button id="refreshPrivacyRequests" class="student-dashboard-action" type="button">Refresh</button>
+            </div>
+            <p id="privacyHistoryNote" class="muted" role="status"></p>
+            <div id="privacyRequestList" class="privacy-request-list" aria-live="polite"></div>
+          </section>
         </section>
       </dialog>
 

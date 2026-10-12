@@ -5,6 +5,9 @@ export { submitApplication } from './src/applications/submit.js';
 export { getApplicationStatus } from './src/applications/status.js';
 export { decideApplication } from './src/applications/decide.js';
 
+// Student privacy requests
+export { submitPrivacyRequest, adminReviewPrivacyRequest } from './src/privacy/requests.js';
+
 // Account administration
 export { adminCreateUser } from './src/admin/create-user.js';
 export { adminSetUserStatus } from './src/admin/set-user-status.js';
