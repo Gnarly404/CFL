@@ -1,0 +1,41 @@
+.student-dashboard-page .btn{border-radius:8px;font-weight:700}
+.student-dashboard-page .btn-primary{background:var(--coral-strong);border-color:var(--coral-strong);color:#fff}
+.student-dashboard-page .btn-primary:hover{background:var(--coral-strong-hover);border-color:var(--coral-strong-hover)}
+.student-dashboard-page .link-btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 var(--s3);border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--navy);font-size:.84rem;font-weight:700;line-height:1.2;text-decoration:none;transition:background var(--t-fast),border-color var(--t-fast),color var(--t-fast)}
+.student-dashboard-page .link-btn:hover{border-color:var(--navy);background:#eef3f9;color:var(--navy)}
+.student-dashboard-page .form-select{min-height:44px;border:1px solid #9aaabd;border-radius:8px;background-color:var(--surface);color:var(--text);font:600 .92rem var(--font-body)}
+.student-dashboard-page .form-select:focus{border-color:var(--navy);box-shadow:var(--focus)}
+.student-dashboard-page .student-quick-link{transition:background var(--t-fast),border-color var(--t-fast),transform var(--t-fast)}
+.student-dashboard-page .student-quick-link:hover{transform:translateY(-2px)}
+.student-dashboard-page .student-quick-link:focus-visible{outline:none;box-shadow:var(--focus)}
+.student-dashboard-page .profile-completion .btn{background:var(--coral-strong);border-color:var(--coral-strong);color:#fff}
+.student-dashboard-page .profile-completion .btn:hover{background:var(--coral-strong-hover);border-color:var(--coral-strong-hover)}
+.student-dashboard-page .student-compact-action,.student-dashboard-page .student-dashboard-action{display:inline-flex;align-items:center;justify-content:center;width:max-content;max-width:100%;min-height:34px;padding:5px 11px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--navy);font:700 .78rem/1.2 var(--font-body);text-align:center;text-decoration:none;cursor:pointer}
+.student-dashboard-page .student-compact-action:hover,.student-dashboard-page .student-dashboard-action:hover{border-color:var(--navy);background:#eef3f9}
+.student-dashboard-page .student-programme-card .link-btn{width:max-content;min-height:32px;padding:4px 9px;font-size:.76rem}
+.student-dashboard-page #enrolmentDetails.is-empty{display:grid;grid-template-columns:minmax(0,1fr);justify-items:start;gap:var(--s3);margin-top:var(--s2)}
+.student-dashboard-page #enrolmentDetails.is-empty p{margin:0}
+.student-dashboard-page .student-dashboard-action--primary{border-color:var(--coral-strong);background:var(--coral-strong);color:#fff}
+.student-dashboard-page .student-record-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s4)}
+.student-dashboard-page .student-record-grid h3,.student-dashboard-page .student-preferences-form h3{margin:0 0 var(--s2);font:700 .95rem var(--font-head);color:var(--navy)}
+.student-dashboard-page .student-empty-state{margin:var(--s3) 0;padding:var(--s3);border:1px dashed #c5cfda;border-radius:8px;background:#f8fafc;color:var(--text);font-size:.88rem}
+.student-dashboard-page .student-empty-state p{margin:var(--s1) 0 0;color:var(--muted)}
+.student-dashboard-page .student-request-links{display:flex;flex-wrap:wrap;gap:var(--s2)}
+.student-dashboard-page .student-request-history{margin:var(--s4) 0 0;padding-top:var(--s3);border-top:1px solid var(--line);color:var(--muted);font-size:.84rem}
+.student-dashboard-page .student-checklist{display:grid;gap:var(--s2);margin:var(--s3) 0;padding:0;list-style:none}
+.student-dashboard-page .student-checklist li{display:flex;justify-content:space-between;gap:var(--s3);padding:var(--s2) 0;border-bottom:1px solid var(--line);font-size:.86rem}
+.student-dashboard-page .student-checklist strong{color:var(--muted);font-size:.8rem;text-align:right}
+.student-dashboard-page .student-account-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:var(--s4);align-items:center}
+.student-dashboard-page .student-photo-control{display:flex;align-items:center;gap:var(--s3)}
+.student-dashboard-page .student-photo-control img,.student-dashboard-page #studentAvatarInitials{display:grid;place-items:center;width:64px;height:64px;flex:0 0 64px;border-radius:50%;object-fit:cover;background:#eaf1f9;color:var(--navy);font:700 1.2rem var(--font-head)}
+.student-dashboard-page .student-photo-control img[hidden],.student-dashboard-page #studentAvatarInitials[hidden],.student-dashboard-page #identityDocumentDetails[hidden]{display:none}
+.student-dashboard-page .student-photo-control p{margin:var(--s1) 0 0}
+.student-dashboard-page .student-account-actions{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2)}
+.student-dashboard-page .student-preferences-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s2) var(--s4);max-width:720px;margin:var(--s5) 0}
+.student-dashboard-page .student-preferences-form h3,.student-dashboard-page .student-preferences-form #accountSettingsNote{grid-column:1/-1}
+.student-dashboard-page .student-setting-toggle{display:flex;align-items:center;gap:var(--s2);min-height:40px;color:var(--text);font-size:.88rem}
+.student-dashboard-page .student-setting-toggle input{width:18px;height:18px;accent-color:var(--navy)}
+html[data-reduce-motion="true"] *{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
+@media(prefers-reduced-motion:reduce){.student-dashboard-page .student-quick-link{transition:none}}
+@media(max-width:820px){.student-dashboard-page .student-record-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.student-dashboard-page .student-record-grid,.student-dashboard-page .student-account-layout,.student-dashboard-page .student-preferences-form{grid-template-columns:1fr}.student-dashboard-page .student-preferences-form h3,.student-dashboard-page .student-preferences-form #accountSettingsNote{grid-column:auto}.student-dashboard-page .student-checklist li{align-items:flex-start;flex-direction:column;gap:2px}.student-dashboard-page .student-checklist strong{text-align:left}}

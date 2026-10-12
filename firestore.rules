@@ -57,9 +57,9 @@ service cloud.firestore {
       allow create, delete: if false;
     }
 
-    // ---------- admissions (Cloud Functions only; admins read) ----------
+    // ---------- admissions (Cloud Functions write; admins and the linked student read) ----------
     match /applications/{applicationId} {
-      allow read: if isAdmin();
+      allow read: if isAdmin() || isUser(resource.data.get('userId', ''));
       allow write: if false;
     }
 

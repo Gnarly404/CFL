@@ -11,11 +11,12 @@
 <link rel="stylesheet" href="/css/components.css">
 <link rel="stylesheet" href="/css/portal.css">
 <link rel="stylesheet" href="/css/practice.css">
+<link rel="stylesheet" href="/css/student-dashboard.css">
 <link rel="icon" type="image/png" href="/images/logo.png">
 <script type="module" src="/js/pages/student-dashboard.js"></script>
 <script type="module" src="/js/motion/boot.js"></script>
 </head>
-<body class="portal">
+<body class="portal student-dashboard-page">
 <div class="portal-shell">
   <aside class="portal-side" id="portalSide"></aside>
 
@@ -23,14 +24,29 @@
     <header class="portal-head" data-reveal="fade">
       <p id="dayMessage" class="muted"></p>
       <h1>Welcome, <span id="studentName">…</span></h1>
-      <p class="muted">Reg no: <span id="registrationNumber">…</span> · <span id="profileName">…</span> · <span id="profileStatus">Account active</span></p>
-    <button type="button" class="voice-chip voice-chip--quiet" data-voice-line="dash.auto" aria-pressed="false">
+      <p class="student-dashboard-meta">
+        <span id="studentNumber">Student number loading…</span>
+        <span id="studentStage" class="status-pill"></span>
+        <span id="profileStatus" class="status-pill">Account status loading…</span>
+        <span id="emailVerification" class="status-pill"></span>
+      </p>
+      <button type="button" class="voice-chip voice-chip--quiet" data-voice-line="dash.auto" aria-pressed="false">
         <span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
         <span>Hear greeting</span>
       </button>
     </header>
 
+    <p id="studentDashboardNote" class="form-note" role="status" hidden></p>
     <div class="stack" data-reveal-group>
+      <section id="profileCompletion" class="profile-completion" aria-labelledby="profileCompletionTitle" hidden>
+        <div>
+          <p class="eyebrow">Profile details</p>
+          <h2 id="profileCompletionTitle">A few required details are missing</h2>
+          <p id="profileCompletionText" class="muted"></p>
+        </div>
+        <a class="btn" href="mailto:cfllearning33@gmail.com?subject=Request%20to%20complete%20student%20profile">Contact the Centre</a>
+      </section>
+
       <section class="card continue" aria-labelledby="continueTitle">
         <p class="eyebrow">Continue learning</p>
         <h2 id="continueTitle">Loading…</h2>
@@ -38,19 +54,177 @@
         <div id="continueAction"></div>
       </section>
 
-      <div class="two-col">
-        <section class="card">
-          <h2>Application status</h2>
-          <p id="applicationStatus">Loading…</p>
-          <div id="studentDetails" class="muted"></div>
+      <div class="student-dashboard-grid">
+        <section class="card student-programme-card" aria-labelledby="enrolmentTitle">
+          <div class="student-card-heading">
+            <div>
+              <p class="eyebrow">My studies</p>
+              <h2 id="enrolmentTitle">Programme and enrolment</h2>
+            </div>
+            <a class="student-compact-action" href="/student/schedule">Schedule</a>
+          </div>
+          <div id="enrolmentPickerWrap" class="student-enrolment-picker" hidden>
+            <label for="enrolmentPicker" class="form-label">Select enrollment</label>
+            <select id="enrolmentPicker" class="form-select"></select>
+          </div>
+          <div id="enrolmentDetails" class="student-facts">
+            <p class="muted">Loading enrolment…</p>
+          </div>
+          <p id="enrolmentHistoryNote" class="muted" hidden></p>
         </section>
-        <section class="card">
-          <h2>Enrolments</h2>
-          <ul id="enrolments" class="muted">
-            <li>Loading enrolments…</li>
-          </ul>
+
+        <section class="card" aria-labelledby="nextClassHeading">
+          <div class="student-card-heading">
+            <div>
+              <p class="eyebrow">Timetable</p>
+              <h2 id="nextClassHeading">Next class</h2>
+            </div>
+            <a class="link-btn" href="/student/schedule">Full schedule</a>
+          </div>
+          <div id="nextClassContent"><p class="muted">Loading your timetable…</p></div>
         </section>
       </div>
+
+      <section class="card" aria-labelledby="learningRecordTitle">
+        <div class="student-card-heading"><div><p class="eyebrow">Learning progress</p><h2 id="learningRecordTitle">Practice activity</h2></div><a class="student-dashboard-action" href="/student/practice">Open English Practice</a></div>
+        <div id="learningSummary" class="student-progress-summary"><p class="muted">Loading learning progress…</p></div>
+        <p class="student-record-note">Practice progress is not an official examination result or qualification.</p>
+        <p id="formalResultsNote" class="student-empty-state">Formal assignments, grades, attendance, and course materials are not available in this portal yet.</p>
+      </section>
+
+      <div class="two-col">
+        <section class="card student-profile-card" aria-labelledby="personalInfoTitle">
+          <div class="student-card-heading">
+            <div>
+              <p class="eyebrow">Official record</p>
+              <h2 id="personalInfoTitle">Personal information</h2>
+            </div>
+          </div>
+          <dl id="studentDetails" class="student-facts"></dl>
+          <details id="sensitiveDetails" class="sensitive-details" hidden>
+            <summary>Show private contact details</summary>
+            <dl id="privateStudentDetails" class="student-facts"></dl>
+          </details>
+          <p class="muted student-record-note">Official identity details are verified by CFL. To correct a legal name or other official detail, contact the Centre; do not create a second account.</p>
+          <a id="correctionRequest" class="link-btn" href="mailto:cfllearning33@gmail.com?subject=Request%20to%20correct%20student%20record">Request a record correction</a>
+        </section>
+
+        <section class="card" id="applicationCard" aria-labelledby="applicationHeading" hidden>
+          <p class="eyebrow">Admissions</p>
+          <h2 id="applicationHeading">Application status</h2>
+          <p id="applicationStatus"></p>
+          <p id="applicationReference" class="muted"></p>
+        </section>
+      </div>
+
+      <section class="card" aria-labelledby="academicRecordTitle">
+        <div class="student-card-heading">
+          <div><p class="eyebrow">Academic record</p><h2 id="academicRecordTitle">Background and identification</h2></div>
+        </div>
+        <div class="student-record-grid">
+          <div>
+            <h3>Academic background</h3>
+            <dl id="academicFacts" class="student-facts"></dl>
+          </div>
+          <div>
+            <h3>Identification documents</h3>
+            <p id="identityDocumentStatus" class="muted">No ID or passport record is linked to this account.</p>
+            <dl id="identityDocumentDetails" class="student-facts" hidden></dl>
+            <p class="student-record-note">Identification numbers are hidden by default. Contact the Centre to add or verify an official document.</p>
+          </div>
+          <div>
+            <h3>Consent record</h3>
+            <p id="consentStatus" class="muted">Registration consent not available.</p>
+            <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Student%20data%20access%20request">Request access to my data</a>
+          </div>
+        </div>
+      </section>
+
+      <div class="student-dashboard-grid">
+        <section class="card" aria-labelledby="feesTitle">
+          <div class="student-card-heading"><div><p class="eyebrow">Financial record</p><h2 id="feesTitle">Fees and payments</h2></div></div>
+          <div id="feesSummary" class="student-empty-state">
+            <strong>No fee statement is available online.</strong>
+            <p>Payment history, receipts, balances, and disputes are not connected to this portal yet.</p>
+          </div>
+          <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Student%20fees%20or%20payment%20question">Contact Finance</a>
+        </section>
+
+        <section class="card" aria-labelledby="documentsTitle">
+          <div class="student-card-heading"><div><p class="eyebrow">Student records</p><h2 id="documentsTitle">Documents</h2></div></div>
+          <div id="documentsSummary" class="student-empty-state">
+            <strong>No official documents are available online.</strong>
+            <p>Admission letters, receipts, transcripts, and certificates are not linked to this account yet.</p>
+          </div>
+          <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Request%20for%20a%20student%20document">Request a document</a>
+        </section>
+      </div>
+
+      <section class="card" aria-labelledby="requestsTitle">
+        <div class="student-card-heading"><div><p class="eyebrow">Student services</p><h2 id="requestsTitle">Requests and support</h2></div></div>
+        <p class="muted">Online request tracking is not available yet. Email the Centre to request a change or service; reference numbers and response history will be added when requests move into the portal.</p>
+        <div class="student-request-links">
+          <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Programme%20transfer%20request">Programme transfer</a>
+          <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Deferment%20or%20withdrawal%20request">Deferment or withdrawal</a>
+          <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Student%20record%20correction">Correct personal record</a>
+          <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Academic%20support%20request">Academic support</a>
+          <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Transcript%20request">Transcript request</a>
+          <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Payment%20dispute">Payment dispute</a>
+        </div>
+        <p class="student-request-history" id="requestHistory">No online service requests are recorded.</p>
+      </section>
+
+      <section class="card" aria-labelledby="completionTitle">
+        <div class="student-card-heading"><div><p class="eyebrow">Programme completion</p><h2 id="completionTitle">Completion and certificate status</h2></div></div>
+        <p id="completionSummary" class="muted">Official completion eligibility has not been assessed in this portal.</p>
+        <ul class="student-checklist">
+          <li><span>Attendance compliance</span><strong>Not tracked online</strong></li>
+          <li><span>Outstanding academic requirements</span><strong>Not available</strong></li>
+          <li><span>Financial clearance</span><strong>Not connected</strong></li>
+          <li><span>Certificate processing</span><strong>No record</strong></li>
+        </ul>
+        <p class="student-record-note">Completing online practice does not automatically award an official qualification.</p>
+      </section>
+
+      <section class="card" aria-labelledby="accountSettingsTitle">
+        <div class="student-card-heading"><div><p class="eyebrow">Account and privacy</p><h2 id="accountSettingsTitle">Account settings</h2></div></div>
+        <div class="student-account-layout">
+          <div class="student-photo-control">
+            <img id="studentAvatar" alt="Student profile photo" hidden>
+            <span id="studentAvatarInitials" aria-hidden="true">?</span>
+            <div>
+              <label class="student-dashboard-action" for="studentAvatarUpload">Change profile photo</label>
+              <input id="studentAvatarUpload" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+              <p class="student-record-note">PNG, JPEG, or WebP; maximum 2 MB.</p>
+            </div>
+          </div>
+          <div class="student-account-actions">
+            <button id="sendVerificationEmail" type="button" class="student-dashboard-action" hidden>Resend verification email</button>
+            <button id="sendPasswordReset" type="button" class="student-dashboard-action">Send password reset link</button>
+          </div>
+        </div>
+        <form id="studentPreferencesForm" class="student-preferences-form">
+          <h3>Communication and accessibility</h3>
+          <label for="preferredLanguage">Preferred language</label>
+          <select id="preferredLanguage" class="form-select"><option value="en">English</option><option value="sw">Kiswahili</option></select>
+          <label class="student-setting-toggle"><input id="emailUpdates" type="checkbox"> Email updates</label>
+          <label class="student-setting-toggle"><input id="classReminders" type="checkbox"> Class reminders</label>
+          <label class="student-setting-toggle"><input id="reduceMotion" type="checkbox"> Reduce motion</label>
+          <button class="student-dashboard-action student-dashboard-action--primary" type="submit">Save preferences</button>
+          <p id="accountSettingsNote" class="student-record-note" role="status"></p>
+        </form>
+        <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Privacy%20or%20data%20request">Privacy and data request</a>
+      </section>
+
+      <section class="card" aria-labelledby="studentLinksTitle">
+        <p class="eyebrow">Student services</p>
+        <h2 id="studentLinksTitle">Your CFL</h2>
+        <div class="student-quick-links">
+          <a class="student-quick-link" href="/student/practice"><strong>English Practice</strong><span>Lessons, flashcards, and review</span></a>
+          <a class="student-quick-link" href="/student/messages"><strong>Messages</strong><span>Talk with your assigned instructor</span></a>
+          <a class="student-quick-link" href="/student/notifications"><strong>Notifications</strong><span>Class updates and feedback alerts</span></a>
+        </div>
+      </section>
     </div>
   </main>
 </div>

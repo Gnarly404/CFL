@@ -1,0 +1,210 @@
+// @vitest-environment jsdom
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import programmes from '../../src/data/programmes.json';
+import { loadPage, tick } from '../helpers.js';
+
+const getDoc = vi.fn();
+const getDocs = vi.fn();
+const loadOverview = vi.fn();
+const loadMyClasses = vi.fn();
+const listPublicProgrammes = vi.fn();
+const updateStudentDoc = vi.fn();
+const sendEmailVerification = vi.fn();
+const requestPasswordReset = vi.fn();
+const uploadBytes = vi.fn();
+const getDownloadURL = vi.fn();
+const storageRef = vi.fn();
+let studentRecord;
+let accountRecord;
+let applicationRecord;
+let enrolmentRecords;
+
+vi.mock('firebase/firestore', () => ({
+  collection: (_db, path) => ({ path }),
+  doc: (_db, ...path) => ({ path: path.join('/') }),
+  getDoc: (...args) => getDoc(...args),
+  getDocs: (...args) => getDocs(...args),
+  query: (collectionRef, ...constraints) => ({ collection: collectionRef, constraints }),
+  serverTimestamp: () => 'SERVER_TIMESTAMP',
+  updateDoc: (...args) => updateStudentDoc(...args),
+  where: (field, op, value) => ({ field, op, value }),
+}));
+vi.mock('firebase/auth', () => ({ sendEmailVerification: (...args) => sendEmailVerification(...args) }));
+vi.mock('firebase/storage', () => ({
+  getDownloadURL: (...args) => getDownloadURL(...args),
+  ref: (...args) => storageRef(...args),
+  uploadBytes: (...args) => uploadBytes(...args),
+}));
+vi.mock('@/auth/guards.js', () => ({ guardPage: vi.fn().mockResolvedValue({ user: { uid: 'stu1', displayName: 'Amina Otieno', email: 'amina@example.test', emailVerified: true } }) }));
+vi.mock('@/services/firebase-db.js', () => ({ dbService: () => ({}) }));
+vi.mock('@/services/firebase-storage.js', () => ({ storageService: () => ({}) }));
+vi.mock('@/services/password-service.js', () => ({ requestPasswordReset: (...args) => requestPasswordReset(...args) }));
+vi.mock('@/services/schedule-service.js', () => ({ loadMyClasses: (...args) => loadMyClasses(...args) }));
+vi.mock('@/services/programme-service.js', () => ({ listPublicProgrammes: (...args) => listPublicProgrammes(...args) }));
+vi.mock('@/practice/overview.js', () => ({ loadOverview: (...args) => loadOverview(...args) }));
+vi.mock('@/practice/engine.js', () => ({ pickContinue: vi.fn().mockReturnValue(null) }));
+vi.mock('@/ui/portal-shell.js', () => ({ mountPortalShell: vi.fn() }));
+vi.mock('@/ui/notification-badge.js', () => ({ mountNotificationBadge: vi.fn() }));
+
+const snapshot = (record) => ({ exists: () => record !== null, data: () => record });
+const enrollmentDocs = () => enrolmentRecords.map((record, index) => ({ id: `e${index}`, data: () => record }));
+
+async function open() {
+  vi.resetModules();
+  loadPage('student/dashboard.html');
+  await import('@/pages/student-dashboard.js');
+  await tick();
+}
+
+const fullProfile = () => ({
+  firstName: 'Amina', middleName: 'Wanjiku', surname: 'Otieno', dateOfBirth: '2004-05-12',
+  gender: 'female', phoneNumber: '+254700000001', nationality: 'kenyan', applicationReference: 'CFL-2026-00124',
+  guardian: { name: 'Jane Otieno', relationship: 'parent', phoneNumber: '+254700000002', emergencyContact: 'Jane Otieno' },
+});
+const futureClass = () => ({
+  id: 'class1', programmeId: 'english-beginner-1', title: 'Speaking practice',
+  startsAtMs: Date.now() + 86_400_000, endsAtMs: Date.now() + 90_000_000,
+  mode: 'in_person', location: 'Room 2', instructorName: 'Jane Doe', joinLink: null, notes: '', cancelled: false,
+});
+
+beforeEach(() => {
+  studentRecord = { displayName: 'Amina Otieno', profile: fullProfile() };
+  accountRecord = { displayName: 'Amina Otieno', status: 'active', applicationId: 'app1' };
+  applicationRecord = {
+    reference: 'CFL-2026-00124', status: 'approved', programmeId: 'english-beginner-1',
+    applicant: { firstName: 'Registration', middleName: 'Form', surname: 'Record', dateOfBirth: '2004-05-12', gender: 'female', phoneNumber: '+254700000001', nationality: 'kenyan' },
+    guardian: { name: 'Jane Otieno', relationship: 'parent', phoneNumber: '+254700000002', emergencyContact: 'Jane Otieno' },
+  };
+  enrolmentRecords = [{ studentId: 'stu1', programmeId: 'english-beginner-1', status: 'active', createdAt: new Date('2026-09-01T00:00:00Z') }];
+  getDoc.mockReset().mockImplementation(async (ref) => {
+    if (ref.path === 'students/stu1') return snapshot(studentRecord);
+    if (ref.path === 'users/stu1') return snapshot(accountRecord);
+    if (ref.path === 'applications/app1') return snapshot(applicationRecord);
+    return snapshot(null);
+  });
+  getDocs.mockReset().mockImplementation(async (queryRef) => ({ docs: queryRef.collection.path === 'enrolments' ? enrollmentDocs() : [] }));
+  updateStudentDoc.mockReset().mockResolvedValue();
+  sendEmailVerification.mockReset().mockResolvedValue();
+  requestPasswordReset.mockReset().mockResolvedValue();
+  uploadBytes.mockReset().mockResolvedValue({ ref: { id: 'avatar-ref' } });
+  getDownloadURL.mockReset().mockResolvedValue('https://storage.example.test/student-avatar');
+  storageRef.mockReset().mockReturnValue({ path: 'users/stu1/avatar/profile' });
+  loadOverview.mockReset().mockResolvedValue({ entries: [] });
+  loadMyClasses.mockReset().mockResolvedValue({ classes: [futureClass()], programmeIds: ['english-beginner-1'] });
+  listPublicProgrammes.mockReset().mockResolvedValue(programmes);
+});
+
+describe('student dashboard', () => {
+  it('shows active enrollment, student number, application state, and next class', async () => {
+    await open();
+    expect(document.getElementById('studentStage').textContent).toBe('Active student');
+    expect(document.getElementById('studentNumber').textContent).toContain('CFL-2026-00124');
+    expect(document.getElementById('enrolmentDetails').textContent).toContain(programmes[1].name);
+    expect(document.getElementById('enrolmentDetails').textContent).toContain('Active');
+    expect(document.getElementById('applicationStatus').textContent).toBe('Approved');
+    expect(document.getElementById('nextClassContent').textContent).toContain('Speaking practice');
+  });
+
+  it('uses registration-submitted identity ahead of the copied student profile', async () => {
+    studentRecord.profile.firstName = 'Stale';
+    studentRecord.profile.surname = 'Copy';
+    await open();
+    expect(document.getElementById('studentDetails').textContent).toContain('Registration Form Record');
+    expect(document.getElementById('studentDetails').textContent).not.toContain('Stale Copy');
+    expect(document.getElementById('studentNumber').textContent).toContain(applicationRecord.reference);
+  });
+
+  it('lets a student switch between multiple enrollment records', async () => {
+    enrolmentRecords = [
+      { studentId: 'stu1', programmeId: 'english-beginner-1', status: 'active' },
+      { studentId: 'stu1', programmeId: 'english-intermediate', status: 'pending_start' },
+    ];
+    await open();
+    const picker = document.getElementById('enrolmentPicker');
+    expect(picker.hidden).toBe(false);
+    picker.value = '1';
+    picker.dispatchEvent(new Event('change'));
+    expect(document.getElementById('enrolmentDetails').textContent).toContain(programmes[3].name);
+    expect(document.getElementById('enrolmentDetails').textContent).toContain('Starting soon');
+  });
+
+  it('positions the compact programme action below the no-enrollment message', async () => {
+    enrolmentRecords = [];
+    await open();
+    const details = document.getElementById('enrolmentDetails');
+    const action = details.querySelector('a');
+    expect(details.classList.contains('is-empty')).toBe(true);
+    expect(action.textContent).toBe('View programmes');
+    expect(action.classList.contains('student-compact-action')).toBe(true);
+  });
+
+  it('shows profile completion only for missing required details', async () => {
+    await open();
+    expect(document.getElementById('profileCompletion').hidden).toBe(true);
+    applicationRecord.applicant = { firstName: 'Amina' };
+    applicationRecord.guardian = {};
+    studentRecord = { displayName: 'Amina Otieno', profile: { firstName: 'Amina' } };
+    await open();
+    expect(document.getElementById('profileCompletion').hidden).toBe(false);
+    expect(document.getElementById('profileCompletionText').textContent).toContain('Date of birth');
+  });
+
+  it('distinguishes admitted students from active learners and graduates', async () => {
+    enrolmentRecords = [{ studentId: 'stu1', programmeId: 'english-beginner-1', status: 'pending_start' }];
+    await open();
+    expect(document.getElementById('studentStage').textContent).toBe('Admitted');
+    enrolmentRecords = [{ studentId: 'stu1', programmeId: 'english-beginner-1', status: 'completed' }];
+    await open();
+    expect(document.getElementById('studentStage').textContent).toBe('Graduate / Alumni');
+  });
+
+  it('keeps private identity and emergency details collapsed by default', async () => {
+    await open();
+    expect(document.getElementById('studentDetails').textContent).toContain('Registration Form Record');
+    expect(document.getElementById('studentDetails').textContent).not.toContain('2004');
+    expect(document.getElementById('studentDetails').textContent).not.toContain('+254700000001');
+    expect(document.getElementById('sensitiveDetails').open).toBe(false);
+    expect(document.getElementById('privateStudentDetails').textContent).toContain('+254700000001');
+  });
+
+  it('saves preferences and applies reduced motion immediately', async () => {
+    delete document.documentElement.dataset.reduceMotion;
+    await open();
+    document.getElementById('preferredLanguage').value = 'sw';
+    document.getElementById('emailUpdates').checked = true;
+    document.getElementById('reduceMotion').checked = true;
+    document.getElementById('studentPreferencesForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    await tick();
+    expect(updateStudentDoc).toHaveBeenCalledWith(
+      expect.objectContaining({ path: 'students/stu1' }),
+      expect.objectContaining({ preferences: expect.objectContaining({ preferredLanguage: 'sw', emailUpdates: true, reduceMotion: true }) }),
+    );
+    expect(document.documentElement.dataset.reduceMotion).toBe('true');
+  });
+
+  it('sends password reset and email verification links from account settings', async () => {
+    await open();
+    document.getElementById('sendPasswordReset').click();
+    expect(requestPasswordReset).toHaveBeenCalledWith('amina@example.test');
+    const verification = document.getElementById('sendVerificationEmail');
+    verification.hidden = false;
+    verification.click();
+    expect(sendEmailVerification).toHaveBeenCalledTimes(1);
+  });
+
+  it('uploads a profile image to the private student avatar path and saves its URL', async () => {
+    await open();
+    const picker = document.getElementById('studentAvatarUpload');
+    const file = new File(['image'], 'profile.webp', { type: 'image/webp' });
+    Object.defineProperty(picker, 'files', { configurable: true, value: [file] });
+    picker.dispatchEvent(new Event('change'));
+    await tick();
+    expect(storageRef).toHaveBeenCalledWith(expect.anything(), 'users/stu1/avatar/profile');
+    expect(uploadBytes).toHaveBeenCalledWith(expect.anything(), file, { contentType: 'image/webp' });
+    expect(updateStudentDoc).toHaveBeenCalledWith(
+      expect.objectContaining({ path: 'students/stu1' }),
+      expect.objectContaining({ profile: expect.objectContaining({ photoURL: 'https://storage.example.test/student-avatar' }) }),
+    );
+    expect(document.getElementById('studentAvatar').hidden).toBe(false);
+  });
+});

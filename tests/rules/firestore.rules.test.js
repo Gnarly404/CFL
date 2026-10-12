@@ -38,6 +38,7 @@ beforeEach(async () => {
     await setDoc(doc(db, 'programmeStaff/open'), { programmeId: 'open', instructorIds: ['ins1', 'ins3'] });
     await setDoc(doc(db, 'catalogMeta/programmes'), { deletedIds: [], inactiveIds: [] });
     await setDoc(doc(db, 'practiceContent/grammar'), { skill: 'grammar', lessons: [] });
+    await setDoc(doc(db, 'applications/student-app'), { userId: 'stu1', email: 'student@example.test', status: 'approved' });
     await setDoc(doc(db, 'programmes/open'), { active: true, title: 'General English' });
     await setDoc(doc(db, 'programmes/hidden'), { active: false, title: 'Draft' });
     await setDoc(doc(db, 'lessons/live'), { published: true, title: 'Greetings' });
@@ -83,9 +84,13 @@ describe('identity documents', () => {
 });
 
 describe('admissions', () => {
-  it('applications are readable by admins only and never writable from a browser', async () => {
+  it('students read only their linked application and nobody writes applications from a browser', async () => {
     await assertSucceeds(getDoc(doc(as.admin(), 'applications/app1')));
+    await assertSucceeds(getDoc(doc(as.student(), 'applications/student-app')));
     await assertFails(getDoc(doc(as.student(), 'applications/app1')));
+    await assertFails(getDoc(doc(as.student('stu2'), 'applications/student-app')));
+    await assertSucceeds(getDocs(query(collection(as.student(), 'applications'), where('userId', '==', 'stu1'))));
+    await assertFails(getDocs(collection(as.student(), 'applications')));
     await assertFails(getDoc(doc(as.anon(), 'applications/app1')));
     await assertFails(setDoc(doc(as.anon(), 'applications/new'), { email: 'x@y.co' }));
     await assertFails(updateDoc(doc(as.admin(), 'applications/app1'), { status: 'approved' }));
