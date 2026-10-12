@@ -12,6 +12,7 @@ describe('instructor navigation', () => {
     const link = document.querySelector('#portalSide a[href="/instructor/curriculum"]');
     expect(link?.getAttribute('aria-current')).toBe('page');
     expect(document.querySelector('#portalBottom a[href="/instructor/curriculum"]')).not.toBeNull();
+    expect([...document.querySelectorAll('#portalSide nav a, #portalBottom a')].every((entry) => entry.querySelector('svg'))).toBe(true);
   });
 
   it('does not expose instructor curriculum navigation to admins', () => {

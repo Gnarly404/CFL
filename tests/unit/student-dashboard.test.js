@@ -49,9 +49,10 @@ vi.mock('@/ui/notification-badge.js', () => ({ mountNotificationBadge: vi.fn() }
 const snapshot = (record) => ({ exists: () => record !== null, data: () => record });
 const enrollmentDocs = () => enrolmentRecords.map((record, index) => ({ id: `e${index}`, data: () => record }));
 
-async function open() {
+async function open(hash = '') {
   vi.resetModules();
   loadPage('student/dashboard.html');
+  window.history.replaceState({}, '', `/student/dashboard${hash}`);
   await import('@/pages/student-dashboard.js');
   await tick();
 }
@@ -95,6 +96,15 @@ beforeEach(() => {
 });
 
 describe('student dashboard', () => {
+  it('opens account settings when entered from the Settings navigation link', async () => {
+    const showModal = vi.fn(function show() { this.open = true; });
+    Object.defineProperty(HTMLDialogElement.prototype, 'showModal', { configurable: true, value: showModal });
+    await open('#settings');
+    expect(showModal).toHaveBeenCalledOnce();
+    expect(document.getElementById('studentSettingsDialog').open).toBe(true);
+    delete HTMLDialogElement.prototype.showModal;
+  });
+
   it('shows active enrollment, student number, application state, and next class', async () => {
     await open();
     expect(document.getElementById('studentStage').textContent).toBe('Active student');
@@ -103,6 +113,7 @@ describe('student dashboard', () => {
     expect(document.getElementById('enrolmentDetails').textContent).toContain('Active');
     expect(document.getElementById('applicationStatus').textContent).toBe('Approved');
     expect(document.getElementById('nextClassContent').textContent).toContain('Speaking practice');
+    expect(document.querySelectorAll('.student-quick-link-icon svg')).toHaveLength(3);
   });
 
   it('uses registration-submitted identity ahead of the copied student profile', async () => {

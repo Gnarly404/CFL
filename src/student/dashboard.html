@@ -22,18 +22,26 @@
 
   <main class="portal-main">
     <header class="portal-head" data-reveal="fade">
-      <p id="dayMessage" class="muted"></p>
-      <h1>Welcome, <span id="studentName">…</span></h1>
-      <p class="student-dashboard-meta">
-        <span id="studentNumber">Student number loading…</span>
-        <span id="studentStage" class="status-pill"></span>
-        <span id="profileStatus" class="status-pill">Account status loading…</span>
-        <span id="emailVerification" class="status-pill"></span>
-      </p>
-      <button type="button" class="voice-chip voice-chip--quiet" data-voice-line="dash.auto" aria-pressed="false">
-        <span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
-        <span>Hear greeting</span>
-      </button>
+      <div class="student-dashboard-heading">
+        <div class="student-avatar" role="group" aria-label="Student profile photo">
+          <img id="studentAvatar" alt="Student profile photo" hidden>
+          <span id="studentAvatarInitials" aria-hidden="true">?</span>
+        </div>
+        <div class="student-dashboard-heading-copy">
+          <p id="dayMessage" class="muted"></p>
+          <h1>Welcome, <span id="studentName">…</span></h1>
+          <p class="student-dashboard-meta">
+            <span id="studentNumber">Student number loading…</span>
+            <span id="studentStage" class="status-pill"></span>
+            <span id="profileStatus" class="status-pill">Account status loading…</span>
+            <span id="emailVerification" class="status-pill"></span>
+          </p>
+          <button type="button" class="voice-chip voice-chip--quiet" data-voice-line="dash.auto" aria-pressed="false">
+            <span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span>
+            <span>Hear greeting</span>
+          </button>
+        </div>
+      </div>
     </header>
 
     <p id="studentDashboardNote" class="form-note" role="status" hidden></p>
@@ -186,12 +194,15 @@
         <p class="student-record-note">Completing online practice does not automatically award an official qualification.</p>
       </section>
 
-      <section class="card" aria-labelledby="accountSettingsTitle">
+      <dialog id="studentSettingsDialog" class="student-settings-dialog" aria-labelledby="accountSettingsTitle">
+        <div class="student-settings-dialog-header">
+          <p class="eyebrow">Account</p>
+          <form method="dialog"><button type="submit" class="student-dashboard-action">Close settings</button></form>
+        </div>
+        <section class="student-settings-content" aria-labelledby="accountSettingsTitle">
         <div class="student-card-heading"><div><p class="eyebrow">Account and privacy</p><h2 id="accountSettingsTitle">Account settings</h2></div></div>
         <div class="student-account-layout">
           <div class="student-photo-control">
-            <img id="studentAvatar" alt="Student profile photo" hidden>
-            <span id="studentAvatarInitials" aria-hidden="true">?</span>
             <div>
               <label class="student-dashboard-action" for="studentAvatarUpload">Change profile photo</label>
               <input id="studentAvatarUpload" type="file" accept="image/png,image/jpeg,image/webp" hidden>
@@ -214,15 +225,16 @@
           <p id="accountSettingsNote" class="student-record-note" role="status"></p>
         </form>
         <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Privacy%20or%20data%20request">Privacy and data request</a>
-      </section>
+        </section>
+      </dialog>
 
       <section class="card" aria-labelledby="studentLinksTitle">
         <p class="eyebrow">Student services</p>
         <h2 id="studentLinksTitle">Your CFL</h2>
         <div class="student-quick-links">
-          <a class="student-quick-link" href="/student/practice"><strong>English Practice</strong><span>Lessons, flashcards, and review</span></a>
-          <a class="student-quick-link" href="/student/messages"><strong>Messages</strong><span>Talk with your assigned instructor</span></a>
-          <a class="student-quick-link" href="/student/notifications"><strong>Notifications</strong><span>Class updates and feedback alerts</span></a>
+          <a class="student-quick-link" href="/student/practice"><span class="student-quick-link-icon" data-student-link-icon="reading"></span><strong>English Practice</strong><span>Lessons, flashcards, and review</span></a>
+          <a class="student-quick-link" href="/student/messages"><span class="student-quick-link-icon" data-student-link-icon="messages"></span><strong>Messages</strong><span>Talk with your assigned instructor</span></a>
+          <a class="student-quick-link" href="/student/notifications"><span class="student-quick-link-icon" data-student-link-icon="notifications"></span><strong>Notifications</strong><span>Class updates and feedback alerts</span></a>
         </div>
       </section>
     </div>

@@ -18,12 +18,28 @@ import { PROGRAMME_GROUP_LABELS } from '@/utils/programme-schema.js';
 import { enrollmentStatusLabel, legalName, missingRequiredProfileFields } from '@/student/dashboard.js';
 import { STATUS_LABELS } from '@/utils/application-status.js';
 import { h } from '@/ui/h.js';
+import { icon } from '@/ui/icons.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
 import { mountNotificationBadge } from '@/ui/notification-badge.js';
 
 mountPortalShell('dashboard');
 const session = await guardPage({ roles: ['student'] });
 mountNotificationBadge(session.user.uid);
+document.querySelectorAll('[data-student-link-icon]').forEach((node) => {
+  node.replaceChildren(icon(node.dataset.studentLinkIcon, { size: 22 }));
+});
+const studentSettingsDialog = document.getElementById('studentSettingsDialog');
+const openSettingsFromLocation = () => {
+  if (window.location.hash === '#settings' && studentSettingsDialog && !studentSettingsDialog.open) studentSettingsDialog.showModal?.();
+};
+studentSettingsDialog?.addEventListener('click', (event) => {
+  if (event.target === studentSettingsDialog) studentSettingsDialog.close?.();
+});
+studentSettingsDialog?.addEventListener('close', () => {
+  if (window.location.hash === '#settings') window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}`);
+});
+window.addEventListener('hashchange', openSettingsFromLocation);
+openSettingsFromLocation();
 const hour = new Date().getHours();
 const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
 const dayMessage = document.getElementById('dayMessage');
