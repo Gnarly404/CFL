@@ -10,6 +10,7 @@ export const ROUTES = Object.freeze({
   activate: '/activate',
   student: '/student/dashboard',
   practice: '/student/practice',
+  progress: '/student/progress',
   practiceLesson: '/student/practice/lesson',
   practiceMistakes: '/student/practice/mistakes',
   practiceFlashcards: '/student/practice/flashcards',

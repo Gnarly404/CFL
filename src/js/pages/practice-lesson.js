@@ -123,7 +123,12 @@ async function runLesson(tracker) {
       h('p', { class: 'step-meta' }, `Step 1 of 2: ${learnLabel}`),
       h('h1', { id: 'stageHeading', tabindex: '-1' }, lesson.title),
       ...learnBody(),
-      h('div', { class: 'actions' }, h('button', { class: 'btn btn-primary', type: 'button', id: 'startBtn' }, lesson.passage || lesson.listening ? 'Start questions' : 'Start practice')),
+      h('div', { class: 'lesson-start-prompt' },
+        h('div', { class: 'lesson-start-copy' },
+          h('p', { class: 'eyebrow' }, 'Next step'),
+          h('h2', {}, 'Practice questions'),
+          h('p', { id: 'lessonStartDescription', class: 'muted' }, `Answer ${questions.length} questions to check what you have learned. Your result and any mistakes will be saved when you finish.`)),
+        h('button', { class: 'btn btn-primary lesson-start-button', type: 'button', id: 'startBtn', 'aria-describedby': 'lessonStartDescription' }, `Start ${questions.length} questions`)),
     );
     document.getElementById('startBtn').addEventListener('click', () => { step = 'question'; render(); });
   }

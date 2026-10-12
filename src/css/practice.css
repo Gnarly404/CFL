@@ -9,6 +9,12 @@
 .skill .progress{margin-top:var(--s1)}
 .stage{max-width:720px}
 .stage h1,.stage h2{outline:none}
+.lesson-start-prompt{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:var(--s4);margin-top:var(--s5);padding:var(--s4);border:1px solid var(--line);border-left:4px solid var(--coral-strong);border-radius:8px;background:#f8fafc}
+.lesson-start-copy{min-width:0}
+.lesson-start-copy .eyebrow{margin:0 0 var(--s1);color:var(--coral-strong)}
+.lesson-start-copy h2{margin:0;color:var(--navy);font:700 1.05rem/1.25 var(--font-head)}
+.lesson-start-copy p:last-child{margin:var(--s1) 0 0;font-size:.84rem;line-height:1.45}
+.lesson-start-button{flex:0 0 auto;white-space:nowrap}
 .rule-list,.example-list{margin:0 0 var(--s4);padding-left:1.2rem}
 .example-list li{margin-bottom:var(--s2)}
 .example-list em{color:var(--muted);font-style:normal;font-size:.85rem}
@@ -54,6 +60,33 @@
 .goal-opt:has(input:checked){border-color:var(--navy);background:#eef3f9;font-weight:700}
 .goal-opt:has(input:focus-visible){box-shadow:var(--focus)}
 .today-list{margin:var(--s3) 0;padding-left:1.1rem}
+.practice-review-card{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:var(--s5);border-left:4px solid var(--navy);background:#f5f9fc}
+.practice-review-card.has-due{border-left-color:var(--coral-strong);background:#fff8f5}
+.practice-review-copy{min-width:0}
+.practice-review-heading{display:flex;align-items:center;gap:var(--s3);margin-bottom:var(--s1)}
+.practice-review-heading .eyebrow{margin:0;color:var(--coral-strong)}
+.practice-review-badge{display:inline-flex;align-items:center;min-height:25px;padding:3px 9px;border:1px solid #cbd6e1;border-radius:999px;background:#fff;color:var(--navy);font-size:.72rem;font-weight:700}
+.practice-review-badge.is-due{border-color:#edb2a8;background:#fff;color:#a72f22}
+.practice-review-card h2{margin:0;color:var(--navy);font:700 1.2rem/1.2 var(--font-head)}
+.practice-review-copy>p{max-width:600px;margin:var(--s2) 0;color:var(--muted);font-size:.88rem}
+.practice-review-stats{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s4);padding-top:var(--s2);border-top:1px solid rgba(30,58,95,.12);color:var(--muted);font-size:.78rem}
+.practice-review-stats strong{color:var(--navy);font:700 1rem var(--font-head)}
+.practice-review-action{flex:0 0 auto;min-height:42px}
+.practice-review-action:not(.btn-primary){border-color:var(--navy);color:var(--navy);font-weight:700}
+.recommended-section{margin-top:var(--s3);padding-top:var(--s3);border-top:1px solid var(--line)}
+.recommended-heading{display:flex;align-items:center;justify-content:space-between;gap:var(--s3);margin-bottom:var(--s3)}
+.recommended-heading .eyebrow{margin:0 0 2px;color:var(--coral-strong);font-size:.75rem}
+.recommended-heading h3{margin:0;color:var(--navy);font:700 1.05rem/1.25 var(--font-head)}
+.recommended-count{color:var(--muted);font-size:.76rem;white-space:nowrap}
+.recommendation-list{display:grid;gap:var(--s2);margin:0;padding:0;list-style:none}
+.recommendation-item{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:var(--s4);padding:var(--s3);border:1px solid var(--line);border-radius:8px;background:#f8fafc}
+.recommendation-copy{min-width:0}
+.recommendation-title{display:block;color:var(--navy);font:700 .9rem/1.3 var(--font-head)}
+.recommendation-copy p{margin:3px 0 6px;color:var(--muted);font-size:.8rem;line-height:1.4}
+.recommendation-duration{display:inline-flex;align-items:center;min-height:22px;padding:2px 8px;border-radius:999px;background:#eaf1f9;color:var(--navy);font-size:.7rem;font-weight:700}
+.recommendation-action{min-height:38px;padding-inline:var(--s3);white-space:nowrap}
+.recommendation-action:hover{border-color:var(--coral-strong-hover);background:var(--coral-strong-hover);color:#fff}
+.recommendation-action:focus-visible,.practice-review-action:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
 .badge-list{display:flex;flex-wrap:wrap;gap:var(--s2);margin:0;padding:0;list-style:none}
 .badge-list .badge{padding:4px 12px}
 .flashcard{padding:var(--s6) var(--s4);margin:0 0 var(--s4);text-align:center;border:1px solid var(--line);border-radius:var(--radius);background:#f3f8fc}
@@ -102,3 +135,6 @@ mark sup{font-weight:700;margin-left:2px}
   .inbox:not(.inbox--open) .inbox-thread { display: none; }
   .inbox-back { display: inline-flex; }
 }
+@media(max-width:520px){.lesson-start-prompt{grid-template-columns:minmax(0,1fr);gap:var(--s3)}.lesson-start-button{width:100%;white-space:normal}}
+@media(max-width:640px){.practice-review-card{grid-template-columns:minmax(0,1fr);gap:var(--s3)}.practice-review-action{width:max-content;max-width:100%}.recommendation-item{grid-template-columns:minmax(0,1fr);gap:var(--s2)}.recommendation-action{width:max-content;max-width:100%}}
+@media(prefers-reduced-motion:reduce){.recommendation-action,.practice-review-action{transition:none}}

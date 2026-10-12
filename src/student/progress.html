@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" data-auth="pending" data-veil="on">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Learning Progress - CFL</title>
+<link rel="stylesheet" href="/css/foundation.css">
+<link rel="stylesheet" href="/css/fonts.css">
+<link rel="stylesheet" href="/css/motion.css">
+<link rel="stylesheet" href="/css/tokens.css">
+<link rel="stylesheet" href="/css/components.css">
+<link rel="stylesheet" href="/css/portal.css">
+<link rel="stylesheet" href="/css/practice.css">
+<link rel="stylesheet" href="/css/progress.css">
+<link rel="icon" type="image/png" href="/images/logo.png">
+<script type="module" src="/js/pages/student-progress.js"></script>
+<script type="module" src="/js/motion/boot.js"></script>
+</head>
+<body class="portal student-progress-page">
+<div class="portal-shell">
+  <aside class="portal-side" id="portalSide"></aside>
+  <main class="portal-main">
+    <header class="portal-head progress-head" data-reveal="fade">
+      <div>
+        <p class="eyebrow">Your learning record</p>
+        <h1>Progress</h1>
+        <p class="muted">See what you have completed, revisit lesson results, and choose what to practise next.</p>
+      </div>
+      <button id="refreshProgress" class="progress-refresh" type="button">Refresh progress</button>
+    </header>
+
+    <p id="progressNotice" class="form-note" role="status" hidden></p>
+    <div class="stack" data-reveal-group>
+      <section class="progress-metrics" aria-label="Learning summary" aria-live="polite">
+        <article class="progress-metric progress-metric--lessons">
+          <span class="progress-metric-label">Lessons completed</span>
+          <strong id="completedCount">—</strong>
+          <span id="lessonTotal" class="muted">Loading lessons…</span>
+        </article>
+        <article class="progress-metric progress-metric--score">
+          <span class="progress-metric-label">Average best score</span>
+          <strong id="averageScore">—</strong>
+          <span id="scoreCount" class="muted">Across scored lessons</span>
+        </article>
+        <article class="progress-metric progress-metric--words">
+          <span class="progress-metric-label">Words mastered</span>
+          <strong id="masteredWords">—</strong>
+          <span id="wordTotal" class="muted">Vocabulary cards</span>
+        </article>
+      </section>
+
+      <section class="card progress-skills-card" aria-labelledby="skillProgressTitle">
+        <div class="student-card-heading">
+          <div><p class="eyebrow">At a glance</p><h2 id="skillProgressTitle">Progress by skill</h2></div>
+          <a class="student-dashboard-action" href="/student/practice">Go to English Practice</a>
+        </div>
+        <div id="skillProgress" class="progress-skill-list" aria-live="polite">
+          <p class="muted">Loading saved progress…</p>
+        </div>
+      </section>
+
+      <section class="card progress-lessons-card" aria-labelledby="lessonHistoryTitle">
+        <div class="student-card-heading">
+          <div><p class="eyebrow">Saved results</p><h2 id="lessonHistoryTitle">Lesson progress</h2></div>
+          <span id="filteredCount" class="progress-result-count" aria-live="polite"></span>
+        </div>
+        <div class="progress-filters">
+          <label for="skillFilter">Skill
+            <select id="skillFilter" class="form-select"><option value="all">All skills</option></select>
+          </label>
+          <label for="statusFilter">Status
+            <select id="statusFilter" class="form-select">
+              <option value="all">All lessons</option>
+              <option value="completed">Completed</option>
+              <option value="not-started">Not started</option>
+            </select>
+          </label>
+        </div>
+        <div id="lessonProgress" class="progress-lesson-list" aria-live="polite">
+          <p class="muted">Retrieving your saved lesson results…</p>
+        </div>
+        <p class="student-record-note">Practice scores reflect your online English Practice activity. They are not official examination results or qualifications.</p>
+      </section>
+    </div>
+  </main>
+</div>
+<nav class="portal-bottom" id="portalBottom" aria-label="Student portal mobile"></nav>
+</body>
+</html>

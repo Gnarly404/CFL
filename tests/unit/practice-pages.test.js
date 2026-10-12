@@ -53,7 +53,11 @@ describe('practice hub page', () => {
     loadMistakes.mockResolvedValue({ x: { questionId: 'be-1', status: 'open', dueAt: '2000-01-01T00:00:00.000Z' } });
     await open('student/practice/index.html', '@/pages/practice-hub.js');
     expect(text('hubContinueText')).toContain('Vocabulary: 1 of 4');
-    expect(text('skillSections')).toContain('1 to review · 1 due now');
+    expect(text('skillSections')).toContain('1 saved question');
+    expect(text('skillSections')).toContain('1 due now');
+    expect(document.querySelector('.practice-review-card').classList.contains('has-due')).toBe(true);
+    expect(document.querySelector('.practice-review-action').textContent).toBe('Review due mistakes');
+    expect(document.querySelector('#todayCard .recommendation-item')).not.toBeNull();
   });
 
   it('warns when progress cannot be loaded but still renders', async () => {
@@ -128,5 +132,39 @@ describe('my mistakes page', () => {
     loadMistakes.mockRejectedValue(new Error('offline'));
     await open('student/practice/mistakes.html', '@/pages/practice-mistakes.js');
     expect(document.getElementById('mistakesNote').hidden).toBe(false);
+  });
+});
+
+describe('student progress page', () => {
+  beforeEach(() => {
+    loadLessonProgress.mockReset().mockResolvedValue({});
+    loadWordProgress.mockReset().mockResolvedValue({});
+  });
+
+  it('shows saved lesson results and filters by skill and completion', async () => {
+    const lesson = grammar.lessons[0];
+    loadLessonProgress.mockImplementation(async (_uid, skill) => (skill === 'grammar' ? {
+      [lesson.id]: { status: 'completed', bestPercent: 88, lastPercent: 75, attempts: 2, updatedAt: '2026-10-10T12:00:00.000Z' },
+    } : {}));
+    await open('student/progress.html', '@/pages/student-progress.js');
+
+    expect(text('completedCount')).toBe('1');
+    expect(text('averageScore')).toBe('88%');
+    expect(text('lessonProgress')).toContain(lesson.title);
+    expect(text('lessonProgress')).toContain('Best 88%');
+    expect(text('lessonProgress')).toContain('2 attempts');
+    expect(document.querySelector('#portalSide a[href="/student/progress"]')).not.toBeNull();
+    expect(document.querySelector('#portalBottom a[href="/student/progress"]')).not.toBeNull();
+
+    const skillFilter = document.getElementById('skillFilter');
+    skillFilter.value = 'grammar';
+    skillFilter.dispatchEvent(new Event('change'));
+    expect(document.querySelectorAll('#lessonProgress .progress-lesson-row')).toHaveLength(grammar.lessons.length);
+    expect([...document.querySelectorAll('#lessonProgress .progress-lesson-skill')].every((node) => node.textContent === 'Grammar')).toBe(true);
+
+    const statusFilter = document.getElementById('statusFilter');
+    statusFilter.value = 'completed';
+    statusFilter.dispatchEvent(new Event('change'));
+    expect(document.querySelectorAll('#lessonProgress .progress-lesson-row')).toHaveLength(1);
   });
 });

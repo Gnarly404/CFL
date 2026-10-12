@@ -53,8 +53,16 @@ function draw(container, state) {
     streak.current > 0 || streak.longest > 0
       ? h('p', { class: 'muted' }, `Streak: ${streak.current} ${streak.current === 1 ? 'day' : 'days'} · best ${streak.longest} (last ${HISTORY_DAYS} days)`)
       : '',
-    recs.length ? h('div', {}, h('h3', {}, 'Recommended for you'),
-      h('ul', { class: 'review-list' }, ...recs.map((rec) => h('li', {}, h('strong', {}, rec.title), h('div', { class: 'muted' }, rec.why), h('a', { class: 'link-btn', href: hrefFor(rec) }, `Start (about ${rec.minutes} min)`))))) : '',
+    recs.length ? h('section', { class: 'recommended-section', 'aria-labelledby': 'recommendedTitle' },
+      h('div', { class: 'recommended-heading' },
+        h('div', {}, h('p', { class: 'eyebrow' }, 'Your next steps'), h('h3', { id: 'recommendedTitle' }, 'Recommended for you')),
+        h('span', { class: 'recommended-count' }, `${recs.length} ${recs.length === 1 ? 'suggestion' : 'suggestions'}`)),
+      h('ul', { class: 'recommendation-list' }, ...recs.map((rec) => h('li', { class: `recommendation-item recommendation-item--${rec.type}` },
+        h('div', { class: 'recommendation-copy' },
+          h('strong', { class: 'recommendation-title' }, rec.title),
+          h('p', { class: 'muted' }, rec.why),
+          h('span', { class: 'recommendation-duration' }, `About ${rec.minutes} min`)),
+        h('a', { class: 'btn btn-primary recommendation-action', href: hrefFor(rec) }, 'Start'))))) : '',
     earned.length ? h('div', {}, h('h3', {}, 'Achievements'), h('ul', { class: 'badge-list' }, ...earned.map((b) => h('li', { class: 'badge', title: b.detail }, b.label)))) : '',
   );
 }

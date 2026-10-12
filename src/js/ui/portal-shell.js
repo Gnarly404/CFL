@@ -7,7 +7,7 @@ const ITEMS = [
   { key: 'practice', label: 'English Practice', short: 'Practice', href: ROUTES.practice, icon: 'reading' },
   { key: 'notifications', label: 'Notifications', short: 'Alerts', href: ROUTES.notifications, badge: true, icon: 'notifications' },
   { key: 'schedule', label: 'Schedule', short: 'Schedule', href: ROUTES.schedule, icon: 'schedule' },
-  { key: 'progress', label: 'Progress', short: 'Progress', icon: 'progress' },
+  { key: 'progress', label: 'Progress', short: 'Progress', href: ROUTES.progress, icon: 'progress' },
   { key: 'messages', label: 'Messages', short: 'Messages', href: ROUTES.messages, icon: 'messages' },
 ];
 

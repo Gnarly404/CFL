@@ -1,0 +1,55 @@
+.student-progress-page .progress-head{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--s4)}
+.student-progress-page .progress-head .eyebrow{margin:0 0 var(--s1);color:var(--coral-strong)}
+.student-progress-page .progress-head h1{margin-bottom:var(--s2)}
+.student-progress-page .progress-head .muted{max-width:620px;margin:0}
+.student-progress-page .student-dashboard-action{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:7px 13px;border:1px solid #aebbc9;border-radius:8px;background:var(--surface);color:var(--navy);font:700 .82rem/1.2 var(--font-body);text-align:center;text-decoration:none;cursor:pointer;transition:background var(--t-fast),border-color var(--t-fast),color var(--t-fast),transform var(--t-fast)}
+.student-progress-page .student-dashboard-action:hover{border-color:var(--navy);background:#eef3f9;color:var(--navy)}
+.student-progress-page .student-dashboard-action:active{transform:translateY(1px)}
+.student-progress-page .student-dashboard-action:focus-visible,.progress-refresh:focus-visible{outline:none;box-shadow:var(--focus)}
+.student-progress-page .student-dashboard-action--primary{border-color:var(--coral-strong);background:var(--coral-strong);color:#fff}
+.student-progress-page .student-dashboard-action--primary:hover{border-color:var(--coral-strong-hover);background:var(--coral-strong-hover);color:#fff}
+.student-progress-page .progress-refresh{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 var(--s4);border:1px solid var(--navy);border-radius:8px;background:var(--navy);color:#fff;font:700 .86rem var(--font-body);cursor:pointer;white-space:nowrap;transition:background var(--t-fast),border-color var(--t-fast),transform var(--t-fast)}
+.student-progress-page .progress-refresh:hover{border-color:var(--ink);background:var(--ink)}
+.student-progress-page .progress-refresh:active{transform:translateY(1px)}
+.progress-refresh:disabled{opacity:.7;cursor:wait}
+.progress-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s3)}
+.progress-metric{position:relative;display:grid;align-content:start;gap:var(--s1);min-width:0;min-height:126px;padding:var(--s4);overflow:hidden;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.progress-metric::before{position:absolute;inset:0 auto 0 0;width:4px;background:var(--navy);content:""}
+.progress-metric--score::before{background:var(--coral-strong)}
+.progress-metric--words::before{background:#287b58}
+.progress-metric-label{color:var(--muted);font-size:.8rem;font-weight:700}
+.progress-metric strong{color:var(--navy);font:700 2rem/1.1 var(--font-head)}
+.progress-metric .muted{margin:0;font-size:.8rem}
+.student-progress-page .student-card-heading{align-items:center}
+.progress-skill-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:var(--s6)}
+.progress-skill-row{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s2);padding:var(--s3) 0;border-top:1px solid var(--line)}
+.progress-skill-copy{display:grid;gap:2px}
+.progress-skill-title{display:flex;align-items:baseline;justify-content:space-between;gap:var(--s3)}
+.progress-skill-title h3{margin:0;color:var(--navy);font:700 .96rem var(--font-head)}
+.progress-skill-title span{color:var(--navy);font-size:.82rem;font-weight:700;white-space:nowrap}
+.progress-skill-copy p{margin:0;font-size:.8rem}
+.progress-bar{height:8px;overflow:hidden;border-radius:999px;background:#e8edf2}
+.progress-bar span{display:block;width:var(--value);height:100%;border-radius:inherit;background:var(--navy);transition:width 450ms ease}
+.progress-skill-row:nth-child(3n + 2) .progress-bar span{background:var(--coral-strong)}
+.progress-skill-row:nth-child(3n) .progress-bar span{background:#287b58}
+.progress-result-count{color:var(--muted);font-size:.82rem;white-space:nowrap}
+.progress-filters{display:grid;grid-template-columns:repeat(2,minmax(0,220px));gap:var(--s3);margin:var(--s3) 0 var(--s4)}
+.progress-filters label{display:grid;gap:var(--s1);color:var(--muted);font-size:.8rem;font-weight:700}
+.student-progress-page .progress-filters .form-select{width:100%;min-height:44px;padding:0 var(--s3);border:1px solid #9aaabd;border-radius:8px;background-color:var(--surface);color:var(--text);font:600 .9rem var(--font-body);cursor:pointer;transition:border-color var(--t-fast),box-shadow var(--t-fast),background var(--t-fast)}
+.student-progress-page .progress-filters .form-select:hover{border-color:var(--navy);background-color:#fbfcfe}
+.student-progress-page .progress-filters .form-select:focus-visible{outline:none;border-color:var(--navy);box-shadow:var(--focus)}
+.progress-lesson-list{display:grid}
+.progress-lesson-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:var(--s4);padding:var(--s3) 0;border-top:1px solid var(--line)}
+.progress-lesson-copy{min-width:0}
+.progress-lesson-heading{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2);margin-bottom:var(--s1)}
+.progress-lesson-skill{color:var(--coral-strong);font-size:.75rem;font-weight:700}
+.progress-lesson-state{padding:3px 8px;border-radius:999px;background:#f0f2f5;color:var(--muted);font-size:.69rem;font-weight:700}
+.progress-lesson-state.is-complete{background:#eaf6ef;color:#17643d}
+.progress-lesson-row h3{margin:0;color:var(--navy);font:700 .98rem/1.3 var(--font-head)}
+.progress-lesson-row p{margin:3px 0 0;font-size:.8rem}
+.progress-lesson-row .student-dashboard-action{flex:0 0 auto}
+.progress-empty{padding:var(--s4) 0;border-top:1px solid var(--line)}
+.student-progress-page .student-record-note{margin-bottom:0}
+@media(max-width:700px){.student-progress-page .progress-head{align-items:flex-start;flex-direction:column}.progress-metrics{grid-template-columns:1fr}.progress-metric{min-height:0}.progress-skill-list{grid-template-columns:1fr}.progress-lesson-row{grid-template-columns:minmax(0,1fr);gap:var(--s2)}.progress-lesson-row .student-dashboard-action{width:max-content}}
+@media(max-width:420px){.progress-filters{grid-template-columns:1fr}.student-progress-page .student-card-heading{align-items:flex-start;flex-direction:column}.student-progress-page .student-card-heading .student-dashboard-action{width:max-content}}
+@media(prefers-reduced-motion:reduce){.progress-bar span{transition:none}}

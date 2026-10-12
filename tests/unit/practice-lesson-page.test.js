@@ -75,6 +75,9 @@ describe('practice lesson page', () => {
   it('runs learn, practice, feedback and results, saving once', async () => {
     await open(`?skill=grammar&id=${lesson.id}`);
     expect(stageText()).toContain(lesson.rule[0]);
+    expect(stageText()).toContain(`Answer ${lesson.questions.length} questions to check what you have learned.`);
+    expect(document.getElementById('startBtn').textContent).toBe(`Start ${lesson.questions.length} questions`);
+    expect(document.getElementById('startBtn').getAttribute('aria-describedby')).toBe('lessonStartDescription');
     click('#startBtn');
     for (const [i, q] of lesson.questions.entries()) {
       expect(document.getElementById('stageHeading').textContent).toBe(q.prompt);
