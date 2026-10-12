@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import programmes from '../../src/data/programmes.json';
 import { loadPage, tick } from '../helpers.js';
 
 const loadMyClasses = vi.fn();
@@ -7,6 +8,7 @@ let failLoad = false;
 vi.mock('@/auth/guards.js', () => ({ guardPage: vi.fn().mockResolvedValue({ user: { uid: 'stu1' } }) }));
 vi.mock('@/ui/notification-badge.js', () => ({ mountNotificationBadge: vi.fn() }));
 vi.mock('@/services/schedule-service.js', () => ({ loadMyClasses: async (...a) => { if (failLoad) throw new Error('offline'); return loadMyClasses(...a); } }));
+vi.mock('@/services/programme-service.js', () => ({ listPublicProgrammes: vi.fn().mockResolvedValue(programmes) }));
 
 const H = 3_600_000;
 const cls = (id, startOffsetH, extra = {}) => ({

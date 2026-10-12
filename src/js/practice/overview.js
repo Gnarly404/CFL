@@ -1,10 +1,11 @@
 import { loadLessonProgress } from '@/services/practice-service.js';
-import { getSkillContent } from './content.js';
+import { getSkillContent, loadPracticeContent } from './content.js';
 import { lessonStatus, nextLesson, skillPercent } from './engine.js';
 import { SKILLS } from './skills.js';
 
 /** Progress for every skill that has content. `failed` is true if any skill's progress could not be loaded. */
 export async function loadOverview(uid) {
+  await loadPracticeContent();
   let failed = false;
   const entries = await Promise.all(SKILLS.filter((skill) => skill.available).map(async (skill) => {
     let progress = {};

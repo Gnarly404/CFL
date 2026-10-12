@@ -36,6 +36,8 @@ beforeEach(async () => {
     await setDoc(doc(db, 'users/stu2'), { uid: 'stu2', role: 'student', status: 'active' });
     await setDoc(doc(db, 'students/stu1'), { uid: 'stu1', profile: {}, preferences: {}, instructorIds: ['ins1'] });
     await setDoc(doc(db, 'programmeStaff/open'), { programmeId: 'open', instructorIds: ['ins1', 'ins3'] });
+    await setDoc(doc(db, 'catalogMeta/programmes'), { deletedIds: [], inactiveIds: [] });
+    await setDoc(doc(db, 'practiceContent/grammar'), { skill: 'grammar', lessons: [] });
     await setDoc(doc(db, 'programmes/open'), { active: true, title: 'General English' });
     await setDoc(doc(db, 'programmes/hidden'), { active: false, title: 'Draft' });
     await setDoc(doc(db, 'lessons/live'), { published: true, title: 'Greetings' });
@@ -91,11 +93,24 @@ describe('admissions', () => {
 });
 
 describe('catalogue and curriculum', () => {
-  it('visitors see only active programmes', async () => {
+  it('visitors see only active programmes; nobody writes them from the browser', async () => {
     await assertSucceeds(getDoc(doc(as.anon(), 'programmes/open')));
     await assertFails(getDoc(doc(as.anon(), 'programmes/hidden')));
     await assertSucceeds(getDocs(query(collection(as.anon(), 'programmes'), where('active', '==', true))));
     await assertSucceeds(getDoc(doc(as.admin(), 'programmes/hidden')));
+    await assertFails(setDoc(doc(as.admin(), 'programmes/new'), { active: true, title: 'New' }));
+    await assertFails(updateDoc(doc(as.admin(), 'programmes/open'), { title: 'Changed' }));
+    await assertFails(setDoc(doc(as.instructor(), 'programmes/open'), { active: true }));
+  });
+
+  it('keeps preset tombstones public-read-only and practice content signed-in-read-only', async () => {
+    await assertSucceeds(getDoc(doc(as.anon(), 'catalogMeta/programmes')));
+    await assertFails(setDoc(doc(as.admin(), 'catalogMeta/programmes'), { deletedIds: [] }));
+    await assertFails(getDoc(doc(as.anon(), 'practiceContent/grammar')));
+    await assertSucceeds(getDoc(doc(as.student(), 'practiceContent/grammar')));
+    await assertSucceeds(getDoc(doc(as.instructor(), 'practiceContent/grammar')));
+    await assertFails(setDoc(doc(as.instructor(), 'practiceContent/grammar'), { lessons: [] }));
+    await assertFails(setDoc(doc(as.admin(), 'practiceContent/grammar'), { lessons: [] }));
   });
 
   it('signed-in users read published lessons; drafts are for staff; only admins write', async () => {

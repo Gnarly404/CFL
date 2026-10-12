@@ -5,6 +5,10 @@ import { loadPage, tick } from '../helpers.js';
 const loadWordProgress = vi.fn();
 const saveWordProgress = vi.fn();
 const recordSession = vi.fn();
+vi.mock('@/practice/content.js', async (importOriginal) => ({
+  ...await importOriginal(),
+  loadPracticeContent: vi.fn().mockResolvedValue({}),
+}));
 vi.mock('@/auth/guards.js', () => ({ guardPage: vi.fn().mockResolvedValue({ user: { uid: 'u1' } }) }));
 vi.mock('@/ui/notification-badge.js', () => ({ mountNotificationBadge: vi.fn() }));
 vi.mock('@/services/practice-service.js', () => ({

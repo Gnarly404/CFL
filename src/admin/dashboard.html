@@ -18,6 +18,7 @@
             <a href="#applications">Applications<span class="nav-attention" data-attention-key="applications" hidden role="status" aria-live="polite" aria-atomic="true"><span aria-hidden="true"></span></span></a>
             <a href="#create-account">Create account</a>
             <a href="#teaching-assignments">Teaching assignments</a>
+            <a href="#programmes">Programmes</a>
             <a href="#programme-staff">Programme staff</a>
             <a href="#accounts">Accounts</a>
         </nav>
@@ -93,6 +94,74 @@
                     <thead><tr><th>Student</th><th>Instructors</th><th>Assign</th></tr></thead>
                     <tbody id="assignmentsBody"></tbody>
                 </table>
+            </div>
+        </section>
+
+        <section class="card admin-section" id="programmes" aria-labelledby="programmesHeading">
+            <div class="card-header"><h2 id="programmesHeading">Programmes</h2></div>
+            <div class="card-body">
+                <p class="login-help">Manage the programme cards and the details shown when a card is opened. Uncheck Published to hide a programme without deleting it.</p>
+                <form id="programmeForm" novalidate>
+                    <div class="row g-3">
+                        <div class="col-md-3 form-group">
+                            <label for="programmeId" class="form-label">Id</label>
+                            <input type="text" class="form-control" id="programmeId" autocomplete="off" maxlength="60" placeholder="english-intake">
+                        </div>
+                        <div class="col-md-5 form-group">
+                            <label for="programmeName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="programmeName" autocomplete="off" maxlength="120" required>
+                        </div>
+                        <div class="col-md-4 form-group">
+                            <label for="programmeCategory" class="form-label">Category</label>
+                            <input type="text" class="form-control" id="programmeCategory" autocomplete="off" maxlength="80" required>
+                        </div>
+                        <div class="col-md-3 form-group">
+                            <label for="programmeGroup" class="form-label">Level</label>
+                            <select class="form-select" id="programmeGroup" required>
+                                <option value="intake">Intake</option>
+                                <option value="beginner">Elementary-Beginner</option>
+                                <option value="intermediate">Intermediate</option>
+                                <option value="advanced">Advanced</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 form-group">
+                            <label for="programmeDuration" class="form-label">Duration</label>
+                            <input type="text" class="form-control" id="programmeDuration" autocomplete="off" maxlength="40" placeholder="4 months" required>
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="programmeSkills" class="form-label">Skills</label>
+                            <input type="text" class="form-control" id="programmeSkills" maxlength="240">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label for="programmeEligibility" class="form-label">Eligibility</label>
+                            <input type="text" class="form-control" id="programmeEligibility" maxlength="160">
+                        </div>
+                        <div class="col-md-3 form-group">
+                            <label for="programmeFeeLocal" class="form-label">Local application fee</label>
+                            <input type="text" class="form-control" id="programmeFeeLocal" maxlength="80">
+                        </div>
+                        <div class="col-md-3 form-group">
+                            <label for="programmeFeeForeign" class="form-label">Foreign application fee</label>
+                            <input type="text" class="form-control" id="programmeFeeForeign" maxlength="80">
+                        </div>
+                        <div class="col-md-2 form-group d-flex align-items-end">
+                            <div class="form-check mb-2">
+                                <input type="checkbox" class="form-check-input" id="programmeActive" checked>
+                                <label for="programmeActive" class="form-check-label">Published</label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end gap-2">
+                            <button type="submit" class="btn btn-primary">Add programme</button>
+                            <button type="button" class="btn btn-outline-secondary" id="programmeReset">Clear</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="table-wrap mt-4">
+                    <table class="table table-hover align-middle">
+                        <thead><tr><th>Programme</th><th>Level</th><th>Duration</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="programmesBody"></tbody>
+                    </table>
+                </div>
             </div>
         </section>
 

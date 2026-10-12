@@ -1,6 +1,7 @@
-import programmes from '../../data/programmes.json';
+import fallbackProgrammes from '../../data/programmes.json';
 import { el } from '@/utils/dom.js';
 import { assignProgramme, listProgrammeStaff } from '@/services/admin-service.js';
+import { listCatalog } from '@/services/programme-service.js';
 
 /**
  * "Programme staff": which instructors teach each programme. Many-to-many, so a programme can list several
@@ -35,6 +36,12 @@ export function initProgrammeStaff({ root = document, say, getUsers }) {
     const users = getUsers();
     const byId = new Map(users.map((u) => [u.uid, u]));
     const instructors = users.filter((u) => u.role === 'instructor' && u.status !== 'disabled');
+    let programmes = fallbackProgrammes;
+    try {
+      programmes = await listCatalog();
+    } catch (error) {
+      console.warn('Could not load the programme catalogue', error?.code ?? error);
+    }
 
     body.replaceChildren(...programmes.map((programme) => {
       const ids = staff.get(programme.id) ?? [];

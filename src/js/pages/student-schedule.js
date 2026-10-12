@@ -1,5 +1,6 @@
 import { guardPage } from '@/auth/guards.js';
-import programmes from '../../data/programmes.json';
+import fallbackProgrammes from '../../data/programmes.json';
+import { listPublicProgrammes } from '@/services/programme-service.js';
 import {
   describeWhen, groupByDay, isHappeningNow, modeLabel, nextClass, splitClasses, formatDay,
 } from '@/schedule/state.js';
@@ -12,6 +13,12 @@ mountPortalShell('schedule');
 const session = await guardPage({ roles: ['student'] });
 mountNotificationBadge(session.user.uid);
 const $ = (id) => document.getElementById(id);
+let programmes = fallbackProgrammes;
+try {
+  programmes = await listPublicProgrammes();
+} catch (error) {
+  console.warn('Could not load programme names', error?.code ?? error);
+}
 const programmeName = (id) => programmes.find((p) => p.id === id)?.name ?? 'Your programme';
 
 function card(c, now) {

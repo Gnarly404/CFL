@@ -1,6 +1,6 @@
 import { guardPage } from '@/auth/guards.js';
 import { ROUTES } from '@/core/routes.js';
-import { questionIndex } from '@/practice/content.js';
+import { loadPracticeContent, questionIndex } from '@/practice/content.js';
 import { dueMistakes } from '@/practice/engine.js';
 import { SKILLS } from '@/practice/skills.js';
 import { loadMistakes } from '@/services/practice-service.js';
@@ -10,6 +10,7 @@ import { mountNotificationBadge } from '@/ui/notification-badge.js';
 
 mountPortalShell('practice');
 const session = await guardPage({ roles: ['student'] });
+await loadPracticeContent();
 mountNotificationBadge(session.user.uid);
 
 let mistakes = {};

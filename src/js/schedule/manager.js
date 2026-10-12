@@ -1,10 +1,9 @@
-import programmes from '../../data/programmes.json';
+import fallbackProgrammes from '../../data/programmes.json';
 import { el } from '@/utils/dom.js';
 import { describeWhen, formatDay, modeLabel } from './state.js';
 import { buildClass } from './validate.js';
+import { listCatalog } from '@/services/programme-service.js';
 import { createClass, listClasses, listMyProgrammeIds, manageScheduledClass } from '@/services/schedule-service.js';
-
-const programmeName = (id) => programmes.find((p) => p.id === id)?.name ?? id;
 
 /** Lets an instructor schedule and manage their own classes. */
 export function initSchedule({ root = document, say, instructor }) {
@@ -15,6 +14,8 @@ export function initSchedule({ root = document, say, instructor }) {
   const empty = (text) => el('tr', {}, el('td', { colspan: 4, class: 'empty' }, text));
   const programmeSelect = field('classProgramme');
   const instructors = [{ uid: instructor.uid, displayName: instructor.displayName }];
+  let catalogue = fallbackProgrammes;
+  const programmeName = (id) => catalogue.find((p) => p.id === id)?.name ?? id;
 
   const submitButton = form.querySelector('button[type="submit"]');
   const programmeNote = root.querySelector('#classProgrammeNote');
@@ -28,7 +29,14 @@ export function initSchedule({ root = document, say, instructor }) {
       console.warn('Could not load assigned programmes', error?.code ?? error);
       say('Your assigned programmes could not be loaded.', 'error');
     }
-    const mine = programmes.filter((p) => ids.includes(p.id));
+    try {
+      catalogue = await listCatalog();
+    } catch (error) {
+      console.warn('Could not load the programme catalogue', error?.code ?? error);
+      catalogue = fallbackProgrammes;
+    }
+    const byId = new Map(catalogue.map((p) => [p.id, p]));
+    const mine = ids.map((id) => byId.get(id) ?? { id, name: id });
     programmeSelect.replaceChildren(
       el('option', { value: '' }, mine.length ? 'Choose a programme…' : 'No programmes assigned'),
       ...mine.map((p) => el('option', { value: p.id }, p.name)),

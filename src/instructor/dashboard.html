@@ -54,6 +54,33 @@
           </table>
         </div>
       </section>
+      <section class="card" id="practice-curriculum" aria-labelledby="curriculumHeading" hidden>
+        <h2 id="curriculumHeading">Practice curriculum</h2>
+        <label for="practiceSkill" class="form-label">Skill</label>
+        <select id="practiceSkill" class="form-select">
+          <option value="grammar">Grammar</option>
+          <option value="vocabulary">Vocabulary</option>
+          <option value="reading">Reading</option>
+          <option value="listening">Listening</option>
+          <option value="speaking">Speaking</option>
+          <option value="writing">Writing</option>
+        </select>
+        <div class="curriculum-editor-layout">
+          <aside class="curriculum-lesson-panel" aria-label="Lessons in selected skill">
+            <h3>Lessons</h3>
+            <ol id="practiceLessonList" class="curriculum-lesson-list"></ol>
+            <button type="button" class="btn btn-outline-secondary" id="addPracticeLesson">Add lesson</button>
+          </aside>
+          <form id="practiceContentForm" novalidate>
+            <div id="practiceLessonFields" class="curriculum-fields"></div>
+            <div class="actions mt-3">
+              <button type="button" class="btn btn-outline-danger" id="deletePracticeLesson">Delete lesson</button>
+              <button type="submit" class="btn btn-primary">Save curriculum</button>
+            </div>
+          </form>
+        </div>
+        <p id="practiceContentNote" class="form-alert" role="status" hidden></p>
+      </section>
     </div>
   </main>
 </div>

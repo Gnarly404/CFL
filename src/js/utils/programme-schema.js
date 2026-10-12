@@ -1,0 +1,81 @@
+// Programme catalogue, shared by the admin form and the adminSaveProgramme function.
+import { cleanText } from './validation.js';
+
+export const PROGRAMME_GROUPS = Object.freeze(['intake', 'beginner', 'intermediate', 'advanced']);
+export const PROGRAMME_GROUP_LABELS = Object.freeze({
+  intake: 'Intake',
+  beginner: 'Elementary-Beginner',
+  intermediate: 'Intermediate',
+  advanced: 'Advanced',
+});
+export const PROGRAMME_ID_RE = /^[a-z0-9][a-z0-9-]{0,59}$/;
+export const PROGRAMME_DEFAULT_DETAILS = Object.freeze({
+  skills: 'Grammar, Writing, Speech, Listening, Reading & Vocabulary',
+  eligibility: 'High School Certificate',
+  applicationFeeLocal: 'KES 1,000',
+  applicationFeeForeign: 'KES 0',
+});
+
+/** Merge saved catalogue records over presets, except ids explicitly removed by an administrator. */
+export function mergeCatalog(remote = [], fallback = [], excludedIds = []) {
+  const excluded = new Set(excludedIds);
+  const byId = new Map(fallback.filter((p) => !excluded.has(p.id)).map((p) => [p.id, { ...p }]));
+  for (const p of remote) {
+    if (excluded.has(p.id)) continue;
+    const previous = byId.get(p.id) ?? {};
+    byId.set(p.id, { ...previous, ...p, details: { ...previous.details, ...p.details } });
+  }
+  return [...byId.values()];
+}
+
+export function slugProgrammeId(name) {
+  return cleanText(name)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60);
+}
+
+/**
+ * Validates a programme the administrator is creating or editing.
+ * @returns {{ ok: boolean, value: object, errors: Record<string, string> }}
+ */
+export function validateProgramme(input) {
+  const src = input && typeof input === 'object' ? input : {};
+  const errors = {};
+  const name = cleanText(src.name);
+  if (!name) errors.name = 'Enter the programme name.';
+  else if (name.length > 120) errors.name = 'Keep the name under 121 characters.';
+
+  const category = cleanText(src.category);
+  if (!category) errors.category = 'Enter a category.';
+  else if (category.length > 80) errors.category = 'Keep the category under 81 characters.';
+
+  const group = typeof src.group === 'string' ? src.group.trim() : '';
+  if (!PROGRAMME_GROUPS.includes(group)) errors.group = 'Choose a level.';
+
+  const duration = cleanText(src.duration);
+  if (!duration) errors.duration = 'Enter the duration.';
+  else if (duration.length > 40) errors.duration = 'Keep the duration under 41 characters.';
+
+  let id = typeof src.id === 'string' ? src.id.trim().toLowerCase() : '';
+  if (!id) id = slugProgrammeId(name);
+  if (!PROGRAMME_ID_RE.test(id)) errors.id = 'Use a short id: lowercase letters, numbers and hyphens.';
+
+  const active = src.active !== false && src.active !== 'false';
+  const detailLimits = { skills: 240, eligibility: 160, applicationFeeLocal: 80, applicationFeeForeign: 80 };
+  const details = {};
+  for (const [key, defaultValue] of Object.entries(PROGRAMME_DEFAULT_DETAILS)) {
+    const raw = src.details?.[key];
+    const value = raw == null ? defaultValue : typeof raw === 'string' ? cleanText(raw) : '';
+    if (raw != null && typeof raw !== 'string') errors[key] = 'Enter text for this programme detail.';
+    else if (value.length > detailLimits[key]) errors[key] = `Keep this detail under ${detailLimits[key] + 1} characters.`;
+    details[key] = value;
+  }
+
+  return {
+    ok: Object.keys(errors).length === 0,
+    errors,
+    value: { id, name, category, group, duration, active, details },
+  };
+}

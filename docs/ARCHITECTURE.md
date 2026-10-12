@@ -69,7 +69,7 @@ Written by "server" means Cloud Functions (Admin SDK); rules deny browser writes
 | `instructors/{uid}` | server; owner edits bio | signed in | bio, assignedCourses |
 | `applications/{id}` | server | admin | reference, status, applicant, guardian, consent, statusHistory |
 | `enrolments/{studentId_programmeId}` | server | owner, admin, assigned instructor | status, instructorIds, applicationId |
-| `programmes`, `courses`, `units`, `lessons`, `questions`, `assignments` | admin | active/published to the right audience | arrive with their sessions |
+| `programmes/{id}` | server (`adminSaveProgramme`, admin only, audited) | visitors see `active` programmes; staff see all | catalogue name, level, duration; instructors never write this |
 | `practiceSessions`, `questionAttempts`, `lessonProgress`, `skillProgress`, `mistakes` | the student (own rows) | owner, admin | English Practice session |
 | `submissions` | student (drafts, then submit) | owner, admin, assigned instructor (submitted only) | locked after submit |
 | `feedback/{submissionId}` | assigned instructor | the student, the writing instructor, admin | overall, notes (quote + comment), never edits the submission |

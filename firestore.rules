@@ -66,12 +66,22 @@ service cloud.firestore {
     // ---------- catalogue and curriculum ----------
     match /programmes/{programmeId} {
       allow read: if resource.data.get('active', false) == true || isStaff();
-      allow write: if isAdmin();
+      allow write: if false;
+    }
+
+    match /catalogMeta/{catalogId} {
+      allow read: if catalogId == 'programmes';
+      allow write: if false;
     }
 
     // Which instructors teach a programme. Written only by the adminAssignProgramme callable.
     match /programmeStaff/{programmeId} {
       allow read: if isAdmin() || (isInstructor() && request.auth.uid in resource.data.get('instructorIds', []));
+      allow write: if false;
+    }
+
+    match /practiceContent/{skillId} {
+      allow read: if signedIn();
       allow write: if false;
     }
 

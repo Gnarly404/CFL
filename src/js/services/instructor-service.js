@@ -1,5 +1,8 @@
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { dbService } from './firebase-db.js';
+import { call } from './callable.js';
+
+export const savePracticeContent = ({ skillId, content }) => call('instructorSavePracticeContent', { skillId, content });
 
 export async function getInstructorDashboardData(uid) {
   const [instructorSnap, studentSnap] = await Promise.all([

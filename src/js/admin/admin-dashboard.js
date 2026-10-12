@@ -4,6 +4,7 @@ import {
 } from '@/utils/application-status.js';
 import { initAssignments } from './assignments.js';
 import { initProgrammeStaff } from './programme-staff.js';
+import { initProgrammes } from './programmes.js';
 import { setAttentionBadge } from '@/ui/attention-badge.js';
 import { validateEmail, validateName } from '@/utils/validation.js';
 import { formatDate } from '@/utils/format.js';
@@ -45,6 +46,7 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
 
   const assignments = initAssignments({ root, say, getUsers: () => knownUsers });
   const programmeStaff = initProgrammeStaff({ root, say, getUsers: () => knownUsers });
+  const programmes = initProgrammes({ root, say, onChange: () => programmeStaff.load() });
 
   async function run(label, work, { reload = ['applications', 'users'] } = {}) {
     try {
@@ -181,10 +183,11 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
     }
     assignments.load();
     programmeStaff.load();
+    programmes.load();
   }
 
   filter?.addEventListener('change', loadApplications);
-  root.querySelector('#refreshAll')?.addEventListener('click', () => { loadApplications(); loadUsers(); });
+  root.querySelector('#refreshAll')?.addEventListener('click', () => { loadApplications(); loadUsers(); programmes.load(); });
 
   createForm?.addEventListener('submit', async (event) => {
     event.preventDefault();

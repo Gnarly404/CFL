@@ -1,5 +1,6 @@
 import { guardPage } from '@/auth/guards.js';
 import { ROUTES } from '@/core/routes.js';
+import { loadPracticeContent } from '@/practice/content.js';
 import { buildDeck, deckCounts, reviewCard } from '@/practice/flashcards.js';
 import { startTracker } from '@/practice/session-tracker.js';
 import { loadWordProgress, saveWordProgress } from '@/services/practice-service.js';
@@ -10,6 +11,7 @@ import { speak, speechSupported } from '@/ui/speech.js';
 
 mountPortalShell('practice');
 const session = await guardPage({ roles: ['student'] });
+await loadPracticeContent();
 mountNotificationBadge(session.user.uid);
 const uid = session.user.uid;
 const stage = document.getElementById('stage');

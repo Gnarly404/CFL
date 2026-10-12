@@ -31,7 +31,7 @@
 - **Firestore rules** read the claim from the token. Identity, admissions, enrolments, payments, certificates, audit logs
   and counters are server-written only. Students write only their own learning state.
 - **Privileged functions** (`decideApplication`, `adminCreateUser`, `adminSetUserStatus`, `adminSetUserRole`,
-  `adminResendInvite`) look the caller up in Firebase Auth on every call, so demoting or disabling someone takes effect
+  `adminResendInvite`, `adminAssignProgramme`, `adminSaveProgramme`) look the caller up in Firebase Auth on every call, so demoting or disabling someone takes effect
   immediately, not when their token expires. Disabling an account also revokes its sessions.
 - **Public functions** (`submitApplication`, `getApplicationStatus`) validate input on the server, rate-limit by hashed
   IP and by email or reference, ignore a hidden honeypot field, and never reveal whether an email or reference exists.

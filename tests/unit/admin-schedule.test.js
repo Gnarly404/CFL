@@ -1,17 +1,20 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import programmes from '../../src/data/programmes.json';
 import { tick } from '../helpers.js';
 
 const listClasses = vi.fn();
 const createClass = vi.fn();
 const manageScheduledClass = vi.fn();
 const listMyProgrammeIds = vi.fn();
+const listCatalog = vi.fn();
 vi.mock('@/services/schedule-service.js', () => ({
   listClasses: (...a) => listClasses(...a),
   createClass: (...a) => createClass(...a),
   manageScheduledClass: (...a) => manageScheduledClass(...a),
   listMyProgrammeIds: (...a) => listMyProgrammeIds(...a),
 }));
+vi.mock('@/services/programme-service.js', () => ({ listCatalog: (...args) => listCatalog(...args) }));
 
 const row = (extra = {}) => ({ id: 'c1', programmeId: 'english-intake', title: 'Speaking', startsAtMs: Date.now() + 86_400_000, endsAtMs: Date.now() + 90_000_000, mode: 'online', instructorName: 'Ms Otieno', cancelled: false, ...extra });
 
@@ -30,7 +33,12 @@ async function setup(list = [], assigned = ['english-intake']) {
 const set = (id, value) => { document.getElementById(id).value = value; };
 const submit = async () => { document.getElementById('classForm').dispatchEvent(new Event('submit', { cancelable: true })); await tick(); };
 
-beforeEach(() => { listMyProgrammeIds.mockReset(); listClasses.mockReset(); createClass.mockReset().mockResolvedValue({ classId: 'new' }); manageScheduledClass.mockReset().mockResolvedValue(); });
+beforeEach(() => {
+  listMyProgrammeIds.mockReset(); listClasses.mockReset();
+  listCatalog.mockReset().mockResolvedValue(programmes.map((p) => ({ ...p, active: true })));
+  createClass.mockReset().mockResolvedValue({ classId: 'new' });
+  manageScheduledClass.mockReset().mockResolvedValue();
+});
 
 describe('instructor class schedule', () => {
   it('loads only the current instructor’s classes and shows an empty state', async () => {

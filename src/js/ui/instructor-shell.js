@@ -4,6 +4,7 @@ import { attentionBadge } from './attention-badge.js';
 
 const ITEMS = [
   { key: 'dashboard', label: 'Dashboard', href: ROUTES.instructor },
+  { key: 'curriculum', label: 'Practice curriculum', href: `${ROUTES.instructor}#practice-curriculum` },
   { key: 'review', label: 'Writing review', href: ROUTES.instructorReview, attention: 'writing-review' },
   { key: 'messages', label: 'Messages', href: ROUTES.instructorMessages },
 ];

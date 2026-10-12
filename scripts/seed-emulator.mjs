@@ -52,9 +52,12 @@ for (const person of people) {
   }
 }
 
-// Let the demo instructor schedule classes: assign them to the first few programmes.
 const demoInstructor = await auth.getUserByEmail(people.find((person) => person.role === 'instructor').email);
 const programmeList = JSON.parse(readFileSync(new URL('../src/data/programmes.json', import.meta.url), 'utf8'));
+await Promise.all(programmeList.map((programme) => db.collection('programmes').doc(programme.id).set({
+  ...programme, active: true, updatedAt: FieldValue.serverTimestamp(),
+}, { merge: true })));
+await db.collection('catalogMeta').doc('programmes').set({ deletedIds: [], inactiveIds: [] }, { merge: true });
 await Promise.all(programmeList.slice(0, 3).map((programme) => db.collection('programmeStaff').doc(programme.id).set({
   programmeId: programme.id, instructorIds: [demoInstructor.uid], updatedAt: FieldValue.serverTimestamp(),
 }, { merge: true })));

@@ -1,4 +1,4 @@
-import vocabulary from '../../data/practice/vocabulary.json';
+import { getSkillContent } from './content.js';
 
 /** Pure flashcard logic: word confidence, spaced scheduling and deck building. */
 
@@ -10,7 +10,7 @@ export const keyOf = (word) => word.toLowerCase();
 
 /** Every vocabulary word with the lesson it comes from. */
 export function allWords() {
-  return vocabulary.lessons.flatMap((lesson) => lesson.words.map((w) => ({ ...w, key: keyOf(w.word), lessonId: lesson.id, lessonTitle: lesson.title })));
+  return getSkillContent('vocabulary').lessons.flatMap((lesson) => (lesson.words ?? []).map((w) => ({ ...w, key: keyOf(w.word), lessonId: lesson.id, lessonTitle: lesson.title })));
 }
 
 /**

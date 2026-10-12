@@ -5,10 +5,12 @@ import { tick } from '../helpers.js';
 
 const listProgrammeStaff = vi.fn();
 const assignProgramme = vi.fn();
+const listCatalog = vi.fn();
 vi.mock('@/services/admin-service.js', () => ({
   listProgrammeStaff: (...a) => listProgrammeStaff(...a),
   assignProgramme: (...a) => assignProgramme(...a),
 }));
+vi.mock('@/services/programme-service.js', () => ({ listCatalog: (...args) => listCatalog(...args) }));
 
 const users = [
   { uid: 'ins1', displayName: 'Ms Otieno', email: 'o@x.com', role: 'instructor', status: 'active' },
@@ -28,7 +30,11 @@ async function setup(staff) {
 }
 const firstRow = () => document.querySelector('#programmeStaffBody tr');
 
-beforeEach(() => { listProgrammeStaff.mockReset(); assignProgramme.mockReset().mockResolvedValue({}); });
+beforeEach(() => {
+  listProgrammeStaff.mockReset();
+  assignProgramme.mockReset().mockResolvedValue({});
+  listCatalog.mockReset().mockResolvedValue(programmes.map((p) => ({ ...p, active: true })));
+});
 
 describe('programme staff', () => {
   it('lists every programme, with none assigned yet', async () => {
