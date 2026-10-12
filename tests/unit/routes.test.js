@@ -29,6 +29,8 @@ describe('canAccess', () => {
     expect(canAccess('instructor', '/admin/dashboard')).toBe(false);
     expect(canAccess('admin', '/admin/dashboard')).toBe(true);
     expect(canAccess('admin', '/instructor/dashboard')).toBe(true);
+    expect(canAccess('instructor', ROUTES.instructorCurriculum)).toBe(true);
+    expect(canAccess('admin', ROUTES.instructorCurriculum)).toBe(false);
     expect(canAccess('student', '/student/dashboard?tab=1')).toBe(true);
     expect(canAccess('admin', '/student/dashboard')).toBe(false);
   });
@@ -50,6 +52,7 @@ describe('loginUrl and postLoginDestination', () => {
     expect(postLoginDestination('student', '/gallery')).toBe('/gallery');
     expect(postLoginDestination('student', '/admin/dashboard')).toBe('/student/dashboard');
     expect(postLoginDestination('admin', null)).toBe('/admin/dashboard');
+    expect(postLoginDestination('admin', ROUTES.instructorCurriculum)).toBe('/admin/dashboard');
     expect(postLoginDestination('student', '//evil.com')).toBe('/student/dashboard');
     expect(postLoginDestination('student', '/login')).toBe('/student/dashboard');
   });

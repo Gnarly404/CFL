@@ -17,6 +17,7 @@ export const ROUTES = Object.freeze({
   schedule: '/student/schedule',
   messages: '/student/messages',
   instructor: '/instructor/dashboard',
+  instructorCurriculum: '/instructor/curriculum',
   instructorReview: '/instructor/review',
   instructorMessages: '/instructor/messages',
   instructorReviewSubmission: '/instructor/review/submission',
@@ -32,6 +33,7 @@ const ROLE_HOME = Object.freeze({
 /** Which roles may open each protected area. Everything else is public. */
 const AREAS = Object.freeze([
   { prefix: '/admin', roles: ['admin'] },
+  { prefix: ROUTES.instructorCurriculum, roles: ['instructor'] },
   { prefix: '/instructor', roles: ['instructor', 'admin'] },
   { prefix: '/student', roles: ['student'] },
 ]);

@@ -8,8 +8,8 @@ import { h } from '@/ui/h.js';
 import { mountInstructorShell } from '@/ui/instructor-shell.js';
 import { refreshWritingAttention } from '@/ui/instructor-attention.js';
 
-mountInstructorShell('review');
 const session = await guardPage({ roles: ['instructor', 'admin'] });
+mountInstructorShell('review', session.role);
 if (session.role === 'instructor') refreshWritingAttention(session.user.uid);
 const stage = document.getElementById('stage');
 const params = new URLSearchParams(window.location.search);

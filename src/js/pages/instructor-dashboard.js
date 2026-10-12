@@ -5,11 +5,9 @@ import { initSchedule } from '@/schedule/manager.js';
 import { h } from '@/ui/h.js';
 import { setAttentionBadge } from '@/ui/attention-badge.js';
 import { mountInstructorShell } from '@/ui/instructor-shell.js';
-import { initPracticeContentEditor } from '@/instructor/practice-content.js';
 
-mountInstructorShell('dashboard');
 const session = await guardPage({ roles: ['instructor', 'admin'] });
-if (session.role === 'instructor') initPracticeContentEditor({ root: document });
+mountInstructorShell('dashboard', session.role);
 const $ = (id) => document.getElementById(id);
 const note = (text, kind = 'error') => { $('dashNote').hidden = false; $('dashNote').dataset.kind = kind; $('dashNote').textContent = text; };
 let instructorName = session.user.displayName || session.user.email;

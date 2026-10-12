@@ -6,13 +6,10 @@ import { ROUTES } from '@/core/routes.js';
 import { lessonUrl } from '@/practice/content.js';
 import { pickContinue } from '@/practice/engine.js';
 import { loadOverview } from '@/practice/overview.js';
-import { mountToday } from '@/practice/today.js';
-import { SKILLS } from '@/practice/skills.js';
 import { STATUS_LABELS } from '@/utils/application-status.js';
 import { h } from '@/ui/h.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
 import { mountNotificationBadge } from '@/ui/notification-badge.js';
-import { skillCard } from '@/ui/skill-card.js';
 
 mountPortalShell('dashboard');
 const session = await guardPage({ roles: ['student'] });
@@ -83,22 +80,16 @@ try {
   console.warn('Could not load the student profile', error?.code ?? error);
 }
 
-// Continue Learning and the practice skill cards come from real lesson progress.
+// Continue Learning is powered by real lesson progress.
 {
   const { entries } = await loadOverview(session.user.uid);
   const pick = pickContinue(entries);
-  const todayEl = document.getElementById('todayCard');
-  if (todayEl) await mountToday(todayEl, { uid: session.user.uid, entries });
   const titleEl = document.getElementById('continueTitle');
   const textEl = document.getElementById('continueText');
   const actionEl = document.getElementById('continueAction');
-  const gridEl = document.getElementById('skillGrid');
   if (titleEl) titleEl.textContent = pick ? pick.next.title : 'All available lessons are complete';
   if (textEl) textEl.textContent = pick ? `${pick.skill.label}: You have completed ${pick.done} of ${pick.lessons.length} lessons. ${pick.next.summary}` : 'You can review any lesson in English Practice.';
   if (actionEl) {
     actionEl.replaceChildren(h('a', { class: 'btn btn-primary', href: pick ? lessonUrl(pick.skill.id, pick.next.id) : ROUTES.practice }, pick ? (pick.done ? 'Continue' : 'Start lesson') : 'Open English Practice'));
-  }
-  if (gridEl) {
-    gridEl.replaceChildren(...SKILLS.map((skill) => skillCard(skill, entries.find((e) => e.skill.id === skill.id), { href: ROUTES.practice })));
   }
 }

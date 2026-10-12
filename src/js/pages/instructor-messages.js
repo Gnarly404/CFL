@@ -6,8 +6,8 @@ import {
 import { mountInstructorShell } from '@/ui/instructor-shell.js';
 import { refreshWritingAttention } from '@/ui/instructor-attention.js';
 
-mountInstructorShell('messages');
 const session = await guardPage({ roles: ['instructor'] });
+mountInstructorShell('messages', session.role);
 refreshWritingAttention(session.user.uid);
 await mountInbox({
   viewer: { uid: session.user.uid, role: 'instructor' },

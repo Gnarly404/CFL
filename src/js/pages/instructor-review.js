@@ -6,8 +6,8 @@ import { h } from '@/ui/h.js';
 import { setAttentionBadge } from '@/ui/attention-badge.js';
 import { mountInstructorShell } from '@/ui/instructor-shell.js';
 
-mountInstructorShell('review');
 const session = await guardPage({ roles: ['instructor', 'admin'] });
+mountInstructorShell('review', session.role);
 const $ = (id) => document.getElementById(id);
 
 let result;

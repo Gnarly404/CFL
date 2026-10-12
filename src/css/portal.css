@@ -38,6 +38,7 @@ body.portal{margin:0;background:var(--bg);color:var(--text);font-family:var(--fo
   .portal-bottom .nav-attention[hidden]{display:none}
   .portal-bottom [aria-current="page"]{color:var(--coral-strong)}
   .portal-bottom [aria-disabled="true"]{opacity:.5}
+  .portal-bottom a,.portal-bottom span{min-width:0;flex:1;padding-inline:2px;font-size:.72rem;line-height:1.1;text-align:center}
 }
 
 /* ---------- Experience layer: calmer type, icon skill cards, quiet motion ---------- */
@@ -112,6 +113,11 @@ a.skill:hover .skill-cta svg{transform:translateX(3px)}
 .schedule-table .btn-delete:hover{background:#fdeceb}
 
 .curriculum-editor-layout{display:grid;grid-template-columns:minmax(210px,280px) minmax(0,1fr);gap:var(--s5);margin-top:var(--s4)}
+.curriculum-skill-picker{display:grid;gap:var(--s2);max-width:480px;margin-top:var(--s4)}
+.curriculum-skill-picker label{font-size:.88rem;font-weight:700;color:var(--navy)}
+.curriculum-skill-select{width:100%;min-height:48px;padding:var(--s2) var(--s3);border:1px solid #9aaabd;border-radius:8px;background:var(--surface);color:var(--navy);font:600 1rem var(--font-body);accent-color:var(--navy)}
+.curriculum-skill-select:hover{border-color:var(--navy)}
+.curriculum-skill-select:focus-visible{outline:3px solid rgba(24,63,105,.24);outline-offset:2px;border-color:var(--navy)}
 .curriculum-lesson-panel{display:grid;align-content:start;gap:var(--s3)}
 .curriculum-lesson-panel h3{margin:0;font:700 1rem var(--font-head);color:var(--navy)}
 .curriculum-lesson-list{display:grid;gap:var(--s2);margin:0;padding:0;list-style:none}

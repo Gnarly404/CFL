@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" data-auth="pending" data-veil="on">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Practice curriculum - CFL</title>
+<link rel="stylesheet" href="/css/foundation.css">
+<link rel="stylesheet" href="/css/fonts.css">
+<link rel="stylesheet" href="/css/motion.css">
+<link rel="stylesheet" href="/css/tokens.css">
+<link rel="stylesheet" href="/css/components.css">
+<link rel="stylesheet" href="/css/portal.css">
+<link rel="icon" type="image/png" href="/images/logo.png">
+<script type="module" src="/js/pages/instructor-curriculum.js"></script>
+<script type="module" src="/js/motion/boot.js"></script>
+</head>
+<body class="portal">
+<div class="portal-shell">
+  <aside class="portal-side" id="portalSide"></aside>
+  <main class="portal-main">
+    <header class="portal-head">
+      <h1>Practice curriculum</h1>
+      <p class="muted">Edit the lessons available to students.</p>
+    </header>
+    <div class="stack">
+      <section class="card" id="practice-curriculum" aria-labelledby="curriculumHeading">
+        <h2 id="curriculumHeading">Lessons</h2>
+        <div class="curriculum-skill-picker">
+          <label for="practiceSkill">Skill</label>
+          <select id="practiceSkill" class="curriculum-skill-select">
+            <option value="grammar">Grammar</option>
+            <option value="vocabulary">Vocabulary</option>
+            <option value="reading">Reading</option>
+            <option value="listening">Listening</option>
+            <option value="speaking">Speaking</option>
+            <option value="writing">Writing</option>
+          </select>
+        </div>
+        <div class="curriculum-editor-layout">
+          <aside class="curriculum-lesson-panel" aria-label="Lessons in selected skill">
+            <h3>Lessons</h3>
+            <ol id="practiceLessonList" class="curriculum-lesson-list"></ol>
+            <button type="button" class="btn btn-outline-secondary" id="addPracticeLesson">Add lesson</button>
+          </aside>
+          <form id="practiceContentForm" novalidate>
+            <div id="practiceLessonFields" class="curriculum-fields"></div>
+            <div class="actions mt-3">
+              <button type="button" class="btn btn-outline-danger" id="deletePracticeLesson">Delete lesson</button>
+              <button type="submit" class="btn btn-primary">Save curriculum</button>
+            </div>
+          </form>
+        </div>
+        <p id="practiceContentNote" class="form-alert" role="status" hidden></p>
+      </section>
+    </div>
+  </main>
+</div>
+<nav class="portal-bottom" id="portalBottom" aria-label="Instructor mobile"></nav>
+</body>
+</html>
