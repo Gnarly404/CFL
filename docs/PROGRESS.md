@@ -12,7 +12,7 @@ upload the latest zip and say "continue with session N"; this file is the handof
 | 3 | Student portal and dashboard | **Started**: Continue Learning and skill cards use real lesson progress. Still open: schedule, materials, fees from real data, profile and settings pages, email change |
 | 4 | English Practice (hub, engine, six skills, results, mistake review) | **Started**: hub, lesson shell, Grammar (5 starter lessons) work end to end. Vocabulary also works (4 starter lessons). Still open: Listening, Speaking, Reading, Writing, a cross-lesson mistake review page, daily goal, recommendations |
 | 5 | Public site, programmes, admissions pages | Planned |
-| 6 | Admin and instructor tools, messaging and notifications | In progress (notifications done; messaging planned) |
+| 6 | Admin and instructor tools, messaging and notifications | In progress (notifications, student-teacher messaging and class announcements done; Administration messages and staff alerts open) |
 | 7 | Personalisation, hardening (CI deploy, accessibility, performance, monitoring), final release zip | Planned |
 
 The owner confirmed this order: student portal and English Practice come before the public site.
@@ -66,7 +66,7 @@ email field and consent checkbox that did not behave on small screens.
 Production spec is the master document and v2 supplies design intent; Vite without a framework; Data Connect removed; functions in
 `europe-west1` on Node 22; routes follow the Production spec (`/programmes`, `/student/dashboard`) rather than the v2 file names;
 mail through SMTP behind one module (swap the provider in `functions/src/lib/mailer.js`); instructors cannot read student learning data
-yet and nobody can create messages yet (both are deliberate, see docs/SECURITY.md).
+yet, and messages are created only by server functions (both are deliberate, see docs/SECURITY.md).
 
 ## Known gaps carried forward
 
