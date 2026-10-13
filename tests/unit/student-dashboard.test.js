@@ -180,6 +180,8 @@ describe('student dashboard', () => {
     expect(document.getElementById('studentNumber').textContent).toContain('CFL-2026-00124');
     expect(document.getElementById('enrolmentDetails').textContent).toContain(programmes[1].name);
     expect(document.getElementById('enrolmentDetails').textContent).toContain('Active');
+    expect(document.querySelector('.student-enrolment-status').classList.contains('status-active')).toBe(true);
+    expect(document.querySelectorAll('.student-enrolment-fact')).toHaveLength(3);
     expect(document.getElementById('applicationStatus').textContent).toBe('Approved');
     expect(document.getElementById('nextClassContent').textContent).toContain('Speaking practice');
     expect(document.querySelectorAll('.student-quick-link-icon svg')).toHaveLength(3);
@@ -206,6 +208,7 @@ describe('student dashboard', () => {
     picker.dispatchEvent(new Event('change'));
     expect(document.getElementById('enrolmentDetails').textContent).toContain(programmes[3].name);
     expect(document.getElementById('enrolmentDetails').textContent).toContain('Starting soon');
+    expect(document.querySelector('.student-enrolment-status').classList.contains('status-pending_start')).toBe(true);
   });
 
   it('positions the compact programme action below the no-enrollment message', async () => {

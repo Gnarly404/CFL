@@ -500,20 +500,21 @@ function renderEnrolment(enrolment) {
   if (!enrolment) {
     enrolmentDetailsEl.classList.add('is-empty');
     enrolmentDetailsEl.replaceChildren(
-      h('p', { class: 'muted' }, 'No programme enrollment is linked to this account yet.'),
-      h('a', { class: 'student-compact-action', href: ROUTES.programmes }, 'View programmes'),
+      h('p', { class: 'muted student-enrolment-empty-copy' }, 'No programme enrollment is linked to this account yet.'),
+      h('a', { class: 'student-compact-action student-enrolment-action', href: ROUTES.programmes }, 'View programmes'),
     );
     return;
   }
   enrolmentDetailsEl.classList.remove('is-empty');
   const programme = programmeById.get(enrolment.programmeId);
   enrolmentDetailsEl.replaceChildren(
-    h('p', { class: 'student-programme-name' }, programme?.name ?? enrolment.programmeId ?? 'Programme'),
-    h('span', { class: `status-pill status-${enrolment.status ?? 'unknown'}` }, enrollmentStatusLabel(enrolment.status)),
-    h('dl', { class: 'student-facts' },
-      ...fact('Level', PROGRAMME_GROUP_LABELS[programme?.group] ?? ''),
-      ...fact('Student number', profile.applicationReference),
-      ...fact('Enrollment recorded', displayDate(enrolment.createdAt))),
+    h('div', { class: 'student-enrolment-header' },
+      h('p', { class: 'student-programme-name' }, programme?.name ?? enrolment.programmeId ?? 'Programme'),
+      h('span', { class: `status-pill student-enrolment-status status-${enrolment.status ?? 'unknown'}` }, enrollmentStatusLabel(enrolment.status))),
+    h('dl', { class: 'student-enrolment-facts' },
+      h('div', { class: 'student-enrolment-fact' }, h('dt', {}, 'Level'), h('dd', {}, PROGRAMME_GROUP_LABELS[programme?.group] ?? 'Not specified')),
+      h('div', { class: 'student-enrolment-fact' }, h('dt', {}, 'Student number'), h('dd', {}, profile.applicationReference || 'Not assigned')),
+      h('div', { class: 'student-enrolment-fact' }, h('dt', {}, 'Enrollment recorded'), h('dd', {}, displayDate(enrolment.createdAt) || 'Not available'))),
   );
 }
 
