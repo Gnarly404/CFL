@@ -6,6 +6,11 @@ import { scanParallax } from './parallax.js';
 import { scanSplit } from './split-text.js';
 import { scanTilt } from './tilt.js';
 import { scanNavGlide } from './nav-glide.js';
+import { scanGlide } from './glide.js';
+import { scanRows } from './rows.js';
+import { scanToast } from './toast.js';
+import { scanPresence } from './presence.js';
+import { scanForms } from './form-motion.js';
 import { initTransitions } from './transition.js';
 
 /** Turns every motion feature off and makes sure nothing stays hidden. */
@@ -22,6 +27,11 @@ function scan(node) {
   scanParallax(node);
   scanTilt(node);
   scanNavGlide();
+  scanGlide(node);
+  scanRows(node);
+  scanToast(node);
+  scanPresence(node);
+  scanForms(node);
 }
 
 /** Starts the motion layer. Safe to call on any page; does nothing visible when motion is unavailable. */

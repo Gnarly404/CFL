@@ -2,260 +2,285 @@
 <html lang="en" data-veil="on">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Apply · Centre of Foreign Learning</title>
-    
-    <!-- Google Fonts -->
-    
-    <!-- CSS Files -->
-    <link rel="stylesheet" href="/css/foundation.css">
-<link rel="stylesheet" href="/css/fonts.css">
-<link rel="stylesheet" href="/css/motion.css">
-    <link rel="stylesheet" href="/css/registration.css">
-    <link rel="stylesheet" href="/css/multi-step-form.css">
     <link rel="icon" type="image/png" href="/images/logo.png">
-<script type="module" src="/js/motion/boot.js"></script>
+    <link rel="stylesheet" href="/css/foundation.css">
+    <link rel="stylesheet" href="/css/fonts.css">
+    <link rel="stylesheet" href="/css/motion.css">
+    <link rel="stylesheet" href="/css/tokens.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/registration.css">
+    <script type="module" src="/js/motion/boot.js"></script>
 </head>
-<body>
-    <div class="hero-section">
-        <div class="hero-image-container">
-            <img src="/images/hero-section.jpeg" alt="">
-        </div>
-        <div class="hero-content">
-            <div class="hero-left">
+<body class="apply">
+    <a class="skip-link" href="#applyMain">Skip to the application form</a>
+    <div class="apply-shell">
+        <aside class="apply-rail">
+            <a class="apply-brand" href="/">
+                <img src="/images/logo.png" alt="" width="40" height="40">
+                <span>Centre of Foreign Learning</span>
+            </a>
+            <div class="apply-intro">
+                <p class="apply-eyebrow">Admissions</p>
                 <h1>Apply to study at CFL</h1>
-                <p>Tell us about the student. It takes about five minutes.</p>
+                <p>Tell us about the student. It takes about five minutes, and what you type stays on this device until you send it.</p>
             </div>
-        </div>
-    </div>
-    
-    <div class="registration-container" data-reveal>
-        <div class="progress-container">
-            <div class="progress-bar">
-                <div id="profileProgress" class="progress"></div>
-            </div>
-            <div class="progress-percentage">0%</div>
-        </div>
+            <ol class="apply-steps" id="applySteps" aria-label="Application steps">
+                <li data-state="current" aria-current="step"><button type="button" disabled><span class="apply-step-dot" aria-hidden="true">1</span><span class="apply-step-name">Legal identity</span><span class="visually-hidden apply-step-state">Current step</span></button></li>
+                <li data-state="todo"><button type="button" disabled><span class="apply-step-dot" aria-hidden="true">2</span><span class="apply-step-name">Personal details</span><span class="visually-hidden apply-step-state">Not started</span></button></li>
+                <li data-state="todo"><button type="button" disabled><span class="apply-step-dot" aria-hidden="true">3</span><span class="apply-step-name">Identification</span><span class="visually-hidden apply-step-state">Not started</span></button></li>
+                <li data-state="todo"><button type="button" disabled><span class="apply-step-dot" aria-hidden="true">4</span><span class="apply-step-name">Contact and residence</span><span class="visually-hidden apply-step-state">Not started</span></button></li>
+                <li data-state="todo"><button type="button" disabled><span class="apply-step-dot" aria-hidden="true">5</span><span class="apply-step-name">Emergency contact</span><span class="visually-hidden apply-step-state">Not started</span></button></li>
+                <li data-state="todo"><button type="button" disabled><span class="apply-step-dot" aria-hidden="true">6</span><span class="apply-step-name">Education and application</span><span class="visually-hidden apply-step-state">Not started</span></button></li>
+                <li data-state="todo"><button type="button" disabled><span class="apply-step-dot" aria-hidden="true">7</span><span class="apply-step-name">Review and send</span><span class="visually-hidden apply-step-state">Not started</span></button></li>
+            </ol>
+            <p class="apply-help">Questions before you apply? <a href="/#contacts">Contact admissions</a>.</p>
+        </aside>
 
-        <p id="draftNotice" class="form-alert" role="status" hidden></p>
-        <form id="registrationForm" class="multi-step-form" novalidate>
-            <div class="hp-field" aria-hidden="true"><label for="website">Leave this field empty</label><input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></div>
-            <p id="formError" class="form-alert" role="alert" hidden></p>
-            <div class="form-steps">
-                <div class="step active" data-step="1">
-                    <h2>Legal identity</h2>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="firstName">First Name <span class="required">*</span></label>
-                            <input type="text" id="firstName" name="firstName" required autocomplete="given-name">
-                        </div>
-                        <div class="form-group">
-                            <label for="middleName">Middle Name</label>
-                            <input type="text" id="middleName" name="middleName" autocomplete="additional-name">
-                        </div>
+        <main class="apply-main" id="applyMain">
+            <div class="registration-container" data-reveal data-motion-scope>
+                <div class="progress-container">
+                    <div class="progress-meta">
+                        <p class="apply-step-label" id="stepLabel">Step 1 of 7 · Legal identity</p>
+                        <div class="progress-percentage">0%</div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="surname">Surname <span class="required">*</span></label>
-                            <input type="text" id="surname" name="surname" required autocomplete="family-name">
-                        </div>
-                        <div class="form-group">
-                            <label for="dateOfBirth">Date of Birth <span class="required">*</span></label>
-                            <input type="date" id="dateOfBirth" name="dateOfBirth" required autocomplete="bday">
-                        </div>
-                    </div>
+                    <div class="progress-bar"><div id="profileProgress" class="apply-progress-fill"></div></div>
                 </div>
 
-                <div class="step" data-step="2">
-                    <h2>Personal details</h2>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <fieldset class="gender-fieldset">
-                            <legend>Gender <span class="required">*</span></legend>
-                            <div class="gender-options">
-                                <label class="radio-container">
-                                    <input type="radio" name="gender" value="male" required>
-                                    Male
-                                    <span class="checkmark"></span>
-                                </label>
-                                <label class="radio-container">
-                                    <input type="radio" name="gender" value="female">
-                                    Female
-                                    <span class="checkmark"></span>
-                                </label>
-                                <label class="radio-container">
-                                    <input type="radio" name="gender" value="other">
-                                    Other
-                                    <span class="checkmark"></span>
+                <p id="draftNotice" class="form-alert" role="status" data-enter hidden></p>
+                <form id="registrationForm" class="multi-step-form" data-motion-form novalidate>
+                    <div class="hp-field" aria-hidden="true"><label for="website">Leave this field empty</label><input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></div>
+                    <p id="formError" class="form-alert" role="alert" data-enter hidden></p>
+                    <div class="form-steps">
+                        <div class="step active" data-step="1">
+                            <h2>Legal identity</h2>
+                            <p class="form-step-intro">Enter the names exactly as they appear on the applicant's official identification.</p>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="firstName">First Name <span class="required">*</span></label>
+                                    <input type="text" class="form-control" id="firstName" name="firstName" required autocomplete="given-name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="middleName">Middle Name</label>
+                                    <input type="text" class="form-control" id="middleName" name="middleName" autocomplete="additional-name">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="surname">Surname <span class="required">*</span></label>
+                                    <input type="text" class="form-control" id="surname" name="surname" required autocomplete="family-name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="dateOfBirth">Date of Birth <span class="required">*</span></label>
+                                    <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth" required autocomplete="bday">
+                                    <p class="hint">Applicants under 18 need a parent or legal guardian to give consent in step 5.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step" data-step="2">
+                            <h2>Personal details</h2>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <fieldset class="gender-fieldset">
+                                    <legend>Gender <span class="required">*</span></legend>
+                                    <div class="gender-options">
+                                        <label class="radio-container">
+                                            <input type="radio" name="gender" value="male" required>
+                                            Male
+                                            <span class="checkmark"></span>
+                                        </label>
+                                        <label class="radio-container">
+                                            <input type="radio" name="gender" value="female">
+                                            Female
+                                            <span class="checkmark"></span>
+                                        </label>
+                                        <label class="radio-container">
+                                            <input type="radio" name="gender" value="other">
+                                            Other
+                                            <span class="checkmark"></span>
+                                        </label>
+                                    </div>
+                                    </fieldset>
+                                </div>
+                                <div class="form-group">
+                                    <label for="nationality">Nationality <span class="required">*</span></label>
+                                    <input type="text" class="form-control" id="nationality" name="nationality" required autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step" data-step="3">
+                            <h2>Identification</h2>
+                            <p class="form-step-intro">We use this to confirm who the applicant is. Only the last four characters are shown when you review your answers.</p>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="identificationType">Identification type <span class="required">*</span></label>
+                                    <select id="identificationType" class="form-select" name="identificationType" required>
+                                        <option value="">Select identification type</option>
+                                        <option value="national_id">National ID</option>
+                                        <option value="passport">Passport</option>
+                                        <option value="birth_certificate">Birth certificate</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="identificationNumber">Identification number <span class="required">*</span></label>
+                                    <input type="text" class="form-control" id="identificationNumber" name="identificationNumber" required autocomplete="off" maxlength="64">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step" data-step="4">
+                            <h2>Contact and residence</h2>
+                            <p class="form-step-intro">We send the verification code and your application reference to this email address.</p>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="email">Email <span class="required">*</span></label>
+                                    <input type="email" class="form-control" id="email" name="email" required autocomplete="email">
+                                </div>
+                                <div class="form-group">
+                                    <label for="phoneNumber">Current phone number <span class="required">*</span></label>
+                                    <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" required autocomplete="tel">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="residentialAddress">Residential address <span class="required">*</span></label>
+                                    <input type="text" class="form-control" id="residentialAddress" name="residentialAddress" required autocomplete="street-address" maxlength="200">
+                                </div>
+                                <div class="form-group">
+                                    <label for="countryOfResidence">Country of residence <span class="required">*</span></label>
+                                    <input type="text" class="form-control" id="countryOfResidence" name="countryOfResidence" required autocomplete="country-name">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="step" data-step="5">
+                            <h2>Emergency contact</h2>
+                            <p class="form-step-intro">Provide one person we can contact if needed. For applicants under 18, this person must be a parent or legal guardian.</p>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="contactName">Contact person's name <span class="required">*</span></label>
+                                    <input type="text" class="form-control" id="contactName" name="contactName" required autocomplete="name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="contactRelationship">Relationship to applicant <span class="required">*</span></label>
+                                    <select id="contactRelationship" class="form-select" name="contactRelationship" required>
+                                        <option value="">Select relationship</option>
+                                        <option value="parent">Parent</option>
+                                        <option value="guardian">Legal guardian</option>
+                                        <option value="sibling">Sibling</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="contactPhone">Contact person's phone number <span class="required">*</span></label>
+                                    <input type="tel" class="form-control" id="contactPhone" name="contactPhone" required autocomplete="tel">
+                                </div>
+                            </div>
+                            <div id="guardianConsentGroup" class="conditional-consent" data-enter hidden>
+                                <p class="form-step-intro">The parent or legal guardian listed above must review and complete this consent.</p>
+                                <label class="consent" for="guardianConsent">
+                                    <input type="checkbox" id="guardianConsent" name="guardianConsent" value="yes">
+                                    <span>I am the parent or legal guardian named above. I consent to this application and to CFL using the applicant's information to assess it and provide learning services.</span>
                                 </label>
                             </div>
-                            </fieldset>
                         </div>
-                        <div class="form-group">
-                            <label for="nationality">Nationality <span class="required">*</span></label>
-                            <input type="text" id="nationality" name="nationality" required autocomplete="off">
-                        </div>
-                    </div>
-                </div>
 
-                <div class="step" data-step="3">
-                    <h2>Identification</h2>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="identificationType">Identification type <span class="required">*</span></label>
-                            <select id="identificationType" name="identificationType" required>
-                                <option value="">Select identification type</option>
-                                <option value="national_id">National ID</option>
-                                <option value="passport">Passport</option>
-                                <option value="birth_certificate">Birth certificate</option>
-                            </select>
+                        <div class="step" data-step="6">
+                            <h2>Education and application</h2>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="highestQualification">Highest relevant previous qualification <span class="required">*</span></label>
+                                    <select id="highestQualification" class="form-select" name="highestQualification" required>
+                                        <option value="">Select qualification</option>
+                                        <option value="none">No formal qualification yet</option>
+                                        <option value="primary">Primary school certificate</option>
+                                        <option value="secondary">Secondary school certificate</option>
+                                        <option value="certificate">Certificate</option>
+                                        <option value="diploma">Diploma</option>
+                                        <option value="bachelors">Bachelor's degree</option>
+                                        <option value="postgraduate">Postgraduate qualification</option>
+                                        <option value="other">Other qualification</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="institutionGroup" data-enter>
+                                    <label for="institutionAttended">Institution attended <span class="required" data-required-for="institutionAttended">*</span></label>
+                                    <input type="text" class="form-control" id="institutionAttended" name="institutionAttended" autocomplete="organization">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group" id="completionYearGroup" data-enter>
+                                    <label for="completionYear">Completion year <span class="required" data-required-for="completionYear">*</span></label>
+                                    <input type="number" class="form-control" id="completionYear" name="completionYear" min="1900" inputmode="numeric">
+                                </div>
+                                <div class="form-group">
+                                    <label for="programmeId">Requested programme <span class="required">*</span></label>
+                                    <select id="programmeId" class="form-select" name="programmeId" required>
+                                        <option value="">Loading programmes…</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="consent" for="consent">
+                                    <input type="checkbox" id="consent" name="consent" value="yes" required>
+                                    <span>I confirm these details are accurate, have read the <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Notice</a>, and consent to CFL using this information to assess my application and contact me.</span>
+                                </label>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="identificationNumber">Identification number <span class="required">*</span></label>
-                            <input type="text" id="identificationNumber" name="identificationNumber" required autocomplete="off" maxlength="64">
+                        <div class="step" data-step="7">
+                            <h2>Review and send</h2>
+                            <p class="form-step-intro">Check your answers. Use Back to change anything. We will then email a 6-digit code to confirm your email address.</p>
+                            <dl id="reviewList" class="review-list"></dl>
                         </div>
                     </div>
-                </div>
 
-                <div class="step" data-step="4">
-                    <h2>Contact and residence</h2>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="email">Email <span class="required">*</span></label>
-                            <input type="email" id="email" name="email" required autocomplete="email">
-                        </div>
-                        <div class="form-group">
-                            <label for="phoneNumber">Current phone number <span class="required">*</span></label>
-                            <input type="tel" id="phoneNumber" name="phoneNumber" required autocomplete="tel">
-                        </div>
+                    <div class="form-navigation">
+                        <button type="button" class="btn btn-prev" disabled><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Back</button>
+                        <button type="button" class="btn btn-next">Next<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+                        <button type="submit" class="btn btn-submit" hidden>Send application</button>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="residentialAddress">Residential address <span class="required">*</span></label>
-                            <input type="text" id="residentialAddress" name="residentialAddress" required autocomplete="street-address" maxlength="200">
-                        </div>
-                        <div class="form-group">
-                            <label for="countryOfResidence">Country of residence <span class="required">*</span></label>
-                            <input type="text" id="countryOfResidence" name="countryOfResidence" required autocomplete="country-name">
-                        </div>
-                    </div>
-                </div>
+                </form>
 
-                <div class="step" data-step="5">
-                    <h2>Emergency contact</h2>
-                    <p class="form-step-intro">Provide one person we can contact if needed. For applicants under 18, this person must be a parent or legal guardian.</p>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="contactName">Contact person's name <span class="required">*</span></label>
-                            <input type="text" id="contactName" name="contactName" required autocomplete="name">
-                        </div>
-                        <div class="form-group">
-                            <label for="contactRelationship">Relationship to applicant <span class="required">*</span></label>
-                            <select id="contactRelationship" name="contactRelationship" required>
-                                <option value="">Select relationship</option>
-                                <option value="parent">Parent</option>
-                                <option value="guardian">Legal guardian</option>
-                                <option value="sibling">Sibling</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
+                <section id="otpVerification" class="otp-verification hidden" data-enter aria-live="polite">
+                    <div class="otp-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7.5 8 6 8-6"/></svg>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="contactPhone">Contact person's phone number <span class="required">*</span></label>
-                            <input type="tel" id="contactPhone" name="contactPhone" required autocomplete="tel">
-                        </div>
+                    <div class="otp-header">
+                        <h2>Verify your email</h2>
+                        <p>We've sent a 6-digit verification code to <strong id="otpEmail"></strong>.</p>
                     </div>
-                    <div id="guardianConsentGroup" class="conditional-consent" hidden>
-                        <p class="form-step-intro">The parent or legal guardian listed above must review and complete this consent.</p>
-                        <label class="consent" for="guardianConsent">
-                            <input type="checkbox" id="guardianConsent" name="guardianConsent" value="yes">
-                            <span>I am the parent or legal guardian named above. I consent to this application and to CFL using the applicant's information to assess it and provide learning services.</span>
-                        </label>
-                    </div>
-                </div>
 
-                <div class="step" data-step="6">
-                    <h2>Education and application</h2>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="highestQualification">Highest relevant previous qualification <span class="required">*</span></label>
-                            <select id="highestQualification" name="highestQualification" required>
-                                <option value="">Select qualification</option>
-                                <option value="none">No formal qualification yet</option>
-                                <option value="primary">Primary school certificate</option>
-                                <option value="secondary">Secondary school certificate</option>
-                                <option value="certificate">Certificate</option>
-                                <option value="diploma">Diploma</option>
-                                <option value="bachelors">Bachelor's degree</option>
-                                <option value="postgraduate">Postgraduate qualification</option>
-                                <option value="other">Other qualification</option>
-                            </select>
-                        </div>
-                        <div class="form-group" id="institutionGroup">
-                            <label for="institutionAttended">Institution attended <span class="required" data-required-for="institutionAttended">*</span></label>
-                            <input type="text" id="institutionAttended" name="institutionAttended" autocomplete="organization">
-                        </div>
+                    <div class="otp-input-wrapper">
+                        <label class="visually-hidden" for="otpCode">Verification code</label>
+                        <input id="otpCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" aria-label="6-digit verification code">
                     </div>
-                    <div class="form-row">
-                        <div class="form-group" id="completionYearGroup">
-                            <label for="completionYear">Completion year <span class="required" data-required-for="completionYear">*</span></label>
-                            <input type="number" id="completionYear" name="completionYear" min="1900" inputmode="numeric">
-                        </div>
-                        <div class="form-group">
-                            <label for="programmeId">Requested programme <span class="required">*</span></label>
-                            <select id="programmeId" name="programmeId" required>
-                                <option value="">Loading programmes…</option>
-                            </select>
-                        </div>
+
+                    <p id="otpError" class="otp-error" role="alert"></p>
+                    <button id="verifyOtpButton" type="button" class="btn btn-submit">Verify email</button>
+
+                    <div class="otp-resend">
+                        <p id="otpCountdown">You can request another code in 60 seconds.</p>
+                        <button id="resendOtpButton" type="button" class="btn btn-sm btn-outline-secondary" disabled>Resend code</button>
+                        <button id="changeEmailButton" type="button" class="btn btn-link">Wrong email? Change email</button>
                     </div>
-                    <div class="form-group">
-                        <label class="consent" for="consent">
-                            <input type="checkbox" id="consent" name="consent" value="yes" required>
-                            <span>I confirm these details are accurate, have read the <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Notice</a>, and consent to CFL using this information to assess my application and contact me.</span>
-                        </label>
+                </section>
+
+                <section id="confirmation" class="confirmation" hidden data-enter aria-live="polite">
+                    <div class="confirm-badge" data-pop aria-hidden="true">
+                        <svg viewBox="0 0 64 64" width="64" height="64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="32" cy="32" r="28" pathLength="1" data-draw/><path d="M20 33.5l8.5 8.5L44.5 24" pathLength="1" data-draw/></svg>
                     </div>
-                </div>
-                <div class="step" data-step="7">
-                    <h2>Review and send</h2>
-                    <dl id="reviewList" class="review-list"></dl>
-                </div>
+                    <h2 tabindex="-1">Application received</h2>
+                    <p>Your reference is <strong id="referenceNumber"></strong>. Keep it safe: you will need it to check your application.</p>
+                    <p><button type="button" class="btn btn-sm btn-outline-secondary" id="copyReference">Copy reference</button><span class="visually-hidden" id="copyStatus" role="status"></span></p>
+                    <p>We have emailed you a confirmation. Our admissions team will review the application and email you the outcome.</p>
+                    <p><a class="btn btn-next" href="/">Back to the home page</a></p>
+                </section>
             </div>
-
-            <div class="form-navigation">
-                <button type="button" class="btn btn-prev" disabled>Back</button>
-                <button type="button" class="btn btn-next">Next</button>
-                <button type="submit" class="btn btn-submit" hidden>Send application</button>
-            </div>
-        </form>
-
-        <section id="otpVerification" class="otp-verification hidden" aria-live="polite">
-            <div class="otp-header">
-                <h2>Verify your email</h2>
-                <p>We've sent a 6-digit verification code to <strong id="otpEmail"></strong>.</p>
-            </div>
-
-            <div class="otp-input-wrapper">
-                <label class="sr-only" for="otpCode">Verification code</label>
-                <input id="otpCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" aria-label="6-digit verification code">
-            </div>
-
-            <p id="otpError" class="otp-error" role="alert"></p>
-            <button id="verifyOtpButton" type="button" class="btn btn-submit">Verify email</button>
-
-            <div class="otp-resend">
-                <p id="otpCountdown">You can request another code in 60 seconds.</p>
-                <button id="resendOtpButton" type="button" class="btn btn-secondary" disabled>Resend code</button>
-                <button id="changeEmailButton" type="button" class="btn btn-link">Wrong email? Change email</button>
-            </div>
-        </section>
-
-        <section id="confirmation" class="confirmation" hidden aria-live="polite">
-            <h2 tabindex="-1">Application received</h2>
-            <p>Your reference is <strong id="referenceNumber"></strong>. Keep it safe: you will need it to check your application.</p>
-            <p>We have emailed you a confirmation. Our admissions team will review the application and email you the outcome.</p>
-            <p><a class="btn btn-next" href="/">Back to the home page</a></p>
-        </section>
+        </main>
     </div>
     <script type="module" src="/js/pages/register.js"></script>
 </body>

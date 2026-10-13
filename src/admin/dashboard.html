@@ -2,215 +2,289 @@
 <html lang="en" data-auth="pending" data-veil="on">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Admin console · Centre of Foreign Learning</title>
     <link rel="icon" type="image/png" href="/images/logo.png">
     <link rel="stylesheet" href="/css/foundation.css">
-<link rel="stylesheet" href="/css/fonts.css">
-<link rel="stylesheet" href="/css/motion.css">
+    <link rel="stylesheet" href="/css/fonts.css">
+    <link rel="stylesheet" href="/css/motion.css">
+    <link rel="stylesheet" href="/css/tokens.css">
+    <link rel="stylesheet" href="/css/components.css">
     <link rel="stylesheet" href="/css/admin-dashboard.css">
-<script type="module" src="/js/motion/boot.js"></script>
+    <script type="module" src="/js/motion/boot.js"></script>
 </head>
-<body>
-    <header class="admin-header">
-        <h1>Admin console</h1>
-        <nav class="admin-nav" aria-label="Admin sections">
-            <a href="#applications">Applications<span class="nav-attention" data-attention-key="applications" hidden role="status" aria-live="polite" aria-atomic="true"><span aria-hidden="true"></span></span></a>
-            <a href="#privacy-requests">Privacy requests</a>
-            <a href="#create-account">Create account</a>
-            <a href="#teaching-assignments">Teaching assignments</a>
-            <a href="#programmes">Programmes</a>
-            <a href="#programme-staff">Programme staff</a>
-            <a href="#accounts">Accounts</a>
-        </nav>
-        <div class="admin-actions">
-            <span class="admin-user" data-user-name></span>
-            <button type="button" id="refreshAll" class="btn btn-sm btn-outline-light">Refresh</button>
-            <a href="/login" class="btn btn-sm btn-outline-light" data-action="sign-out">Sign out</a>
-        </div>
-    </header>
-    <noscript><p class="form-alert" data-kind="error">The admin console needs JavaScript.</p></noscript>
-    <main class="container dashboard-container">
-        <p id="adminMessage" class="form-alert" role="status" hidden></p>
-
-        <section class="card admin-section" id="applications" aria-labelledby="applicationsHeading">
-            <div class="card-header d-flex justify-content-between align-items-center gap-2 flex-wrap">
-                <h2 id="applicationsHeading">Applications</h2>
-                <div>
-                    <label for="applicationFilter" class="visually-hidden">Filter by status</label>
-                    <select id="applicationFilter" class="form-select form-select-sm">
-                        <option value="">All statuses</option>
-                        <option value="submitted">Submitted</option>
-                        <option value="under_review">Under review</option>
-                        <option value="info_requested">Information requested</option>
-                        <option value="waitlisted">Waitlisted</option>
-                        <option value="approved">Approved</option>
-                        <option value="rejected">Not accepted</option>
-                    </select>
+<body class="console">
+    <a class="skip-link" href="#console-main">Skip to main content</a>
+    <div class="console-shell">
+        <aside class="console-side">
+            <a class="console-brand" href="/admin/dashboard">
+                <img src="/images/logo.png" alt="" width="36" height="36">
+                <span><strong>CFL</strong><small>Admin console</small></span>
+            </a>
+            <nav class="console-nav" id="consoleNav" aria-label="Admin sections" data-glide="hover">
+                <a href="#admissions" data-workspace-link="admissions" data-glide-item aria-current="page">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 13.5V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v7.5M4 13.5h4.5l1.2 2.5h4.6l1.2-2.5H20M4 13.5V18a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4.5"/></svg>
+                    <span class="console-nav-label">Admissions</span>
+                    <span class="nav-attention" data-attention-key="applications" hidden role="status" aria-live="polite" aria-atomic="true"><span aria-hidden="true"></span></span>
+                </a>
+                <a href="#people" data-workspace-link="people" data-glide-item>
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17.5" cy="9" r="2.4"/><path d="M17 14.2c2.6.2 4.5 2.3 4.5 5"/></svg>
+                    <span class="console-nav-label">People</span>
+                </a>
+                <a href="#academics" data-workspace-link="academics" data-glide-item>
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 5.5C6 4.4 9.2 4.6 12 6.2c2.8-1.6 6-1.8 9-.7V19c-3-1.1-6.2-.9-9 .7-2.8-1.6-6-1.8-9-.7V5.5Z"/><path d="M12 6.2v13.5"/></svg>
+                    <span class="console-nav-label">Academics</span>
+                </a>
+            </nav>
+            <div class="console-account">
+                <span class="console-user" data-user-name></span>
+                <div class="console-actions">
+                    <button type="button" id="refreshAll" class="btn btn-sm btn-outline-light">Refresh</button>
+                    <a href="/login" class="btn btn-sm btn-outline-light" data-action="sign-out">Sign out</a>
                 </div>
             </div>
-            <div class="card-body table-wrap">
-                <table class="table table-hover align-middle">
-                    <thead><tr><th>Reference</th><th>Applicant</th><th>Programme</th><th>Submitted</th><th>Status</th><th>Actions</th></tr></thead>
-                    <tbody id="applicationsBody"></tbody>
-                </table>
-            </div>
-        </section>
+        </aside>
 
-        <section class="card admin-section" id="privacy-requests" aria-labelledby="privacyRequestsHeading">
-            <div class="card-header d-flex justify-content-between align-items-center gap-2 flex-wrap">
-                <div>
-                    <h2 id="privacyRequestsHeading">Privacy requests</h2>
-                    <p class="login-help mb-0">Review personal-data requests. Record a response and any action the student needs to take; requests are never actioned automatically.</p>
-                </div>
-                <div class="d-flex flex-wrap gap-2">
-                    <label for="privacyRequestFilter" class="visually-hidden">Filter privacy requests by status</label>
-                    <select id="privacyRequestFilter" class="form-select form-select-sm">
-                        <option value="">All requests</option>
-                        <option value="submitted">Submitted</option>
-                        <option value="under_review">Under review</option>
-                        <option value="needs_student">Action needed</option>
-                        <option value="completed">Completed</option>
-                        <option value="declined">Closed</option>
-                    </select>
-                    <button id="refreshPrivacyQueue" type="button" class="btn btn-outline-secondary btn-sm">Refresh requests</button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div id="privacyRequestsList" class="privacy-review-list" aria-live="polite"></div>
-            </div>
-        </section>
+        <div class="console-body">
+            <header class="console-top">
+                <p class="eyebrow">Administration</p>
+                <h1 id="consoleTitle">Admissions</h1>
+                <p id="consoleBlurb" class="muted">Decide on applications and answer personal-data requests.</p>
+            </header>
+            <noscript><p class="form-alert" data-kind="error">The admin console needs JavaScript.</p></noscript>
 
-        <section class="card admin-section" id="create-account" aria-labelledby="createHeading">
-            <div class="card-header"><h2 id="createHeading">Create an account</h2></div>
-            <div class="card-body">
-                <form id="createUserForm" novalidate>
-                    <div class="row g-3">
-                        <div class="col-md-4 form-group">
-                            <label for="newName" class="form-label">Full name</label>
-                            <input type="text" class="form-control" id="newName" autocomplete="off" required>
-                        </div>
-                        <div class="col-md-4 form-group">
-                            <label for="newEmail" class="form-label">Email address</label>
-                            <input type="email" class="form-control" id="newEmail" autocomplete="off" required>
-                        </div>
-                        <div class="col-md-2 form-group">
-                            <label for="newRole" class="form-label">Role</label>
-                            <select class="form-select" id="newRole">
-                                <option value="student">Student</option>
-                                <option value="instructor">Instructor</option>
-                                <option value="admin">Administrator</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <button type="submit" class="btn btn-primary w-100">Create and invite</button>
-                        </div>
+            <main id="console-main" class="console-main">
+                <p id="adminMessage" class="toast" role="status" aria-live="polite" data-toast hidden></p>
+
+                <dl class="stat-grid" aria-label="At a glance" data-reveal-group>
+                    <div class="stat" data-tone="coral">
+                        <dt>Open applications</dt>
+                        <dd><span class="stat-value" data-stat="openApplications">—</span><span class="stat-note">Waiting for a decision</span></dd>
                     </div>
-                    <p class="login-help">The person receives an email with a link to choose their own password.</p>
-                </form>
-            </div>
-        </section>
+                    <div class="stat" data-tone="sun">
+                        <dt>Privacy requests</dt>
+                        <dd><span class="stat-value" data-stat="privacyOpen">—</span><span class="stat-note">Waiting for a review</span></dd>
+                    </div>
+                    <div class="stat">
+                        <dt>Active students</dt>
+                        <dd><span class="stat-value" data-stat="students">—</span><span class="stat-note">With an enabled account</span></dd>
+                    </div>
+                    <div class="stat">
+                        <dt>Instructors</dt>
+                        <dd><span class="stat-value" data-stat="instructors">—</span><span class="stat-note">With an enabled account</span></dd>
+                    </div>
+                    <div class="stat">
+                        <dt>Published programmes</dt>
+                        <dd><span class="stat-value" data-stat="programmes">—</span><span class="stat-note">Shown on the public site</span></dd>
+                    </div>
+                </dl>
 
-        <section class="card admin-section" id="teaching-assignments" aria-labelledby="assignmentsHeading">
-            <div class="card-header"><h2 id="assignmentsHeading">Teaching assignments</h2></div>
-            <div class="card-body table-wrap">
-                <p class="login-help">An assigned instructor can read that student's submitted writing and give feedback. Nothing else.</p>
-                <table class="table table-hover align-middle">
-                    <thead><tr><th>Student</th><th>Instructors</th><th>Assign</th></tr></thead>
-                    <tbody id="assignmentsBody"></tbody>
-                </table>
-            </div>
-        </section>
-
-        <section class="card admin-section" id="programmes" aria-labelledby="programmesHeading">
-            <div class="card-header"><h2 id="programmesHeading">Programmes</h2></div>
-            <div class="card-body">
-                <p class="login-help">Manage the programme cards and the details shown when a card is opened. Uncheck Published to hide a programme without deleting it.</p>
-                <form id="programmeForm" novalidate>
-                    <div class="row g-3">
-                        <div class="col-md-3 form-group">
-                            <label for="programmeId" class="form-label">Id</label>
-                            <input type="text" class="form-control" id="programmeId" autocomplete="off" maxlength="60" placeholder="english-intake">
-                        </div>
-                        <div class="col-md-5 form-group">
-                            <label for="programmeName" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="programmeName" autocomplete="off" maxlength="120" required>
-                        </div>
-                        <div class="col-md-4 form-group">
-                            <label for="programmeCategory" class="form-label">Category</label>
-                            <input type="text" class="form-control" id="programmeCategory" autocomplete="off" maxlength="80" required>
-                        </div>
-                        <div class="col-md-3 form-group">
-                            <label for="programmeGroup" class="form-label">Level</label>
-                            <select class="form-select" id="programmeGroup" required>
-                                <option value="intake">Intake</option>
-                                <option value="beginner">Elementary-Beginner</option>
-                                <option value="intermediate">Intermediate</option>
-                                <option value="advanced">Advanced</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3 form-group">
-                            <label for="programmeDuration" class="form-label">Duration</label>
-                            <input type="text" class="form-control" id="programmeDuration" autocomplete="off" maxlength="40" placeholder="4 months" required>
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="programmeSkills" class="form-label">Skills</label>
-                            <input type="text" class="form-control" id="programmeSkills" maxlength="240">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label for="programmeEligibility" class="form-label">Eligibility</label>
-                            <input type="text" class="form-control" id="programmeEligibility" maxlength="160">
-                        </div>
-                        <div class="col-md-3 form-group">
-                            <label for="programmeFeeLocal" class="form-label">Local application fee</label>
-                            <input type="text" class="form-control" id="programmeFeeLocal" maxlength="80">
-                        </div>
-                        <div class="col-md-3 form-group">
-                            <label for="programmeFeeForeign" class="form-label">Foreign application fee</label>
-                            <input type="text" class="form-control" id="programmeFeeForeign" maxlength="80">
-                        </div>
-                        <div class="col-md-2 form-group d-flex align-items-end">
-                            <div class="form-check mb-2">
-                                <input type="checkbox" class="form-check-input" id="programmeActive" checked>
-                                <label for="programmeActive" class="form-check-label">Published</label>
+                <div class="workspace" id="ws-admissions" data-workspace="admissions">
+                    <section class="panel" id="applications" aria-labelledby="applicationsHeading">
+                        <header class="panel-head">
+                            <div>
+                                <h2 id="applicationsHeading">Applications</h2>
+                                <p class="panel-note">Open an application to read what was submitted, then decide.</p>
                             </div>
+                            <div class="panel-tools">
+                                <label for="applicationFilter" class="visually-hidden">Filter by status</label>
+                                <select id="applicationFilter" class="form-select form-select-sm">
+                                    <option value="">All statuses</option>
+                                    <option value="submitted">Submitted</option>
+                                    <option value="under_review">Under review</option>
+                                    <option value="info_requested">Information requested</option>
+                                    <option value="waitlisted">Waitlisted</option>
+                                    <option value="approved">Approved</option>
+                                    <option value="rejected">Not accepted</option>
+                                </select>
+                            </div>
+                        </header>
+                        <div class="table-scroll">
+                            <table class="data-table" data-stack data-avatar-col="1" data-detail-rows>
+                                <thead><tr><th>Reference</th><th>Applicant</th><th>Programme</th><th>Submitted</th><th>Status</th><th>Actions</th></tr></thead>
+                                <tbody id="applicationsBody" data-rows></tbody>
+                            </table>
                         </div>
-                        <div class="col-md-4 d-flex align-items-end gap-2">
-                            <button type="submit" class="btn btn-primary">Add programme</button>
-                            <button type="button" class="btn btn-outline-secondary" id="programmeReset">Clear</button>
+                    </section>
+
+                    <section class="panel" id="privacy-requests" aria-labelledby="privacyRequestsHeading">
+                        <header class="panel-head">
+                            <div>
+                                <h2 id="privacyRequestsHeading">Privacy requests</h2>
+                                <p class="panel-note">Review personal-data requests. Record a response and any action the student needs to take; requests are never actioned automatically.</p>
+                            </div>
+                            <div class="panel-tools">
+                                <label for="privacyRequestFilter" class="visually-hidden">Filter privacy requests by status</label>
+                                <select id="privacyRequestFilter" class="form-select form-select-sm">
+                                    <option value="">All requests</option>
+                                    <option value="submitted">Submitted</option>
+                                    <option value="under_review">Under review</option>
+                                    <option value="needs_student">Action needed</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="declined">Closed</option>
+                                </select>
+                                <button id="refreshPrivacyQueue" type="button" class="btn btn-outline-secondary btn-sm">Refresh requests</button>
+                            </div>
+                        </header>
+                        <div class="panel-body">
+                            <div id="privacyRequestsList" class="privacy-review-list" aria-live="polite"></div>
                         </div>
-                    </div>
-                </form>
-                <div class="table-wrap mt-4">
-                    <table class="table table-hover align-middle">
-                        <thead><tr><th>Programme</th><th>Level</th><th>Duration</th><th>Status</th><th>Actions</th></tr></thead>
-                        <tbody id="programmesBody"></tbody>
-                    </table>
+                    </section>
                 </div>
-            </div>
-        </section>
 
-        <section class="card admin-section" id="programme-staff" aria-labelledby="programmeStaffHeading">
-            <div class="card-header"><h2 id="programmeStaffHeading">Programme staff</h2></div>
-            <div class="card-body table-wrap">
-                <p class="login-help">An instructor can schedule classes and announce them only for the programmes they are assigned to. A programme can have several instructors, and an instructor can teach several programmes.</p>
-                <table class="table table-hover align-middle">
-                    <thead><tr><th>Programme</th><th>Instructors</th><th>Assign</th></tr></thead>
-                    <tbody id="programmeStaffBody"></tbody>
-                </table>
-            </div>
-        </section>
+                <div class="workspace" id="ws-people" data-workspace="people" hidden>
+                    <div class="split">
+                        <section class="panel" id="accounts" aria-labelledby="accountsHeading">
+                            <header class="panel-head">
+                                <div>
+                                    <h2 id="accountsHeading">Accounts</h2>
+                                    <p class="panel-note">Change a role, disable an account, or send an invitation again.</p>
+                                </div>
+                            </header>
+                            <div class="table-scroll">
+                                <table class="data-table" data-stack data-avatar-col="0">
+                                    <thead><tr><th>Person</th><th>Role</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+                                    <tbody id="usersBody" data-rows></tbody>
+                                </table>
+                            </div>
+                        </section>
 
-        <section class="card admin-section" id="accounts" aria-labelledby="accountsHeading">
-            <div class="card-header"><h2 id="accountsHeading">Accounts</h2></div>
-            <div class="card-body table-wrap">
-                <table class="table table-hover align-middle">
-                    <thead><tr><th>Person</th><th>Role</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
-                    <tbody id="usersBody"></tbody>
-                </table>
-            </div>
-        </section>
-    </main>
+                        <section class="panel panel-aside" id="create-account" aria-labelledby="createHeading">
+                            <header class="panel-head">
+                                <div>
+                                    <h2 id="createHeading">Create an account</h2>
+                                    <p class="panel-note">The person receives an email with a link to choose their own password.</p>
+                                </div>
+                            </header>
+                            <form id="createUserForm" class="stack-form" novalidate>
+                                <div class="form-group">
+                                    <label for="newName" class="form-label">Full name</label>
+                                    <input type="text" class="form-control" id="newName" autocomplete="off" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newEmail" class="form-label">Email address</label>
+                                    <input type="email" class="form-control" id="newEmail" autocomplete="off" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="newRole" class="form-label">Role</label>
+                                    <select class="form-select" id="newRole">
+                                        <option value="student">Student</option>
+                                        <option value="instructor">Instructor</option>
+                                        <option value="admin">Administrator</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block">Create and invite</button>
+                            </form>
+                        </section>
+                    </div>
+
+                    <section class="panel" id="teaching-assignments" aria-labelledby="assignmentsHeading">
+                        <header class="panel-head">
+                            <div>
+                                <h2 id="assignmentsHeading">Teaching assignments</h2>
+                                <p class="panel-note">An assigned instructor can read that student's submitted writing and give feedback. Nothing else.</p>
+                            </div>
+                        </header>
+                        <div class="table-scroll">
+                            <table class="data-table" data-stack data-avatar-col="0">
+                                <thead><tr><th>Student</th><th>Instructors</th><th>Assign</th></tr></thead>
+                                <tbody id="assignmentsBody" data-rows></tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="workspace" id="ws-academics" data-workspace="academics" hidden>
+                    <section class="panel" id="programmes" aria-labelledby="programmesHeading">
+                        <header class="panel-head">
+                            <div>
+                                <h2 id="programmesHeading">Programmes</h2>
+                                <p class="panel-note">Manage the programme cards and the details shown when a card is opened. Uncheck Published to hide a programme without deleting it.</p>
+                            </div>
+                        </header>
+                        <div class="split split-form">
+                            <div class="table-scroll">
+                                <table class="data-table" data-stack>
+                                    <thead><tr><th>Programme</th><th>Level</th><th>Duration</th><th>Status</th><th>Actions</th></tr></thead>
+                                    <tbody id="programmesBody" data-rows></tbody>
+                                </table>
+                            </div>
+                            <form id="programmeForm" class="stack-form stack-form-aside" novalidate aria-label="Add or edit a programme">
+                                <div class="form-group">
+                                    <label for="programmeId" class="form-label">Id</label>
+                                    <input type="text" class="form-control" id="programmeId" autocomplete="off" maxlength="60" placeholder="english-intake">
+                                </div>
+                                <div class="form-group">
+                                    <label for="programmeName" class="form-label">Name</label>
+                                    <input type="text" class="form-control" id="programmeName" autocomplete="off" maxlength="120" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="programmeCategory" class="form-label">Category</label>
+                                    <input type="text" class="form-control" id="programmeCategory" autocomplete="off" maxlength="80" required>
+                                </div>
+                                <div class="field-pair">
+                                    <div class="form-group">
+                                        <label for="programmeGroup" class="form-label">Level</label>
+                                        <select class="form-select" id="programmeGroup" required>
+                                            <option value="intake">Intake</option>
+                                            <option value="beginner">Elementary-Beginner</option>
+                                            <option value="intermediate">Intermediate</option>
+                                            <option value="advanced">Advanced</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="programmeDuration" class="form-label">Duration</label>
+                                        <input type="text" class="form-control" id="programmeDuration" autocomplete="off" maxlength="40" placeholder="4 months" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="programmeSkills" class="form-label">Skills</label>
+                                    <input type="text" class="form-control" id="programmeSkills" maxlength="240">
+                                </div>
+                                <div class="form-group">
+                                    <label for="programmeEligibility" class="form-label">Eligibility</label>
+                                    <input type="text" class="form-control" id="programmeEligibility" maxlength="160">
+                                </div>
+                                <div class="field-pair">
+                                    <div class="form-group">
+                                        <label for="programmeFeeLocal" class="form-label">Local application fee</label>
+                                        <input type="text" class="form-control" id="programmeFeeLocal" maxlength="80">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="programmeFeeForeign" class="form-label">Foreign application fee</label>
+                                        <input type="text" class="form-control" id="programmeFeeForeign" maxlength="80">
+                                    </div>
+                                </div>
+                                <div class="form-check">
+                                    <input type="checkbox" class="form-check-input" id="programmeActive" checked>
+                                    <label for="programmeActive" class="form-check-label">Published</label>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">Add programme</button>
+                                    <button type="button" class="btn btn-outline-secondary" id="programmeReset">Clear</button>
+                                </div>
+                            </form>
+                        </div>
+                    </section>
+
+                    <section class="panel" id="programme-staff" aria-labelledby="programmeStaffHeading">
+                        <header class="panel-head">
+                            <div>
+                                <h2 id="programmeStaffHeading">Programme staff</h2>
+                                <p class="panel-note">An instructor can schedule classes and announce them only for the programmes they are assigned to. A programme can have several instructors, and an instructor can teach several programmes.</p>
+                            </div>
+                        </header>
+                        <div class="table-scroll">
+                            <table class="data-table" data-stack>
+                                <thead><tr><th>Programme</th><th>Instructors</th><th>Assign</th></tr></thead>
+                                <tbody id="programmeStaffBody" data-rows></tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
     <script type="module" src="/js/pages/admin-dashboard.js"></script>
 </body>
 </html>

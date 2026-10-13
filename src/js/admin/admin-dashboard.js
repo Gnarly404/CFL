@@ -7,6 +7,7 @@ import { initProgrammeStaff } from './programme-staff.js';
 import { initProgrammes } from './programmes.js';
 import { applicationDetails } from './application-details.js';
 import { setAttentionBadge } from '@/ui/attention-badge.js';
+import { setStat } from './stats.js';
 import { validateEmail, validateName } from '@/utils/validation.js';
 import { formatDate } from '@/utils/format.js';
 import {
@@ -42,7 +43,9 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
 
   async function updateApplicationAttention() {
     try {
-      setAttentionBadge('applications', await countOpenApplications(), root);
+      const open = await countOpenApplications();
+      setAttentionBadge('applications', open, root);
+      setStat('openApplications', open, root);
     } catch (error) {
       console.warn('Could not load pending application count', error?.code ?? error);
     }
@@ -50,7 +53,12 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
 
   const assignments = initAssignments({ root, say, getUsers: () => knownUsers });
   const programmeStaff = initProgrammeStaff({ root, say, getUsers: () => knownUsers });
-  const programmes = initProgrammes({ root, say, onChange: () => programmeStaff.load() });
+  const programmes = initProgrammes({
+    root,
+    say,
+    onChange: () => programmeStaff.load(),
+    onLoad: (rows) => setStat('programmes', rows.filter((programme) => programme.active !== false).length, root),
+  });
 
   async function run(label, work, { reload = ['applications', 'users'] } = {}) {
     try {
@@ -235,6 +243,7 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
     privacyRequestsList.replaceChildren(el('p', { class: 'text-secondary' }, 'Loading privacy requests…'));
     try {
       const requests = await listPrivacyRequests();
+      setStat('privacyOpen', requests.filter((request) => ['submitted', 'under_review'].includes(request.status)).length, root);
       const status = privacyRequestFilter?.value ?? '';
       const filtered = requests.filter((request) => !status || request.status === status);
       privacyRequestsList.replaceChildren(...(filtered.length
@@ -263,6 +272,8 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
     try {
       const users = await listUsers();
       knownUsers = users;
+      setStat('students', users.filter((user) => user.role === 'student' && user.status !== 'disabled').length, root);
+      setStat('instructors', users.filter((user) => user.role === 'instructor' && user.status !== 'disabled').length, root);
       usersBody.replaceChildren(...(users.length ? users.map(userRow) : [emptyRow(5, 'No accounts yet.')]));
     } catch (error) {
       usersBody.replaceChildren(emptyRow(5, 'Accounts could not be loaded.'));

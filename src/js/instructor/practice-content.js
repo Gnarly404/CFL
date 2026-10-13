@@ -1,5 +1,6 @@
 import { getSkillContent, loadPracticeContent } from '@/practice/content.js';
 import { savePracticeContent } from '@/services/instructor-service.js';
+import { icon } from '@/ui/icons.js';
 import { el, setBusy, showMessage } from '@/utils/dom.js';
 
 const SKILL_LABELS = {
@@ -13,6 +14,7 @@ const FIELD_LABELS = {
 };
 const clone = (value) => structuredClone(value);
 const labelFor = (key) => FIELD_LABELS[key] ?? String(key).replace(/[A-Z]/g, (letter) => ` ${letter.toLowerCase()}`).replace(/^./, (letter) => letter.toUpperCase());
+const plural = (count, word) => `${count} ${word}${count === 1 ? '' : 's'}`;
 
 function blankLesson(skillId, ordinal) {
   const lesson = { id: `${skillId}-lesson-${Date.now()}-${ordinal}`, title: '', summary: '' };
@@ -61,12 +63,25 @@ function summaryOf(item, index) {
   return text ? `${index + 1}. ${text}` : `Item ${index + 1}`;
 }
 
+/** A multiple-choice question: options plus the index of the right one. */
+const isQuestion = (value) => Boolean(value) && typeof value === 'object' && !Array.isArray(value)
+  && Array.isArray(value.options) && typeof value.answer === 'number';
+
+function lessonMeta(lesson) {
+  const parts = [];
+  if (Array.isArray(lesson.questions)) parts.push(plural(lesson.questions.length, 'question'));
+  if (Array.isArray(lesson.words)) parts.push(plural(lesson.words.length, 'word'));
+  if (Array.isArray(lesson.prompts)) parts.push(plural(lesson.prompts.length, 'prompt'));
+  if (lesson.writing) parts.push('Writing task');
+  return parts.join(' · ') || 'No exercises yet';
+}
+
 function renderScalar(parent, key, value, path, state) {
   const id = `curriculum-${path.map(String).join('-')}`;
   const fieldKey = typeof path.at(-1) === 'number' ? path.at(-2) : key;
   const isNumber = typeof value === 'number' || key === 'answer';
   const shownValue = key === 'answer' ? String(Number(value) + 1) : String(value ?? '');
-  const label = el('label', { for: id }, labelFor(key));
+  const label = el('label', { for: id }, /\s/.test(key) ? key : labelFor(key)); // "Item 1" is already a label
   let input;
   if (LONG_FIELDS.has(fieldKey)) {
     input = el('textarea', { id, class: 'form-control', rows: fieldKey === 'summary' ? 2 : 3, 'data-path': JSON.stringify(path) }, shownValue);
@@ -86,7 +101,58 @@ function renderScalar(parent, key, value, path, state) {
     setAtPath(state.lesson, path, next);
     state.onChange();
   });
-  parent.append(el('div', { class: 'curriculum-field' }, label, input));
+  parent.append(el('div', { class: `curriculum-field${key === 'id' ? ' curriculum-field--id' : ''}` }, label, input));
+}
+
+/** Answer options with a radio button beside each: choosing it sets the question's `answer` index. */
+function renderOptions(parent, question, path, state) {
+  const { options } = question;
+  const group = el('fieldset', { class: 'curriculum-collection curriculum-options' }, el('legend', {}, 'Answer options'),
+    el('p', { class: 'curriculum-hint' }, 'Choose the radio button beside the correct answer.'));
+  const name = `correct-${question.id ?? path.map(String).join('-')}`;
+  options.forEach((text, index) => {
+    const radio = el('input', { type: 'radio', name, value: String(index), 'aria-label': `Option ${index + 1} is the correct answer` });
+    radio.checked = question.answer === index;
+    radio.addEventListener('change', () => {
+      question.answer = index;
+      state.onChange();
+    });
+    const input = el('input', {
+      class: 'form-control', type: 'text', 'aria-label': `Option ${index + 1}`, 'data-path': JSON.stringify([...path, index]),
+    });
+    input.value = String(text ?? '');
+    input.addEventListener('input', () => {
+      options[index] = input.value;
+      state.onChange();
+    });
+    const remove = el('button', {
+      type: 'button',
+      class: 'btn btn-sm btn-outline-secondary',
+      'aria-label': `Remove option ${index + 1}`,
+      onclick: () => {
+        if (options.length <= minArrayLength(path)) {
+          state.show('A question needs at least 2 options.', 'error');
+          return;
+        }
+        options.splice(index, 1);
+        if (question.answer === index) question.answer = 0;
+        else if (question.answer > index) question.answer -= 1;
+        state.onChange();
+        state.render();
+      },
+    }, 'Remove');
+    group.append(el('div', { class: 'curriculum-option' }, el('label', { class: 'curriculum-correct' }, radio, el('span', { class: 'curriculum-correct-mark' })), input, remove));
+  });
+  group.append(el('button', {
+    type: 'button',
+    class: 'btn btn-sm btn-outline-secondary',
+    onclick: () => {
+      options.push(newArrayItem(path, options, state));
+      state.onChange();
+      state.render();
+    },
+  }, 'Add option'));
+  parent.append(group);
 }
 
 function renderArray(parent, key, values, path, state) {
@@ -132,18 +198,26 @@ function renderArray(parent, key, values, path, state) {
 
 function renderObject(parent, value, path, state) {
   let container = parent;
-  if (path.length) {
-    const last = path.at(-1);
-    const key = typeof last === 'number' ? path.at(-2) : last;
-    container = el('fieldset', { class: 'curriculum-group' }, el('legend', {}, labelFor(key)));
+  // The lesson's own plain fields (id, title, summary) sit together in one card above its groups.
+  const basics = path.length === 0 ? el('div', { class: 'curriculum-basics' }) : null;
+  if (typeof path.at(-1) === 'number') {
+    // An item in a list already has its own heading (the details summary), so it needs no second frame.
+  } else if (path.length) {
+    container = el('fieldset', { class: 'curriculum-group' }, el('legend', {}, labelFor(path.at(-1))));
     parent.append(container);
+  } else {
+    parent.append(basics);
   }
+  const question = isQuestion(value);
   for (const [key, fieldValue] of Object.entries(value)) {
     const fieldPath = [...path, key];
-    if (Array.isArray(fieldValue)) renderArray(container, key, fieldValue, fieldPath, state);
+    if (question && key === 'answer') continue; // chosen with the radio buttons beside the options
+    if (question && key === 'options') renderOptions(container, value, fieldPath, state);
+    else if (Array.isArray(fieldValue)) renderArray(container, key, fieldValue, fieldPath, state);
     else if (fieldValue && typeof fieldValue === 'object') renderObject(container, fieldValue, fieldPath, state);
-    else renderScalar(container, key, fieldValue, fieldPath, state);
+    else renderScalar(basics ?? container, key, fieldValue, fieldPath, state);
   }
+  if (basics && !basics.children.length) basics.remove();
 }
 
 export function initPracticeContentEditor({ root = document } = {}) {
@@ -157,11 +231,71 @@ export function initPracticeContentEditor({ root = document } = {}) {
   const removeButton = root.querySelector('#deletePracticeLesson');
   if (!section || !form || !skill || !lessonList || !fields || !note || !addButton || !removeButton) return;
 
+  const tabs = root.querySelector('#practiceSkillTabs');
+  const panel = root.querySelector('#practiceStudioPanel');
   section.hidden = false;
   addButton.disabled = true;
   const show = (text, kind = 'info') => showMessage(note, text, kind);
   const curricula = new Map();
   let current;
+
+  const anyUnsaved = () => [...curricula.values()].some((entry) => entry.dirty);
+  const lessonCount = (skillId) => {
+    const open = curricula.get(skillId);
+    if (open) return open.lessons.length;
+    try { return getSkillContent(skillId)?.lessons?.length ?? 0; } catch { return 0; }
+  };
+
+  // ---- skill tabs (the hidden <select> stays the single source of truth, so nothing else changes)
+  function syncTabs() {
+    if (!tabs) return;
+    tabs.querySelectorAll('[role="tab"]').forEach((tab) => {
+      const id = tab.dataset.skill;
+      const selected = id === skill.value;
+      tab.setAttribute('aria-selected', String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+      tab.querySelector('.studio-count').textContent = String(lessonCount(id));
+      const unsaved = Boolean(curricula.get(id)?.dirty);
+      tab.toggleAttribute('data-dirty', unsaved);
+      tab.querySelector('.studio-unsaved').textContent = unsaved ? ' (unsaved changes)' : '';
+      if (selected && panel) panel.setAttribute('aria-labelledby', tab.id);
+    });
+  }
+
+  function choose(skillId) {
+    if (skill.value === skillId) return;
+    skill.value = skillId;
+    skill.dispatchEvent(new Event('change'));
+  }
+
+  function buildTabs() {
+    if (!tabs) return;
+    tabs.replaceChildren(...[...skill.options].map((option) => {
+      const id = option.value;
+      let glyph = '';
+      try { glyph = icon(id, { size: 18 }); } catch { /* a skill without an icon still gets a tab */ }
+      return el('button', {
+        type: 'button', role: 'tab', id: `practiceTab-${id}`, class: 'studio-tab', 'data-skill': id, 'data-glide-item': '', 'aria-selected': 'false', 'aria-controls': panel ? 'practiceStudioPanel' : null, tabindex: '-1',
+        onclick: () => choose(id),
+      }, glyph, el('span', { class: 'studio-tab-label' }, option.textContent.trim()), el('span', { class: 'studio-count' }, ''), el('span', { class: 'visually-hidden studio-unsaved' }, ''));
+    }));
+    tabs.addEventListener('keydown', (event) => {
+      const all = [...tabs.querySelectorAll('[role="tab"]')];
+      const at = all.findIndex((tab) => tab.dataset.skill === skill.value);
+      const target = { ArrowRight: (at + 1) % all.length, ArrowLeft: (at - 1 + all.length) % all.length, Home: 0, End: all.length - 1 }[event.key];
+      if (target == null) return;
+      event.preventDefault();
+      choose(all[target].dataset.skill);
+      all[target].focus();
+    });
+    (skill.closest('.curriculum-skill-picker') ?? skill).hidden = true;
+  }
+
+  function markDirty() {
+    current.dirty = true;
+    form.dataset.dirty = 'true';
+    syncTabs();
+  }
 
   function loadSkill() {
     if (!curricula.has(skill.value)) {
@@ -169,6 +303,7 @@ export function initPracticeContentEditor({ root = document } = {}) {
       curricula.set(skill.value, { skillId: skill.value, lessons: clone(content.lessons ?? []), selected: 0, dirty: false });
     }
     current = curricula.get(skill.value);
+    form.dataset.dirty = String(current.dirty);
     show(current.dirty ? 'Unsaved changes for this skill.' : '');
     addButton.disabled = false;
     render();
@@ -185,13 +320,15 @@ export function initPracticeContentEditor({ root = document } = {}) {
         show(current.dirty ? 'Unsaved changes for this skill.' : '');
         render();
       },
-    }, `${index + 1}. ${lesson.title || 'Untitled lesson'}`))));
+    }, el('span', { class: 'lesson-num' }, String(index + 1)),
+    el('span', { class: 'lesson-text' }, el('span', { class: 'lesson-title' }, lesson.title || 'Untitled lesson'), el('span', { class: 'lesson-meta' }, lessonMeta(lesson)))))));
 
     const lesson = current.lessons[current.selected];
     removeButton.disabled = !lesson;
     fields.replaceChildren();
+    syncTabs();
     if (!lesson) {
-      fields.append(el('p', { class: 'muted' }, 'No lessons in this skill yet.'));
+      fields.append(el('p', { class: 'empty-state' }, 'No lessons in this skill yet. Choose Add lesson to write the first one.'));
       return;
     }
     const state = {
@@ -200,7 +337,7 @@ export function initPracticeContentEditor({ root = document } = {}) {
       show,
       render,
       onChange() {
-        current.dirty = true;
+        markDirty();
         show('Unsaved changes. Save curriculum to publish them.', 'info');
       },
     };
@@ -212,7 +349,7 @@ export function initPracticeContentEditor({ root = document } = {}) {
     const lesson = blankLesson(current.skillId, current.lessons.length + 1);
     current.lessons.push(lesson);
     current.selected = current.lessons.length - 1;
-    current.dirty = true;
+    markDirty();
     show('New lesson added. Complete its fields, then save the curriculum.', 'info');
     render();
   });
@@ -221,7 +358,7 @@ export function initPracticeContentEditor({ root = document } = {}) {
     if (!lesson || !window.confirm(`Delete “${lesson.title || 'Untitled lesson'}” from ${SKILL_LABELS[current.skillId]}?`)) return;
     current.lessons.splice(current.selected, 1);
     current.selected = Math.min(current.selected, current.lessons.length - 1);
-    current.dirty = true;
+    markDirty();
     show('Lesson removed. Save curriculum to publish the deletion.', 'info');
     render();
   });
@@ -233,6 +370,8 @@ export function initPracticeContentEditor({ root = document } = {}) {
       const content = { skill: current.skillId, lessons: current.lessons };
       const result = await savePracticeContent({ skillId: current.skillId, content });
       current.dirty = false;
+      form.dataset.dirty = 'false';
+      syncTabs();
       show(`Saved ${result.lessonCount} ${SKILL_LABELS[current.skillId].toLowerCase()} lessons.`, 'success');
     } catch (error) {
       show(error.message || 'The curriculum could not be saved.', 'error');
@@ -241,5 +380,14 @@ export function initPracticeContentEditor({ root = document } = {}) {
     }
   });
 
+  // Leaving the page with unsaved lessons asks first, so a stray click never throws work away.
+  window.addEventListener('beforeunload', (event) => {
+    if (!anyUnsaved()) return;
+    event.preventDefault();
+    event.returnValue = '';
+  });
+
+  buildTabs();
+  syncTabs();
   loadPracticeContent().then(loadSkill);
 }

@@ -10,49 +10,53 @@
 <link rel="stylesheet" href="/css/tokens.css">
 <link rel="stylesheet" href="/css/components.css">
 <link rel="stylesheet" href="/css/portal.css">
+<link rel="stylesheet" href="/css/curriculum.css">
 <link rel="icon" type="image/png" href="/images/logo.png">
 <script type="module" src="/js/pages/instructor-curriculum.js"></script>
 <script type="module" src="/js/motion/boot.js"></script>
 </head>
 <body class="portal">
+<a class="skip-link" href="#studioMain">Skip to the curriculum editor</a>
 <div class="portal-shell">
   <aside class="portal-side" id="portalSide"></aside>
-  <main class="portal-main">
+  <main class="portal-main" id="studioMain">
     <header class="portal-head">
+      <p class="eyebrow">Content studio</p>
       <h1>Practice curriculum</h1>
-      <p class="muted">Edit the lessons available to students.</p>
+      <p class="muted">Write and edit the lessons students practise with. Nothing changes for students until you save.</p>
     </header>
-    <div class="stack">
-      <section class="card" id="practice-curriculum" aria-labelledby="curriculumHeading">
-        <h2 id="curriculumHeading">Lessons</h2>
-        <div class="curriculum-skill-picker">
-          <label for="practiceSkill">Skill</label>
-          <select id="practiceSkill" class="curriculum-skill-select">
-            <option value="grammar">Grammar</option>
-            <option value="vocabulary">Vocabulary</option>
-            <option value="reading">Reading</option>
-            <option value="listening">Listening</option>
-            <option value="speaking">Speaking</option>
-            <option value="writing">Writing</option>
-          </select>
-        </div>
-        <div class="curriculum-editor-layout">
-          <aside class="curriculum-lesson-panel" aria-label="Lessons in selected skill">
-            <h3>Lessons</h3>
-            <ol id="practiceLessonList" class="curriculum-lesson-list"></ol>
-            <button type="button" class="btn btn-outline-secondary" id="addPracticeLesson">Add lesson</button>
-          </aside>
-          <form id="practiceContentForm" novalidate>
-            <div id="practiceLessonFields" class="curriculum-fields"></div>
-            <div class="actions mt-3">
+    <section class="studio" id="practice-curriculum" aria-labelledby="curriculumHeading">
+      <h2 id="curriculumHeading" class="visually-hidden">Lessons by skill</h2>
+      <div id="practiceSkillTabs" class="studio-skills" role="tablist" aria-label="Skill" data-glide></div>
+      <div class="curriculum-skill-picker">
+        <label for="practiceSkill">Skill</label>
+        <select id="practiceSkill" class="form-select">
+          <option value="grammar">Grammar</option>
+          <option value="vocabulary">Vocabulary</option>
+          <option value="reading">Reading</option>
+          <option value="listening">Listening</option>
+          <option value="speaking">Speaking</option>
+          <option value="writing">Writing</option>
+        </select>
+      </div>
+      <div class="studio-layout" id="practiceStudioPanel" role="tabpanel">
+        <aside class="studio-outline" aria-label="Lessons in selected skill">
+          <h3>Lessons</h3>
+          <ol id="practiceLessonList" class="curriculum-lesson-list"></ol>
+          <button type="button" class="btn btn-outline-secondary btn-block" id="addPracticeLesson">Add lesson</button>
+        </aside>
+        <form id="practiceContentForm" class="studio-editor" novalidate>
+          <div id="practiceLessonFields" class="curriculum-fields" data-reveal-swap></div>
+          <div class="studio-bar">
+            <p id="practiceContentNote" class="studio-status" role="status" hidden></p>
+            <div class="studio-actions">
               <button type="button" class="btn btn-outline-danger" id="deletePracticeLesson">Delete lesson</button>
               <button type="submit" class="btn btn-primary">Save curriculum</button>
             </div>
-          </form>
-        </div>
-        <p id="practiceContentNote" class="form-alert" role="status" hidden></p>
-      </section>
-    </div>
+          </div>
+        </form>
+      </div>
+    </section>
   </main>
 </div>
 <nav class="portal-bottom" id="portalBottom" aria-label="Instructor mobile"></nav>

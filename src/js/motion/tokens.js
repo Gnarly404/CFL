@@ -9,3 +9,9 @@ export const DUR = Object.freeze({ micro: 0.18, swap: 0.32, reveal: 0.7, progres
 
 export const STAGGER = 0.06;
 export const TRAVEL = 24; // px
+
+/** Springs for things that should feel physical (spec 23.2). Durations stay in DUR; these are for movement that settles. */
+export const SPRING = Object.freeze({
+  glide: { type: 'spring', stiffness: 420, damping: 36 }, // sliding highlights, same feel as the portal navigation
+  pop: { type: 'spring', stiffness: 520, damping: 26 }, // small things arriving: check marks, counters
+});

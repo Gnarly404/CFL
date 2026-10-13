@@ -3,21 +3,34 @@
   --navy:#1E3A5F;--coral:#FF6F61;--blue:#56CCF2;--yellow:#F4C430;
   --coral-strong:#C8402F;--coral-strong-hover:#B3321F;--ink:#0F2540;--sky:#56CCF2;--sun:#F4C430;
   /* Surfaces and text */
-  --bg:#F5F7FA;--surface:#fff;--text:#24323F;--muted:#566677;--line:#e3e9f0;
+  --bg:#F5F7FA;--surface:#fff;--surface-2:#F9FBFD;--text:#24323F;--text-strong:#0F2540;--muted:#566677;--line:#e3e9f0;--line-strong:#c9d5e2;
+  /* Tints of the navy: hovers, selected rows, icon tiles */
+  --navy-50:#f2f6fb;--navy-100:#e8eff7;--navy-200:#d3e0ee;--navy-700:#16304f;
+  /* Status colours. Every text/background pair below is at least 4.5:1 (checked in tests/unit/colour-contrast.test.js) */
+  --ok:#17643d;--ok-bg:#e8f6ee;--ok-line:#a9d8bf;
+  --warn:#6f4b08;--warn-bg:#fff6df;--warn-line:#efd08a;
+  --bad:#a3231a;--bad-bg:#fdecea;--bad-line:#f0b4ae;
+  --info:#1f4e79;--info-bg:#eaf2fb;--info-line:#b3cde8;
   /* Type: display for headings, UI face for everything else (fonts.css) */
   --font-head:var(--font-display,'Segoe UI',system-ui,sans-serif);
   --font-body:var(--font-ui,'Segoe UI',system-ui,sans-serif);
   /* Spacing (spec 22.2) */
   --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:72px;--s9:96px;--s10:128px;
   /* One radius scale and quiet surfaces: border first, shadow second */
-  --radius-sm:10px;--radius:16px;--radius-lg:24px;
+  --radius-sm:10px;--radius:16px;--radius-lg:24px;--radius-pill:999px;
   --shadow:0 1px 2px rgba(15,37,64,.05),0 8px 24px -12px rgba(15,37,64,.12);
-  /* Motion (spec 23.2): micro 120 to 220ms, reveal 12 to 32px once, progress slow */
-  --t-fast:150ms;--t-card:220ms;--t-progress:700ms;
+  --shadow-sm:0 1px 2px rgba(15,37,64,.06);
+  --shadow-pop:0 12px 32px -8px rgba(15,37,64,.26),0 2px 6px rgba(15,37,64,.08);
+  /* Layers */
+  --z-nav:30;--z-toast:60;
+  /* Motion (spec 23.2): micro 120 to 220ms, reveal 12 to 32px once, progress slow. Leaving is faster than arriving. */
+  --t-fast:150ms;--t-card:220ms;--t-progress:700ms;--t-exit:120ms;--t-enter:320ms;
   --ease-out:cubic-bezier(.22,1,.36,1);
-  --focus:0 0 0 3px rgba(86,204,242,.8);
+  --ease-in:cubic-bezier(.4,0,1,1);
+  /* Focus ring: a white gap and a blue ring, visible on light and dark surfaces alike */
+  --focus:0 0 0 2px #fff,0 0 0 5px #1f6feb;
 }
 @media (prefers-reduced-motion:reduce){
-  :root{--t-fast:0ms;--t-card:0ms;--t-progress:0ms}
+  :root{--t-fast:0ms;--t-card:0ms;--t-progress:0ms;--t-exit:0ms;--t-enter:0ms}
   *{scroll-behavior:auto!important}
 }

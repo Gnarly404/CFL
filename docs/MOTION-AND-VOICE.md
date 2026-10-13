@@ -30,3 +30,20 @@ File names include the voice and pace, so changing either gets new URLs and noth
 
 `--model path/to/voice.onnx` uses another Piper voice (its `.onnx.json` beside it); `--length-scale` sets pace (default 1.08);
 `--force` re-renders everything. Buttons: `<button data-voice-line="home.welcome">` plays an interface line (`dash.auto` picks the greeting for the time of day); lesson results add one for the score. Text with no clip, and browsers that cannot play MP3, fall back to browser speech.
+
+
+## Attributes added in the UI/UX redesign round
+
+All of these are handled by the scanner in `js/motion/index.js`, so content a script adds later is picked up too, and all are skipped under reduced motion.
+
+| Attribute | Where | What it does |
+| --- | --- | --- |
+| `data-glide` (container), `data-glide-item` (items) | admin sidebar, curriculum skill tabs | One highlight slides to the current item (`aria-current="page"`, `aria-selected="true"`, `aria-pressed="true"` or `.is-active`). `data-glide="hover"` also follows the pointer and focus. Colour and shape come from `--glide-bg` and `--glide-radius`. |
+| `data-rows` (on a `<tbody>`) | admin tables | New rows rise 8px with a short cascade; only the first 14 move. Loading and empty rows stay still. |
+| `data-toast` | admin message | Status messages appear over the page and leave by themselves (errors stay until dismissed with a click or Escape). Scripts still use `showMessage()`. |
+| `data-enter` | application form | The element eases in whenever it stops being hidden (the `hidden` attribute or a `.hidden` class). |
+| `data-draw`, `data-pop` (inside a `data-enter` element) | confirmation | An SVG stroke (with `pathLength="1"`) draws itself; a badge springs in. |
+| `data-motion-form` | application form | Error messages ease in and the invalid field shakes; pressing Next or Send with problems shakes them again; a `cfl:step` event slides the new step in from the side you are travelling towards. |
+| `details.application-details`, `.privacy-review-item`, `.curriculum-item` | admin, curriculum | The content rises when the panel opens. |
+
+Spring settings for movement that should settle live in `SPRING` in `motion/tokens.js` (`glide`, `pop`).

@@ -255,3 +255,26 @@ fonts and icons, a Content-Security-Policy, and a visual pass over every existin
 > Programme staff: admins assign instructors to programmes (many-to-many) in the admin console's "Programme staff" section (`adminAssignProgramme`, `programmeStaff` collection). Instructors can schedule and announce classes only for their assigned programmes; the seed assigns the demo instructor to the first three. Existing instructors must be assigned before they can schedule again. Not yet run against the emulator: the new rules tests (`npm run test:rules`).
 >
 > Programme catalogue: only administrators add or edit programmes (`adminSaveProgramme`, `programmes` collection). The admin console "Programmes" section is the editor; instructors cannot change names, levels or publication. The public `/programmes` page reads active programmes from Firestore (falls back to `programmes.json` if the database is unreachable). The emulator seed writes the five starter programmes.
+
+## UI/UX redesign: admin console, application form, curriculum studio, shared components
+
+Scope of this round: the admin dashboard, the application (registration) form, the instructor curriculum page, and the shared design tokens and components that the student and instructor portals inherit. The public pages (home, programmes, gallery, login, activation, legal) and the student portal pages were **not** redesigned in this round (see "Still to do").
+
+### What changed
+- **Shared layer** (`tokens.css`, `components.css`): semantic status colours (each pair checked at 4.5:1 or better), a white-and-blue focus ring that shows on light and dark surfaces, one radius and shadow scale, a button family (primary, secondary, outline, danger, link, small) including the Bootstrap-style names the page scripts already emit, form controls, status pills, toasts, data tables, avatars. The admin page no longer loads Bootstrap.
+- **Admin console** (`admin/dashboard.html`, `admin-dashboard.css`, `js/admin/console.js`, `stats.js`, `js/ui/table-labels.js`): sidebar shell, an "at a glance" strip (open applications, privacy requests, active students, instructors, published programmes), and three workspaces (Admissions, People, Academics). Every section keeps its old id, so `#applications`, `#privacy-requests`, `#programmes`... still work as links. Messages are toasts. Tables become labelled cards on a phone. An opened application shows its facts in a full-width row beneath it.
+- **Application form** (`register.html`, `registration.css`, `js/registration/registration-ui.js`): side panel with a step list (finished steps can be revisited), a card with a progress bar, inline hints, conditional fields that ease in, direction-aware step transitions, shake-and-message validation feedback, a copy-reference button, and a drawn check mark on the confirmation. The controller now announces each step with a `cfl:step` event; it still owns all validation and storage. `multi-step-form.css` was folded into `registration.css` and removed.
+- **Curriculum studio** (`instructor/curriculum.html`, `curriculum.css`, `js/instructor/practice-content.js`): skill tabs with lesson counts and a sliding highlight, a numbered lesson outline, a sticky save bar, an "unsaved" marker on each tab, a prompt before leaving with unsaved lessons, and a question editor where the correct answer is chosen with a radio button beside its option (the stored data shape is unchanged: `answer` is still a zero-based index).
+- **Motion** (`js/motion/glide.js`, `rows.js`, `toast.js`, `presence.js`, `form-motion.js`): built on the existing vanilla Motion engine and registered in `motion/index.js`. Pages opt in with attributes, listed in `MOTION-AND-VOICE.md`. Everything is skipped under reduced motion.
+
+### Deliberately left as it was
+- `window.confirm` stays for destructive actions. Several existing tests drive those handlers synchronously, so a styled dialog needs those tests rewritten first.
+- Server-side behaviour, Firestore rules and Cloud Functions are untouched.
+
+### Verification
+`npm run verify` passes (shared-code check, lint, 77 test files with 596 tests, production build, route check). New tests cover the console workspaces, the table labels and detail rows, the step list and copy button, and the question editor. The three redesigned pages were also rendered in headless Chromium at desktop and phone widths with the Firebase calls stubbed, and the whole seven-step application flow was driven through without a script error. **Not checked:** real Firebase data and sign-in, Safari and Firefox, a screen reader, and the page-transition veil between pages (the previews load pages directly).
+
+### Still to do
+- Public pages (home, programmes, gallery, login, activation, legal) and the student portal pages: restyle onto the shared components.
+- Replace `window.confirm` with a styled dialog (and update the tests that stub it).
+- Applying `data-detail-rows` and the person cells to other tables if wanted.

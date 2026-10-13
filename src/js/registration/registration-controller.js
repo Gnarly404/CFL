@@ -105,6 +105,7 @@ export function initRegistration({
   const otpCountdown = root.querySelector('#otpCountdown');
   const changeEmailButton = root.querySelector('#changeEmailButton');
   let current = 0;
+  let shownStep = null;
 
   // A programme can be chosen before arriving here: /register?programme=general-english
   const programme = new URLSearchParams(search).get('programme') ?? '';
@@ -165,6 +166,10 @@ export function initRegistration({
     if (bar) bar.style.width = `${progress}%`;
     if (percent) percent.textContent = `${progress}%`;
     if (current === steps.length - 1) renderReview();
+    // Let the page chrome (step list, motion) follow along without the controller knowing about either.
+    const previous = shownStep;
+    shownStep = current;
+    form.dispatchEvent(new CustomEvent('cfl:step', { bubbles: true, detail: { index: current, previous, total: steps.length } }));
   }
 
   // Move keyboard and screen-reader focus to the new step without letting the browser scroll the page sideways.

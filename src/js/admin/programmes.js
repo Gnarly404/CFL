@@ -8,7 +8,7 @@ const GROUP_LABEL = (group) => PROGRAMME_GROUP_LABELS[group] ?? group;
  * Admin catalogue: create and edit programmes. Instructors cannot reach this; they only teach
  * programmes an administrator has assigned them.
  */
-export function initProgrammes({ root = document, say, onChange } = {}) {
+export function initProgrammes({ root = document, say, onChange, onLoad } = {}) {
   const body = root.querySelector('#programmesBody');
   const form = root.querySelector('#programmeForm');
   if (!body || !form) return { load() {} };
@@ -45,6 +45,7 @@ export function initProgrammes({ root = document, say, onChange } = {}) {
       say?.(error.message || 'Programmes could not be loaded.', 'error');
       return;
     }
+    onLoad?.(rows);
     if (!rows.length) {
       body.replaceChildren(empty('No programmes yet. Add one with the form.'));
       return;
