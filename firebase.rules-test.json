@@ -1,0 +1,11 @@
+{
+  "firestore": { "rules": "firestore.rules" },
+  "storage": { "rules": "storage.rules" },
+  "emulators": {
+    "firestore": { "port": 18080 },
+    "storage": { "port": 19299 },
+    "hub": { "port": 14410 },
+    "logging": { "port": 14510 },
+    "ui": { "enabled": false }
+  }
+}
