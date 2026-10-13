@@ -1,22 +1,139 @@
-.pc-main{max-width:1180px;margin:0 auto;padding:clamp(48px,8vw,96px) 20px}
-.pc-head h1{margin:0 0 8px;color:#1E3A5F}
-.pc-head p{margin:0 0 24px;color:#5b6b7a}
-.pc-filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px}
-.pc-chip{border:1px solid #cfd8e3;background:#fff;color:#24323F;border-radius:999px;padding:8px 16px;cursor:pointer;font:inherit}
-.pc-chip.is-active{background:#1E3A5F;border-color:#1E3A5F;color:#fff}
-.pc-chip:focus-visible,.pc-btn:focus-visible,.pc-close:focus-visible{outline:3px solid #56CCF2;outline-offset:2px}
-.pc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
-.pc-card{display:flex;flex-direction:column;gap:12px;background:#fff;border:1px solid #e3e9f0;border-radius:16px;padding:24px;box-shadow:0 1px 3px rgba(30,58,95,.06)}
-.pc-kicker{margin:0;font-size:.85rem;font-weight:600;color:#5b6b7a}
-.pc-card h2{margin:0;font-size:1.2rem;color:#1E3A5F}
-.pc-meta{margin:0;color:#24323F}
-.pc-btn{display:inline-block;margin-top:auto;border:1px solid #1E3A5F;background:#fff;color:#1E3A5F;border-radius:999px;padding:10px 20px;font:inherit;cursor:pointer;text-decoration:none}
-.pc-btn-primary{background:#C8402F;border-color:#C8402F;color:#fff}
-.pc-dialog{border:0;border-radius:16px;padding:32px;max-width:520px;width:calc(100% - 32px)}
-.pc-dialog::backdrop{background:rgba(20,30,45,.5)}
-.pc-dialog h2{color:#1E3A5F}
-.pc-close{position:absolute;top:12px;right:16px;border:0;background:none;font-size:1.6rem;cursor:pointer}
-.pc-facts dt{font-weight:600;margin-top:12px;color:#1E3A5F}
-.pc-facts dd{margin:2px 0 0;color:#24323F}
-.pc-actions{margin-top:24px}
-.pc-empty{grid-column:1/-1;color:#5b6b7a}
+/* Public programmes page. Everything specific to this page lives here; tokens come from tokens.css.
+   Motion: the filter highlight (data-glide) and the card entrance (data-reveal-group) are the shared motion
+   layer. CSS below only adds hover/focus feedback and the dialog's arrival, and all of it stops under
+   prefers-reduced-motion (the --t-* tokens drop to 0ms and the keyframes are switched off). */
+
+.pc-page{
+  --pc-navy:var(--navy,#1E3A5F);--pc-ink:var(--ink,#0F2540);--pc-text:var(--text,#24323F);--pc-muted:var(--muted,#566677);
+  --pc-line:var(--line,#e3e9f0);--pc-line-strong:var(--line-strong,#c9d5e2);--pc-surface:var(--surface,#fff);
+  --pc-accent:var(--coral-strong,#C8402F);--pc-accent-hover:var(--coral-strong-hover,#B3321F);--pc-sky:var(--sky,#56CCF2);
+  --pc-tint:var(--navy-50,#f2f6fb);--pc-tint-2:var(--navy-100,#e8eff7);
+  --pc-focus:var(--focus,0 0 0 2px #fff,0 0 0 5px #1f6feb);
+}
+
+.pc-wrap{width:min(1180px,100% - 40px);margin-inline:auto}
+
+/* ---------- Skip link ---------- */
+.pc-skip{position:absolute;left:16px;top:-80px;z-index:2000;padding:10px 16px;border-radius:10px;background:var(--pc-ink,#0F2540);color:#fff;font-weight:600;text-decoration:none;transition:top var(--t-fast,150ms) var(--ease-out,ease)}
+.pc-skip:focus{top:12px}
+
+/* ---------- Hero ---------- */
+.pc-hero{position:relative;overflow:hidden;color:#fff;background:
+  radial-gradient(900px 420px at 88% -20%,rgba(86,204,242,.30),transparent 60%),
+  radial-gradient(700px 380px at -10% 120%,rgba(244,196,48,.14),transparent 60%),
+  linear-gradient(160deg,#0F2540 0%,#1E3A5F 62%,#24497a 100%);
+  padding:clamp(40px,7vw,84px) 0 clamp(36px,5vw,56px)}
+.pc-hero-copy{display:grid;gap:14px;justify-items:start}
+.pc-hero-copy>p,.pc-hero-copy>h1{max-width:760px}
+.pc-eyebrow{display:inline-flex;align-items:center;gap:10px;margin:0;color:#8fe0f7;font:700 .78rem/1 var(--font-head,inherit);letter-spacing:.12em;text-transform:uppercase}
+.pc-hero h1{margin:0;color:#fff;font:700 clamp(2.1rem,5.2vw,3.5rem)/1.05 var(--font-head,inherit);letter-spacing:-.01em}
+.pc-lead{margin:0;max-width:60ch;color:#d6e2ef;font-size:clamp(1rem,1.6vw,1.15rem);line-height:1.6}
+
+/* ---------- Level filter (the highlight glides between chips) ---------- */
+.pc-filters{--glide-bg:#fff;--glide-radius:999px;position:relative;display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;padding:6px;width:fit-content;max-width:100%;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(255,255,255,.08)}
+.glide-pill{position:absolute;z-index:0;top:0;left:0;width:0;height:0;border-radius:var(--glide-radius,999px);background:var(--glide-bg,#fff);pointer-events:none;will-change:transform}
+.pc-chip{position:relative;z-index:1;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border:1px solid transparent;border-radius:999px;background:transparent;color:#fff;font:600 .93rem/1 var(--font-body,inherit);cursor:pointer;-webkit-tap-highlight-color:transparent;transition:color var(--t-fast,150ms) var(--ease-out,ease),background-color var(--t-fast,150ms) var(--ease-out,ease)}
+.pc-chip:hover{background:rgba(255,255,255,.14)}
+.pc-chip.is-active{background:#fff;color:var(--pc-navy,#1E3A5F)}
+/* With the sliding highlight running, the chip itself stays clear so the highlight is what you see move. */
+.pc-filters:has(.glide-pill:not([hidden])) .pc-chip.is-active{background:transparent}
+.pc-count{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:999px;background:rgba(255,255,255,.18);font:700 .75rem/1 var(--font-head,inherit)}
+.pc-chip.is-active .pc-count{background:var(--pc-tint-2,#e8eff7);color:var(--pc-navy,#1E3A5F)}
+.pc-count:empty{display:none}
+.pc-chip:focus-visible,.pc-btn:focus-visible,.pc-close:focus-visible{outline:none;box-shadow:var(--pc-focus)}
+
+/* ---------- Body ---------- */
+.pc-body{padding-block:clamp(28px,4vw,48px) clamp(56px,8vw,96px)}
+.pc-status{margin:0 0 18px;color:var(--pc-muted);font-size:.92rem}
+.pc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:22px;align-items:stretch}
+
+/* ---------- Programme card ---------- */
+.pc-card{--accent:var(--pc-navy,#1E3A5F);position:relative;display:flex;flex-direction:column;gap:16px;padding:24px;border:1px solid var(--pc-line);border-radius:20px;background:var(--pc-surface);box-shadow:0 1px 2px rgba(15,37,64,.05),0 10px 28px -16px rgba(15,37,64,.18);overflow:hidden;transition:transform var(--t-card,220ms) var(--ease-out,ease),box-shadow var(--t-card,220ms) var(--ease-out,ease),border-color var(--t-card,220ms) var(--ease-out,ease)}
+.pc-card::before{content:"";position:absolute;inset:0 0 auto 0;height:5px;background:var(--accent)}
+.pc-card[data-group="intake"]{--accent:#c58a00}
+.pc-card[data-group="beginner"]{--accent:#2f8f5b}
+.pc-card[data-group="intermediate"]{--accent:#1f6fb5}
+.pc-card[data-group="advanced"]{--accent:#7a4bc4}
+.pc-card:focus-within{border-color:var(--pc-navy,#1E3A5F)}
+@media (hover:hover){
+  .pc-card:hover{transform:translate3d(0,-4px,0);border-color:var(--pc-line-strong);box-shadow:0 2px 4px rgba(15,37,64,.06),0 18px 36px -16px rgba(15,37,64,.28)}
+  .pc-card:hover .pc-arrow{transform:translate3d(4px,0,0)}
+}
+.pc-card-top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:4px}
+.pc-kicker{margin:0;color:var(--pc-muted);font:700 .74rem/1.2 var(--font-head,inherit);letter-spacing:.09em;text-transform:uppercase}
+
+/* Where the programme sits: three pips for the levels, none for the intake */
+.pc-level{display:inline-flex;align-items:center;gap:8px;color:var(--pc-text);font:600 .8rem/1 var(--font-body,inherit)}
+.pc-pips{display:inline-flex;gap:4px}
+.pc-pips i{width:16px;height:6px;border-radius:999px;background:var(--pc-line-strong)}
+.pc-pips i[data-on]{background:var(--accent,var(--pc-navy,#1E3A5F))}
+
+.pc-title{margin:0;display:grid;gap:2px;color:var(--pc-ink,#0F2540);font:600 1.3rem/1.2 var(--font-head,inherit)}
+.pc-title-sub{color:var(--pc-muted);font-size:.9rem;font-weight:500}
+.pc-title-main{font-size:1.45rem;font-weight:700;color:var(--pc-navy,#1E3A5F)}
+
+.pc-stats{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:0;border:1px solid var(--pc-line);border-radius:14px;background:var(--pc-tint,#f2f6fb)}
+.pc-stats>div{padding:12px 14px;min-width:0}
+.pc-stats>div+div{border-left:1px solid var(--pc-line)}
+.pc-stats dt{margin:0 0 4px;color:var(--pc-muted);font:700 .7rem/1.2 var(--font-head,inherit);letter-spacing:.08em;text-transform:uppercase}
+.pc-stats dd{margin:0;color:var(--pc-ink,#0F2540);font:600 .93rem/1.35 var(--font-body,inherit);overflow-wrap:anywhere}
+
+.pc-tags{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+.pc-tags li{padding:5px 11px;border-radius:999px;background:var(--pc-tint-2,#e8eff7);color:var(--pc-navy,#1E3A5F);font:600 .8rem/1.3 var(--font-body,inherit)}
+.pc-tags .pc-tag-more{background:transparent;border:1px dashed var(--pc-line-strong);color:var(--pc-muted)}
+
+/* ---------- Buttons ---------- */
+.pc-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;margin-top:auto;padding:0 22px;border:1px solid var(--pc-navy,#1E3A5F);border-radius:999px;background:var(--pc-surface);color:var(--pc-navy,#1E3A5F);font:600 .95rem/1 var(--font-head,inherit);text-decoration:none;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:background-color var(--t-fast,150ms) var(--ease-out,ease),color var(--t-fast,150ms) var(--ease-out,ease),transform var(--t-fast,150ms) var(--ease-out,ease)}
+.pc-btn:hover{background:var(--pc-navy,#1E3A5F);color:#fff}
+.pc-btn:active{transform:scale(.97)}
+.pc-arrow{display:inline-block;transition:transform var(--t-card,220ms) var(--ease-out,ease)}
+/* The whole card is one target; the button stays the accessible control inside it. */
+.pc-card .pc-btn::after{content:"";position:absolute;inset:-400px -400px -400px -400px}
+.pc-card .pc-btn{z-index:1}
+.pc-btn-primary{background:var(--pc-accent,#C8402F);border-color:var(--pc-accent,#C8402F);color:#fff}
+.pc-btn-primary:hover{background:var(--pc-accent-hover,#B3321F);border-color:var(--pc-accent-hover,#B3321F)}
+
+.pc-empty{grid-column:1/-1;display:grid;justify-items:center;gap:14px;padding:48px 20px;border:1px dashed var(--pc-line-strong);border-radius:20px;color:var(--pc-muted);text-align:center}
+.pc-empty .pc-btn{margin-top:0}
+
+/* ---------- Details dialog ---------- */
+.pc-dialog{margin:auto;width:min(560px,100% - 32px);max-height:calc(100dvh - 32px);padding:0;border:0;border-radius:24px;background:var(--pc-surface);color:var(--pc-text);box-shadow:0 30px 70px -20px rgba(15,37,64,.55);overflow:auto}
+.pc-dialog::backdrop{background:rgba(15,37,64,.58);backdrop-filter:blur(3px)}
+.pc-dialog[open]{animation:pc-pop var(--t-enter,320ms) var(--ease-out,ease)}
+.pc-dialog[open]::backdrop{animation:pc-fade var(--t-enter,320ms) var(--ease-out,ease)}
+@keyframes pc-pop{from{opacity:0;transform:translate3d(0,18px,0) scale(.98)}}
+@keyframes pc-fade{from{opacity:0}}
+.pc-dialog-head{position:relative;display:grid;gap:8px;padding:28px 64px 24px 28px;color:#fff;background:linear-gradient(160deg,#0F2540,#1E3A5F)}
+.pc-dialog-head .pc-kicker{color:#8fe0f7}
+.pc-dialog-head h2{margin:0;color:#fff;font:700 1.55rem/1.15 var(--font-head,inherit)}
+.pc-dialog-head .pc-level{color:#d6e2ef}
+.pc-dialog-head .pc-pips i{background:rgba(255,255,255,.28)}
+.pc-dialog-head .pc-pips i[data-on]{background:#8fe0f7}
+.pc-close{position:absolute;top:14px;right:14px;display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;font-size:1.6rem;line-height:1;cursor:pointer;transition:background-color var(--t-fast,150ms) var(--ease-out,ease)}
+.pc-close:hover{background:rgba(255,255,255,.26)}
+.pc-dialog-body{display:grid;gap:22px;padding:24px 28px 28px}
+.pc-facts{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px;margin:0}
+.pc-facts>div{min-width:0}
+.pc-facts .is-wide{grid-column:1/-1}
+.pc-facts dt{margin:0 0 4px;color:var(--pc-muted);font:700 .72rem/1.2 var(--font-head,inherit);letter-spacing:.08em;text-transform:uppercase}
+.pc-facts dd{margin:0;color:var(--pc-ink,#0F2540);font:600 1rem/1.4 var(--font-body,inherit)}
+.pc-actions{display:grid;gap:12px;padding-top:20px;border-top:1px solid var(--pc-line)}
+.pc-actions .pc-btn{margin-top:0}
+.pc-note{margin:0;color:var(--pc-muted);font-size:.88rem;line-height:1.5;text-align:center}
+
+/* ---------- Small screens ---------- */
+@media (max-width:640px){
+  .pc-wrap{width:calc(100% - 32px)}
+  .pc-filters{width:100%;border-radius:22px}
+  .pc-chip{padding:0 14px;font-size:.88rem}
+  .pc-card{padding:20px}
+  .pc-facts{grid-template-columns:1fr}
+  .pc-dialog-head{padding:24px 60px 20px 22px}
+  .pc-dialog-body{padding:20px 22px 24px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  .pc-dialog[open],.pc-dialog[open]::backdrop{animation:none}
+  .pc-card:hover,.pc-btn:active{transform:none}
+  .pc-card:hover .pc-arrow{transform:none}
+}

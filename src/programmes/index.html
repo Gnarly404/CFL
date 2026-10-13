@@ -4,9 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Programmes - Centre of Foreign Learning</title>
+  <meta name="description" content="English language programmes at the Centre of Foreign Learning, from the two-month intake to the advanced level. See what each one covers and apply online.">
   <link rel="stylesheet" href="/css/foundation.css">
 <link rel="stylesheet" href="/css/fonts.css">
 <link rel="stylesheet" href="/css/motion.css">
+  <link rel="stylesheet" href="/css/tokens.css">
   <link rel="stylesheet" href="/css/programmes.css">
   <link rel="stylesheet" href="/css/site-nav.css">
   <link rel="stylesheet" href="/css/programme-cards.css">
@@ -14,29 +16,46 @@
   <link rel="icon" type="image/png" href="/images/logo.png">
 <script type="module" src="/js/motion/boot.js"></script>
 </head>
-<body>
+<body class="pc-page">
+<a class="pc-skip" href="#pcMain">Skip to the programmes</a>
 <!-- @include site-nav -->
 
-<main class="pc-main">
-  <header class="pc-head">
-    <h1>Our Programmes</h1>
-    <p>English language programmes from elementary to advanced.</p>
-    <div class="pc-filters" role="group" aria-label="Filter by level">
-      <button type="button" class="pc-chip is-active" data-group="all" aria-pressed="true">All</button>
-      <button type="button" class="pc-chip" data-group="beginner" aria-pressed="false">Elementary-Beginner</button>
-      <button type="button" class="pc-chip" data-group="intermediate" aria-pressed="false">Intermediate</button>
-      <button type="button" class="pc-chip" data-group="advanced" aria-pressed="false">Advanced</button>
+<main class="pc-main" id="pcMain">
+  <header class="pc-hero">
+    <div class="pc-wrap pc-hero-copy" data-reveal-group>
+      <p class="pc-eyebrow"><span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></span> Admissions</p>
+      <h1>Our Programmes</h1>
+      <p class="pc-lead">English language programmes from elementary to advanced. Pick a level to see what it covers, who it is for and what it costs to apply.</p>
+      <div class="pc-filters" role="group" aria-label="Filter by level" data-glide>
+        <button type="button" class="pc-chip is-active" data-group="all" data-glide-item aria-pressed="true">All <span class="pc-count" aria-hidden="true"></span></button>
+        <button type="button" class="pc-chip" data-group="intake" data-glide-item aria-pressed="false">Intake <span class="pc-count" aria-hidden="true"></span></button>
+        <button type="button" class="pc-chip" data-group="beginner" data-glide-item aria-pressed="false">Elementary-Beginner <span class="pc-count" aria-hidden="true"></span></button>
+        <button type="button" class="pc-chip" data-group="intermediate" data-glide-item aria-pressed="false">Intermediate <span class="pc-count" aria-hidden="true"></span></button>
+        <button type="button" class="pc-chip" data-group="advanced" data-glide-item aria-pressed="false">Advanced <span class="pc-count" aria-hidden="true"></span></button>
+      </div>
     </div>
   </header>
-  <section id="programmeGrid" class="pc-grid" aria-live="polite" data-reveal-group></section>
+
+  <div class="pc-wrap pc-body">
+    <p class="pc-status" id="pcStatus" role="status"></p>
+    <section id="programmeGrid" class="pc-grid" aria-label="Programmes" data-reveal-group></section>
+  </div>
 </main>
 
 <dialog id="programmeDialog" class="pc-dialog" aria-labelledby="pdTitle">
-  <form method="dialog"><button class="pc-close" aria-label="Close">&times;</button></form>
-  <p class="pc-kicker" id="pdCategory"></p>
-  <h2 id="pdTitle"></h2>
-  <dl class="pc-facts" id="pdFacts"></dl>
-  <div class="pc-actions"><a class="pc-btn pc-btn-primary" href="/register">Apply now</a></div>
+  <header class="pc-dialog-head">
+    <form method="dialog"><button class="pc-close" aria-label="Close">&times;</button></form>
+    <p class="pc-kicker" id="pdCategory"></p>
+    <h2 id="pdTitle"></h2>
+    <div class="pc-level-slot" id="pdLevel"></div>
+  </header>
+  <div class="pc-dialog-body">
+    <dl class="pc-facts" id="pdFacts"></dl>
+    <div class="pc-actions">
+      <a class="pc-btn pc-btn-primary" id="pdApply" href="/register">Apply now</a>
+      <p class="pc-note">The application takes about five minutes and is saved on your device until you send it.</p>
+    </div>
+  </div>
 </dialog>
 
 <!-- @include site-footer -->
