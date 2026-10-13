@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
-  adminReviewPrivacyRequestCore, submitPrivacyRequestCore,
+  adminDeletePrivacyRequestCore, adminReviewPrivacyRequestCore, submitPrivacyRequestCore,
 } from '../../functions/src/privacy/requests.js';
 import { fakeDb, fakeFieldValue } from './helpers/fakes.js';
 
@@ -70,5 +70,26 @@ describe('student privacy requests', () => {
       .rejects.toMatchObject({ code: 'invalid-argument' });
     await expect(adminReviewPrivacyRequestCore(d, { actor: admin, data: { requestId: 'missing', status: 'under_review' } }))
       .rejects.toMatchObject({ code: 'not-found' });
+  });
+
+  it('permanently deletes declined requests and audits without retaining details', async () => {
+    const d = deps();
+    d.db.store.set('privacyRequests/r1', { status: 'declined', requestType: 'deletion', details: 'Private details' });
+    await expect(adminDeletePrivacyRequestCore(d, { actor: admin, data: { requestId: 'r1' } }))
+      .resolves.toEqual({ requestId: 'r1', deleted: true });
+    expect(d.db.store.has('privacyRequests/r1')).toBe(false);
+    expect(d.audit).toHaveBeenCalledWith({
+      actorId: 'adm1', action: 'privacy_request.delete', resource: { type: 'privacyRequest', id: 'r1' },
+      metadata: { requestType: 'deletion', previousStatus: 'declined' },
+    });
+    expect(JSON.stringify(d.audit.mock.calls)).not.toContain('Private details');
+  });
+
+  it('refuses permanent deletion when a privacy request is not declined', async () => {
+    const d = deps();
+    d.db.store.set('privacyRequests/r1', { status: 'under_review', requestType: 'objection' });
+    await expect(adminDeletePrivacyRequestCore(d, { actor: admin, data: { requestId: 'r1' } }))
+      .rejects.toMatchObject({ code: 'failed-precondition' });
+    expect(d.db.store.has('privacyRequests/r1')).toBe(true);
   });
 });

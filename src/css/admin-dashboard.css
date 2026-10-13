@@ -79,6 +79,15 @@ html[data-motion="on"] .console-nav a[aria-current="page"]{background:transparen
 .privacy-review-item{border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface);transition:border-color var(--t-fast) var(--ease-out)}
 .privacy-review-item:hover,.privacy-review-item[open]{border-color:var(--line-strong)}
 .privacy-review-item>summary{display:flex;align-items:center;justify-content:space-between;gap:var(--s4);padding:var(--s4);color:var(--navy);list-style:none}
+.privacy-review-item{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start}
+.privacy-review-item>summary{grid-column:1/-1;grid-row:1}
+.privacy-review-item.is-declined>summary{grid-column:1}
+.privacy-review-content{grid-column:1/-1}
+.privacy-delete-button,.application-delete-button{display:inline-grid;place-items:center;width:38px;height:38px;flex:0 0 38px;padding:0;border:1px solid #d8aaa7;border-radius:8px;background:#fff5f4;color:#a12e26;cursor:pointer;transition:background var(--t-fast),border-color var(--t-fast),color var(--t-fast)}
+.privacy-delete-button{grid-column:2;grid-row:1;align-self:center;margin-right:var(--s3)}
+.privacy-delete-button:hover,.application-delete-button:hover{border-color:#a12e26;background:#a12e26;color:#fff}
+.privacy-delete-button:focus-visible,.application-delete-button:focus-visible{outline:none;box-shadow:var(--focus)}
+.privacy-delete-button:disabled,.application-delete-button:disabled{opacity:.6;cursor:wait}
 .privacy-review-item>summary strong{display:block;color:var(--text-strong)}
 .privacy-review-meta{display:block;margin-top:2px;color:var(--muted);font-size:.8rem;overflow-wrap:anywhere}
 .privacy-review-item .badge-status{flex:0 0 auto}

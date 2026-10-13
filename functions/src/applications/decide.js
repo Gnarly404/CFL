@@ -10,7 +10,6 @@ const NOTIFY_ON = new Set(['waitlisted', 'rejected', 'info_requested']);
 /** Moves an application through the admissions workflow; approval creates the student account. */
 export async function decideApplicationCore(deps, { actor, data }) {
   const { repo, audit, provision, mailer, baseUrl, db, FieldValue, log } = deps;
-
   const applicationId = typeof data?.applicationId === 'string' ? data.applicationId : '';
   const target = DECISIONS[data?.decision];
   const note = typeof data?.note === 'string' ? data.note.trim().slice(0, 500) : '';
@@ -21,6 +20,7 @@ export async function decideApplicationCore(deps, { actor, data }) {
   if (!canTransition(application.status, target)) {
     throw new HttpsError('failed-precondition', `An application that is "${application.status}" cannot move to "${target}".`);
   }
+
 
   let userId = application.userId ?? null;
   let accountActivationUrl = null;
@@ -93,6 +93,30 @@ export async function decideApplicationCore(deps, { actor, data }) {
       : {}),
   };
 }
+
+/** Permanently removes only rejected applications. The callable verifies admin role before entering this core. */
+export async function adminDeleteRejectedApplicationCore(deps, { actor, data }) {
+  const { db, repo, audit } = deps;
+  const applicationId = typeof data?.applicationId === 'string' ? data.applicationId.trim() : '';
+  if (!applicationId || applicationId.length > 150) throw new HttpsError('invalid-argument', 'Choose a valid application.');
+  const application = await repo.getById(applicationId);
+  if (!application) throw new HttpsError('not-found', 'That application could not be found.');
+  if (application.status !== 'rejected') throw new HttpsError('failed-precondition', 'Only declined applications can be permanently deleted.');
+  await db.collection('applications').doc(applicationId).delete();
+  await audit?.({
+    actorId: actor.uid,
+    action: 'application.delete_rejected',
+    resource: { type: 'application', id: applicationId },
+    metadata: { reference: application.reference, previousStatus: application.status },
+  });
+  return { applicationId, deleted: true };
+}
+
+export const adminDeleteRejectedApplication = onCall({ cors: true }, async (request) => {
+  const deps = buildRuntime();
+  const actor = await requireRole(request, ['admin'], deps);
+  return adminDeleteRejectedApplicationCore(deps, { actor, data: request.data });
+});
 
 export const decideApplication = onCall({ cors: true, secrets: [SMTP_PASS] }, async (request) => {
   const deps = buildRuntime();

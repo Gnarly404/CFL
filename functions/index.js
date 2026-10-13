@@ -3,10 +3,10 @@ import './global-options.js';
 // Admissions
 export { submitApplication } from './src/applications/submit.js';
 export { getApplicationStatus } from './src/applications/status.js';
-export { decideApplication } from './src/applications/decide.js';
+export { decideApplication, adminDeleteRejectedApplication } from './src/applications/decide.js';
 
 // Student privacy requests
-export { submitPrivacyRequest, adminReviewPrivacyRequest } from './src/privacy/requests.js';
+export { submitPrivacyRequest, adminReviewPrivacyRequest, adminDeletePrivacyRequest } from './src/privacy/requests.js';
 
 // Account administration
 export { adminCreateUser } from './src/admin/create-user.js';

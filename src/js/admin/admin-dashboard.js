@@ -7,6 +7,7 @@ import { initProgrammeStaff } from './programme-staff.js';
 import { initProgrammes } from './programmes.js';
 import { applicationDetails } from './application-details.js';
 import { setAttentionBadge } from '@/ui/attention-badge.js';
+import { icon } from '@/ui/icons.js';
 import { setStat } from './stats.js';
 import { validateEmail, validateName } from '@/utils/validation.js';
 import { formatDate } from '@/utils/format.js';
@@ -15,7 +16,7 @@ import {
 } from '@/utils/dom.js';
 import {
   countOpenApplications, createUser, decideApplication, listApplications, listPrivacyRequests, listUsers,
-  resendInvite, reviewPrivacyRequest, setUserDisabled, setUserRole,
+  resendInvite, reviewPrivacyRequest, deleteDeclinedPrivacyRequest, deleteRejectedApplication, setUserDisabled, setUserRole,
 } from '@/services/admin-service.js';
 import { sendAccountInvitation } from '@/services/email.js';
 import { deliverInvitation as deliverInvitationTo } from './invitation.js';
@@ -101,6 +102,18 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
         }
       },
     }, DECISION_LABELS[decision]));
+        if (app.status === 'rejected') {
+          actions.push(el('button', {
+            type: 'button',
+            class: 'application-delete-button',
+            title: 'Permanently delete declined application',
+            'aria-label': `Permanently delete declined application ${app.reference}`,
+            onclick: async () => {
+              if (!window.confirm(`Permanently delete declined application ${app.reference}? This cannot be undone.`)) return;
+              await run('Application permanently deleted', () => deleteRejectedApplication({ applicationId: app.id }));
+            },
+          }, icon('trash', { size: 18 })));
+        }
     return el('tr', {},
       el('td', {}, app.reference),
       el('td', {}, el('strong', {}, app.applicantName), el('br'), el('small', {}, app.email), applicationDetails(app)),
@@ -228,8 +241,27 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
         setBusy(button, false);
       }
     });
+    const deleteButton = request.status === 'declined' ? el('button', {
+      type: 'button',
+      class: 'privacy-delete-button',
+      title: 'Permanently delete declined request',
+      'aria-label': `Permanently delete declined privacy request ${request.id.slice(0, 8)}`,
+      onclick: async () => {
+        if (!window.confirm(`Permanently delete declined privacy request ${request.id.slice(0, 8)}? This cannot be undone.`)) return;
+        deleteButton.disabled = true;
+        try {
+          await deleteDeclinedPrivacyRequest({ requestId: request.id });
+          say('Declined privacy request permanently deleted.', 'success');
+          await loadPrivacyQueue();
+        } catch (error) {
+          say(error.message || 'The privacy request could not be deleted.', 'error');
+          deleteButton.disabled = false;
+        }
+      },
+    }, icon('trash', { size: 18 })) : '';
 
-    const item = el('details', { class: 'privacy-review-item' }, summary,
+    const item = el('details', { class: `privacy-review-item${request.status === 'declined' ? ' is-declined' : ''}` }, summary,
+      deleteButton,
       el('div', { class: 'privacy-review-content' },
         el('p', {}, el('strong', {}, 'Student request: '), request.details || 'Copy of personal data requested.'),
         request.correctionCategory ? el('p', {}, el('strong', {}, 'Correction category: '), request.correctionCategory.replaceAll('_', ' ')) : '',

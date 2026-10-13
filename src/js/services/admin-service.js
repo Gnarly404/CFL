@@ -37,6 +37,7 @@ export async function listUsers({ max = 200 } = {}) {
 }
 
 export const decideApplication = ({ applicationId, decision, note = '' }) => call('decideApplication', { applicationId, decision, note });
+export const deleteRejectedApplication = ({ applicationId }) => call('adminDeleteRejectedApplication', { applicationId });
 export const createUser = ({ email, displayName, role }) => call('adminCreateUser', { email, displayName, role });
 export const setUserDisabled = ({ uid, disabled }) => call('adminSetUserStatus', { uid, disabled });
 export const setUserRole = ({ uid, role }) => call('adminSetUserRole', { uid, role });
@@ -44,6 +45,7 @@ export const assignInstructor = ({ studentId, instructorId, assigned }) => call(
 export const assignProgramme = ({ programmeId, instructorId, assigned }) => call('adminAssignProgramme', { programmeId, instructorId, assigned });
 export const resendInvite = ({ uid }) => call('adminResendInvite', { uid });
 export const reviewPrivacyRequest = ({ requestId, status, response, nextAction = '' }) => call('adminReviewPrivacyRequest', { requestId, status, response, nextAction });
+export const deleteDeclinedPrivacyRequest = ({ requestId }) => call('adminDeletePrivacyRequest', { requestId });
 
 export async function listPrivacyRequests({ max = 200 } = {}) {
   const rows = rowsFromSnapshot(await getDocs(query(collection(dbService(), 'privacyRequests'), limit(max))));

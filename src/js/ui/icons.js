@@ -23,6 +23,7 @@ const SHAPES = {
   speaker: [['path', { d: 'M11 5 6 9H3v6h3l5 4V5Z' }], ['path', { d: 'M15.5 8.5a5 5 0 0 1 0 7M18.5 6a9 9 0 0 1 0 12' }]],
   arrow: [['path', { d: 'M5 12h14M13 6l6 6-6 6' }]],
   check: [['path', { d: 'm5 12.5 4.5 4.5L19 7.5' }]],
+  trash: [['path', { d: 'M4 7h16M10 11v6M14 11v6' }], ['path', { d: 'M5 7l1 14h12l1-14M9 7V4h6v3' }]],
 };
 
 export const iconNames = Object.keys(SHAPES);

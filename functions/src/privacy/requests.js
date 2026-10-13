@@ -86,6 +86,26 @@ export async function adminReviewPrivacyRequestCore(deps, { actor, data, now = (
   return { requestId, status };
 }
 
+/** Permanently deletes only a declined request. The caller must be an admin. */
+export async function adminDeletePrivacyRequestCore(deps, { actor, data }) {
+  const { db, audit } = deps;
+  const requestId = typeof data?.requestId === 'string' ? data.requestId.trim() : '';
+  if (!requestId || requestId.length > 150) throw new HttpsError('invalid-argument', 'Choose a valid privacy request.');
+  const ref = db.collection('privacyRequests').doc(requestId);
+  const snap = await ref.get();
+  if (!snap.exists) throw new HttpsError('not-found', 'That privacy request could not be found.');
+  const request = snap.data();
+  if (request.status !== 'declined') throw new HttpsError('failed-precondition', 'Only declined privacy requests can be permanently deleted.');
+  await ref.delete();
+  await audit?.({
+    actorId: actor.uid,
+    action: 'privacy_request.delete',
+    resource: { type: 'privacyRequest', id: requestId },
+    metadata: { requestType: request.requestType, previousStatus: request.status },
+  });
+  return { requestId, deleted: true };
+}
+
 export const submitPrivacyRequest = onCall({ cors: true }, async (request) => {
   const deps = buildRuntime();
   const actor = await requireRole(request, ['student'], deps);
@@ -96,4 +116,10 @@ export const adminReviewPrivacyRequest = onCall({ cors: true }, async (request) 
   const deps = buildRuntime();
   const actor = await requireRole(request, ['admin'], deps);
   return adminReviewPrivacyRequestCore(deps, { actor, data: request.data });
+});
+
+export const adminDeletePrivacyRequest = onCall({ cors: true }, async (request) => {
+  const deps = buildRuntime();
+  const actor = await requireRole(request, ['admin'], deps);
+  return adminDeletePrivacyRequestCore(deps, { actor, data: request.data });
 });

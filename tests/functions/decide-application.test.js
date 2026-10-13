@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { decideApplicationCore } from '../../functions/src/applications/decide.js';
+import { adminDeleteRejectedApplicationCore, decideApplicationCore } from '../../functions/src/applications/decide.js';
 import {
   fakeDb, fakeFieldValue, fakeMailer, fakeRepo, log,
 } from './helpers/fakes.js';
@@ -103,5 +103,25 @@ describe('decideApplication', () => {
     const d = deps({ provision: vi.fn().mockRejectedValue(new Error('auth down')) });
     await expect(decide(d, { applicationId: 'app1', decision: 'approve' })).rejects.toThrow('auth down');
     expect(d.repo.applyDecision).not.toHaveBeenCalled();
+  });
+});
+
+describe('adminDeleteRejectedApplication', () => {
+  it('permanently deletes a rejected application and audits only its reference', async () => {
+    const rejected = { ...application, status: 'rejected' };
+    const d = deps({ repo: fakeRepo([rejected]) });
+    await expect(adminDeleteRejectedApplicationCore(d, { actor, data: { applicationId: 'app1' } }))
+      .resolves.toEqual({ applicationId: 'app1', deleted: true });
+    expect(d.db.store.has('applications/app1')).toBe(false);
+    expect(d.audit).toHaveBeenCalledWith(expect.objectContaining({
+      action: 'application.delete_rejected', resource: { type: 'application', id: 'app1' },
+    }));
+  });
+
+  it('refuses to delete applications that are not rejected', async () => {
+    const d = deps();
+    await expect(adminDeleteRejectedApplicationCore(d, { actor, data: { applicationId: 'app1' } }))
+      .rejects.toMatchObject({ code: 'failed-precondition' });
+    expect(d.db.store.has('applications/app1')).toBe(false);
   });
 });
