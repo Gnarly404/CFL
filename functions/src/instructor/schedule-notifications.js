@@ -44,8 +44,14 @@ async function recipientsFor(db, programmeId) {
   const enrolments = await db.collection('enrolments').where('programmeId', '==', programmeId).get();
   const studentIds = [...new Set(enrolments.docs.map((doc) => doc.data().studentId).filter(Boolean))];
   const users = await Promise.all(studentIds.map((uid) => db.collection('users').doc(uid).get()));
-  return users.filter((user) => user.exists && user.data().role === 'student' && user.data().status === 'active')
-    .map((user) => ({ uid: user.id, ...user.data() }));
+  const active = users.filter((user) => user.exists && user.data().role === 'student' && user.data().status === 'active');
+  // "Class reminders" in the student's account settings: on unless they have switched it off.
+  const records = await Promise.all(active.map((user) => db.collection('students').doc(user.id).get()));
+  return active.map((user, index) => ({
+    uid: user.id,
+    ...user.data(),
+    classReminders: !(records[index].exists && records[index].data()?.preferences?.classReminders === false),
+  }));
 }
 
 export async function sendScheduleChangeCore(deps, { classId, eventId, action, scheduleClass }) {
@@ -84,6 +90,8 @@ export async function sendScheduleChangeCore(deps, { classId, eventId, action, s
         createdAt: deps.FieldValue.serverTimestamp(),
         readAt: null,
       });
+      // The announcement stays in their messages either way; the alert is what the setting turns off.
+      if (!student.classReminders) return;
       batch.set(deps.db.collection('notifications').doc(`class_${classId}_${student.uid}`), {
         userId: student.uid,
         type: 'class',

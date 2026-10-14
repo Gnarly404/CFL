@@ -26,6 +26,22 @@ const messages = (deps) => [...deps.db.store.entries()].filter(([key]) => key.st
 const notifications = (deps) => [...deps.db.store.entries()].filter(([key]) => key.startsWith('notifications/')).map(([key, value]) => ({ id: key.split('/')[1], ...value }));
 
 describe('schedule change notifications', () => {
+  it('skips the alert (not the message) for students who switched class reminders off', async () => {
+    const deps = setup();
+    deps.db.store.set('students/stu1', { preferences: { classReminders: false } });
+    const result = await sendScheduleChangeCore(deps, { classId: 'class1', eventId: 'event1', action: 'scheduled', scheduleClass });
+    expect(result.sent).toBe(1);
+    expect(messages(deps)).toHaveLength(1);
+    expect(notifications(deps)).toHaveLength(0);
+  });
+
+  it('still alerts students who have no saved preference or left reminders on', async () => {
+    const deps = setup();
+    deps.db.store.set('students/stu1', { preferences: { classReminders: true, emailUpdates: false } });
+    await sendScheduleChangeCore(deps, { classId: 'class1', eventId: 'event1', action: 'scheduled', scheduleClass });
+    expect(notifications(deps)).toHaveLength(1);
+  });
+
   it('notifies active enrolled students with the full class details', async () => {
     const deps = setup();
     const result = await sendScheduleChangeCore(deps, { classId: 'class1', eventId: 'event1', action: 'scheduled', scheduleClass });

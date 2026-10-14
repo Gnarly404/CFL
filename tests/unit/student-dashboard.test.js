@@ -265,6 +265,18 @@ describe('student dashboard', () => {
     expect(document.documentElement.dataset.reduceMotion).toBe('true');
   });
 
+  it('shows class reminders as on unless the student switched them off, and saves a switch-off', async () => {
+    await open();
+    expect(document.getElementById('classReminders').checked).toBe(true);
+    document.getElementById('classReminders').checked = false;
+    document.getElementById('studentPreferencesForm').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    await tick();
+    expect(updateStudentDoc).toHaveBeenLastCalledWith(
+      expect.objectContaining({ path: 'students/stu1' }),
+      expect.objectContaining({ preferences: expect.objectContaining({ classReminders: false }) }),
+    );
+  });
+
   it('sends password reset and email verification links from account settings', async () => {
     await open();
     document.getElementById('sendPasswordReset').click();

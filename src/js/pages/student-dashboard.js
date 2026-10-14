@@ -21,6 +21,7 @@ import { h } from '@/ui/h.js';
 import { icon } from '@/ui/icons.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
 import { mountNotificationBadge } from '@/ui/notification-badge.js';
+import { setReduceMotionPreference } from '@/motion/reduced-motion.js';
 import { listMyPrivacyRequests, submitPrivacyRequest } from '@/services/privacy-request-service.js';
 
 mountPortalShell('dashboard');
@@ -304,9 +305,11 @@ const classRemindersEl = document.getElementById('classReminders');
 const reduceMotionEl = document.getElementById('reduceMotion');
 if (preferredLanguageEl) preferredLanguageEl.value = savedPreferences.preferredLanguage === 'sw' ? 'sw' : 'en';
 if (emailUpdatesEl) emailUpdatesEl.checked = savedPreferences.emailUpdates === true;
-if (classRemindersEl) classRemindersEl.checked = savedPreferences.classReminders === true;
+// Class reminders are on unless the student has switched them off.
+if (classRemindersEl) classRemindersEl.checked = savedPreferences.classReminders !== false;
 if (reduceMotionEl) reduceMotionEl.checked = savedPreferences.reduceMotion === true;
-if (savedPreferences.reduceMotion) document.documentElement.dataset.reduceMotion = 'true';
+// Keep this browser in step with the saved choice, so every page follows it.
+if (studentRecord) setReduceMotionPreference(savedPreferences.reduceMotion === true);
 
 preferencesForm?.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -326,9 +329,8 @@ preferencesForm?.addEventListener('submit', async (event) => {
   try {
     await updateDoc(doc(dbService(), 'students', session.user.uid), { preferences, updatedAt: serverTimestamp() });
     studentRecord = { ...studentRecord, preferences };
-    if (preferences.reduceMotion) document.documentElement.dataset.reduceMotion = 'true';
-    else delete document.documentElement.dataset.reduceMotion;
-    accountNote('Preferences saved. Reduced motion is applied now; language and notification delivery settings are stored for future portal support.', 'success');
+    setReduceMotionPreference(preferences.reduceMotion);
+    accountNote('Preferences saved. Reduced motion now applies on every page, and class reminders follow your choice. Email updates and language are saved for when they become available.', 'success');
   } catch (error) {
     console.warn('Could not save student preferences', error?.code ?? error);
     accountNote('Preferences could not be saved. Check your connection and try again.', 'error');

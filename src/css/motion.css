@@ -168,3 +168,6 @@ html[data-motion="on"] .portal-nav [aria-current="page"] { background: transpare
   .wave > i { animation: none !important; }
   .voice-chip:hover { transform: none; }
 }
+
+/* The student's own "Reduce motion" setting (reduced-motion.js sets the attribute on every page). */
+html[data-reduce-motion="true"] *{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}
