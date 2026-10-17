@@ -1,0 +1,61 @@
+/* Students and Payments workspaces: dialogs, balance and match badges, the import review table. */
+
+.console-dialog{margin:auto;padding:0;border:0;border-radius:var(--radius);background:var(--surface);color:var(--text);width:min(36rem,calc(100vw - 2rem));max-height:calc(100dvh - 2rem);box-shadow:0 24px 64px rgba(15,37,64,.28);overflow:hidden}
+.console-dialog[open]{display:flex;flex-direction:column}
+.console-dialog--wide{width:min(52rem,calc(100vw - 2rem))}
+.console-dialog--import{width:min(70rem,calc(100vw - 2rem))}
+.console-dialog::backdrop{background:rgba(15,37,64,.5)}
+.dialog-head{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--s4);padding:var(--s4) var(--s5);border-bottom:1px solid var(--line)}
+.dialog-head h2{margin:0;font-size:1.25rem}
+.dialog-head .eyebrow{margin:0 0 2px}
+.dialog-close{flex:0 0 auto;width:36px;height:36px;border:0;border-radius:50%;background:transparent;color:var(--muted);font-size:1.5rem;line-height:1;cursor:pointer}
+.dialog-close:hover{background:var(--surface-2);color:var(--text-strong)}
+.dialog-body{padding:var(--s5);overflow:auto;display:grid;gap:var(--s4);align-content:start}
+.dialog-foot{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:var(--s2);padding:var(--s3) var(--s5);border-top:1px solid var(--line);background:var(--surface-2)}
+
+.form-section{border:0;margin:0 0 var(--s4);padding:0;min-width:0}
+.form-section legend{padding:0;margin-bottom:var(--s2);font-weight:700;color:var(--text-strong)}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:var(--s3) var(--s4)}
+.form-group--wide{grid-column:1/-1}
+
+.record-facts{display:grid;grid-template-columns:max-content 1fr;gap:var(--s1) var(--s4);margin:0 0 var(--s4);padding:var(--s3) var(--s4);background:var(--surface-2);border-radius:var(--radius-sm);font-size:.92rem}
+.record-facts dt{color:var(--muted)}
+.record-facts dd{margin:0;overflow-wrap:anywhere}
+.record-payments{border-top:1px solid var(--line);padding-top:var(--s4)}
+.record-payments-head{display:flex;align-items:center;flex-wrap:wrap;gap:var(--s3);margin-bottom:var(--s2)}
+.record-payments-head h3{margin:0;margin-right:auto;font-size:1.05rem}
+.record-payment-list{list-style:none;margin:var(--s2) 0 0;padding:0;display:grid;gap:var(--s2)}
+.record-payment-list li{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s3);font-size:.92rem}
+
+.data-table .num{text-align:right;font-variant-numeric:tabular-nums}
+.data-table tr.is-reversed td,.data-table tr.is-muted td{color:var(--muted)}
+.data-table tr.is-reversed td:nth-child(3){text-decoration:line-through}
+.data-table .actions{display:flex;flex-wrap:wrap;gap:var(--s2)}
+.badge-status[data-balance="cleared"],.badge-status[data-balance="over"]{background:var(--ok-bg);color:var(--ok)}
+.badge-status[data-balance="part"]{background:var(--warn-bg);color:var(--warn)}
+.badge-status[data-balance="unpaid"]{background:var(--bad-bg);color:var(--bad)}
+.badge-pending{background:var(--warn-bg);color:var(--warn)}
+
+.import-stage{display:grid;gap:var(--s4)}
+.import-mapping summary{cursor:pointer;font-weight:700}
+.import-mapping .form-grid{margin-top:var(--s3)}
+.import-chips,.import-filters{display:flex;flex-wrap:wrap;gap:var(--s2)}
+.chip{display:inline-block;padding:3px 12px;border-radius:var(--radius-pill);background:#eceff3;color:#33414f;font-size:.82rem;font-weight:700}
+.chip--good{background:var(--ok-bg);color:var(--ok)}
+.chip--warn{background:var(--warn-bg);color:var(--warn)}
+.chip--bad{background:var(--bad-bg);color:var(--bad)}
+.import-filters .btn[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.import-student{display:grid;gap:3px;min-width:15rem}
+.import-student small{color:var(--muted)}
+.import-table td{vertical-align:top}
+.tier{justify-self:start;padding:1px 9px;border-radius:var(--radius-pill);font-size:.74rem;font-weight:700;background:#eceff3;color:#33414f}
+.tier--sure{background:var(--ok-bg);color:var(--ok)}
+.tier--likely,.tier--ambiguous{background:var(--warn-bg);color:var(--warn)}
+.tier--chosen{background:var(--info-bg);color:var(--info)}
+.hint--warn{color:var(--warn);font-weight:700}
+.form-control.is-invalid,.form-select.is-invalid{border-color:var(--bad)}
+
+@media (max-width:640px){
+  .dialog-head,.dialog-body,.dialog-foot{padding-left:var(--s4);padding-right:var(--s4)}
+  .record-facts{grid-template-columns:1fr}
+}

@@ -12,6 +12,8 @@ export const WORKSPACES = Object.freeze({
   admissions: { title: 'Admissions', blurb: 'Decide on applications and answer personal-data requests.', sections: ['applications', 'privacy-requests'] },
   people: { title: 'People', blurb: 'Accounts, roles, and who teaches whom.', sections: ['accounts', 'create-account', 'teaching-assignments'] },
   academics: { title: 'Academics', blurb: 'The programme catalogue and its teaching staff.', sections: ['programmes', 'programme-staff'] },
+  students: { title: 'Students', blurb: 'Every student\'s details and fees. Open a record to edit it.', sections: ['student-records'] },
+  payments: { title: 'Payments', blurb: 'Record payments, import a bank or M-Pesa statement, and see who has paid.', sections: ['payments-ledger', 'payment-imports'] },
 });
 const FALLBACK = 'admissions';
 const REST = 'translate3d(0, 0, 0)';

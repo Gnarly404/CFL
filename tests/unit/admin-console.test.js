@@ -24,7 +24,7 @@ describe('admin console workspaces', () => {
     expect(workspaceFor('nonsense')).toBe('admissions');
     expect(workspaceFor('')).toBe('admissions');
     // every section named by a workspace must exist on the page, or a deep link would land nowhere
-    expect(Object.values(WORKSPACES).flatMap((item) => item.sections)).toHaveLength(7);
+    expect(Object.values(WORKSPACES).flatMap((item) => item.sections)).toHaveLength(10);
   });
 
   it('opens the workspace named by the hash, keeps old section links working, and follows hash changes', async () => {

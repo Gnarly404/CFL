@@ -24,6 +24,11 @@ export function fakeDb() {
       store.set(key, { ...store.get(key), ...patch });
     },
     async delete() { store.delete(`${col}/${id}`); },
+    async create(data) {
+      const key = `${col}/${id}`;
+      if (store.has(key)) throw Object.assign(new Error('6 ALREADY_EXISTS'), { code: 6 });
+      store.set(key, { ...data });
+    },
   });
   const makeQuery = (col, filters = []) => {
     const query = {
@@ -46,6 +51,8 @@ export function fakeDb() {
       return {
         doc: (id = `auto${++counter}`) => ref(col, id),
         where: (field, op, value) => makeQuery(col, [[field, op, value]]),
+        limit: () => makeQuery(col),
+        get: () => makeQuery(col).get(),
         async add(data) {
           counter += 1;
           store.set(`${col}/auto${counter}`, { ...data });

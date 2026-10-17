@@ -5,6 +5,7 @@ import {
 import { initAssignments } from './assignments.js';
 import { initProgrammeStaff } from './programme-staff.js';
 import { initProgrammes } from './programmes.js';
+import { initRecords } from './records.js';
 import { applicationDetails } from './application-details.js';
 import { setAttentionBadge } from '@/ui/attention-badge.js';
 import { icon } from '@/ui/icons.js';
@@ -54,11 +55,15 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
 
   const assignments = initAssignments({ root, say, getUsers: () => knownUsers });
   const programmeStaff = initProgrammeStaff({ root, say, getUsers: () => knownUsers });
+  const records = initRecords({ root, say });
   const programmes = initProgrammes({
     root,
     say,
     onChange: () => programmeStaff.load(),
-    onLoad: (rows) => setStat('programmes', rows.filter((programme) => programme.active !== false).length, root),
+    onLoad: (rows) => {
+      setStat('programmes', rows.filter((programme) => programme.active !== false).length, root);
+      records.store.setProgrammes(rows);
+    },
   });
 
   async function run(label, work, { reload = ['applications', 'users'] } = {}) {
@@ -320,7 +325,7 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
   filter?.addEventListener('change', loadApplications);
   privacyRequestFilter?.addEventListener('change', loadPrivacyQueue);
   root.querySelector('#refreshPrivacyQueue')?.addEventListener('click', loadPrivacyQueue);
-  root.querySelector('#refreshAll')?.addEventListener('click', () => { loadApplications(); loadUsers(); programmes.load(); loadPrivacyQueue(); });
+  root.querySelector('#refreshAll')?.addEventListener('click', () => { loadApplications(); loadUsers(); programmes.load(); loadPrivacyQueue(); records.reload(); });
 
   createForm?.addEventListener('submit', async (event) => {
     event.preventDefault();

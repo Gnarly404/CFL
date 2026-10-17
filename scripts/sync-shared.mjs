@@ -4,7 +4,7 @@ import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 
 const root = resolve(import.meta.dirname, '..');
-const FILES = ['validation.js', 'application-schema.js', 'application-status.js', 'roles.js', 'programme-schema.js'];
+const FILES = ['validation.js', 'application-schema.js', 'application-status.js', 'roles.js', 'programme-schema.js', 'payment-schema.js', 'student-record-schema.js'];
 const checkOnly = process.argv.includes('--check');
 let stale = 0;
 

@@ -225,6 +225,17 @@ service cloud.firestore {
       allow read: if isUser(resource.data.studentId) || isAdmin();
       allow write: if false;
     }
+    match /paymentImports/{importId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    match /paymentImports/{importId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    match /studentRecords/{uid} {
+      allow read, write: if false;
+    }
     match /certificates/{certificateId} {
       allow read: if isUser(resource.data.studentId) || isAdmin();
       allow write: if false;

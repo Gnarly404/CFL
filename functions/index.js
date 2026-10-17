@@ -18,6 +18,10 @@ export { adminAssignProgramme } from './src/admin/assign-programme.js';
 export { adminSaveProgramme } from './src/admin/save-programme.js';
 export { adminDeleteProgramme } from './src/admin/delete-programme.js';
 
+// Student records and payments
+export { adminListStudentRecords, adminGetStudentRecord, adminSaveStudentRecord } from './src/admin/student-records.js';
+export { adminRecordPayment, adminImportPayments, adminAssignPayment, adminReversePayment } from './src/admin/payments.js';
+
 // Instructor tools
 export { instructorSavePracticeContent } from './src/instructor/save-practice-content.js';
 export { instructorNotifyFeedback } from './src/instructor/notify-feedback.js';

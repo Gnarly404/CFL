@@ -1,11 +1,12 @@
 /** An error whose message is safe to show to the person using the site. */
 export class AppError extends Error {
-  constructor(code, message, { fieldErrors = null, cause = null } = {}) {
+  constructor(code, message, { fieldErrors = null, cause = null, details = null } = {}) {
     super(message);
     this.name = 'AppError';
     this.code = code;
     this.fieldErrors = fieldErrors;
     this.cause = cause;
+    this.details = details;
   }
 }
 
@@ -24,5 +25,5 @@ export function fromCallableError(error) {
   const serverMessage = typeof error?.message === 'string' ? error.message : '';
   const message = GENERIC_MESSAGES[code] ?? (serverMessage || GENERIC_MESSAGES.unknown);
   const fieldErrors = error?.details?.fieldErrors ?? null;
-  return new AppError(code, message, { fieldErrors, cause: error });
+  return new AppError(code, message, { fieldErrors, cause: error, details: error?.details ?? null });
 }
