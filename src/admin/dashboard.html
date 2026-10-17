@@ -58,7 +58,7 @@
             <header class="console-top">
                 <p class="eyebrow">Administration</p>
                 <h1 id="consoleTitle">Admissions</h1>
-                <p id="consoleBlurb" class="muted">Decide on applications and answer personal-data requests.</p>
+                <p id="consoleBlurb" class="muted">Decide on applications and answer student and personal-data requests.</p>
             </header>
             <noscript><p class="form-alert" data-kind="error">The admin console needs JavaScript.</p></noscript>
 
@@ -137,6 +137,34 @@
                         </header>
                         <div class="panel-body">
                             <div id="privacyRequestsList" class="privacy-review-list" aria-live="polite"></div>
+                        </div>
+                    </section>
+
+                    <section class="panel" id="service-requests" aria-labelledby="serviceRequestsHeading">
+                        <header class="panel-head">
+                            <div>
+                                <h2 id="serviceRequestsHeading">Student requests</h2>
+                                <p class="panel-note">Transfers, deferments, transcripts, academic support and payment disputes. Your reply is shown to the student.</p>
+                            </div>
+                            <div class="panel-tools">
+                                <label for="serviceRequestFilter" class="visually-hidden">Filter requests</label>
+                                <select id="serviceRequestFilter" class="form-select form-select-sm">
+                                    <option value="open">Open requests</option>
+                                    <option value="">All requests</option>
+                                    <option value="submitted">Received</option>
+                                    <option value="in_progress">In progress</option>
+                                    <option value="needs_student">Waiting for the student</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="declined">Not approved</option>
+                                </select>
+                            </div>
+                        </header>
+                        <p id="serviceRequestsStatus" class="muted" role="status" aria-live="polite"></p>
+                        <div class="table-scroll">
+                            <table class="data-table" data-stack data-avatar-col="0">
+                                <thead><tr><th>Student</th><th>Request</th><th>Received</th><th>Status</th><th>Actions</th></tr></thead>
+                                <tbody id="serviceRequestsBody" data-rows></tbody>
+                            </table>
                         </div>
                     </section>
                 </div>

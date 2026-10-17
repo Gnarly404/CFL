@@ -118,3 +118,15 @@
 .student-dashboard-page .badge-status[data-balance="cleared"],.student-dashboard-page .badge-status[data-balance="over"]{background:var(--ok-bg);color:var(--ok)}
 .student-dashboard-page .badge-status[data-balance="part"]{background:var(--warn-bg);color:var(--warn)}
 .student-dashboard-page .badge-status[data-balance="unpaid"]{background:var(--bad-bg);color:var(--bad)}
+
+.student-request-links button.student-dashboard-action{font:inherit;cursor:pointer}
+.student-request-links button.student-dashboard-action:disabled{opacity:.55;cursor:not-allowed}
+.service-list-title{margin:var(--s4) 0 var(--s2);font-size:1rem}
+.service-list{list-style:none;margin:0;padding:0;display:grid;gap:var(--s3)}
+.service-item{padding:var(--s3) var(--s4);border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface)}
+.service-item-head{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s3)}
+.service-reply{margin:var(--s2) 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.service-dialog{margin:auto;padding:var(--s5);border:0;border-radius:var(--radius);width:min(32rem,calc(100vw - 2rem));max-height:calc(100dvh - 2rem);overflow:auto;background:var(--surface);color:var(--text);box-shadow:0 24px 64px rgba(15,37,64,.28)}
+.service-dialog::backdrop{background:rgba(15,37,64,.5)}
+.service-dialog h2{margin:0 0 var(--s2);font-size:1.25rem}
+.service-dialog-actions{display:flex;justify-content:flex-end;gap:var(--s2);margin-top:var(--s4)}

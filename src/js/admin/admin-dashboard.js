@@ -6,6 +6,7 @@ import { initAssignments } from './assignments.js';
 import { initProgrammeStaff } from './programme-staff.js';
 import { initProgrammes } from './programmes.js';
 import { initRecords } from './records.js';
+import { initServiceRequests } from './service-requests.js';
 import { applicationDetails } from './application-details.js';
 import { setAttentionBadge } from '@/ui/attention-badge.js';
 import { icon } from '@/ui/icons.js';
@@ -56,6 +57,7 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
   const assignments = initAssignments({ root, say, getUsers: () => knownUsers });
   const programmeStaff = initProgrammeStaff({ root, say, getUsers: () => knownUsers });
   const records = initRecords({ root, say });
+  const serviceRequests = initServiceRequests({ root, say });
   const programmes = initProgrammes({
     root,
     say,
@@ -325,7 +327,7 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
   filter?.addEventListener('change', loadApplications);
   privacyRequestFilter?.addEventListener('change', loadPrivacyQueue);
   root.querySelector('#refreshPrivacyQueue')?.addEventListener('click', loadPrivacyQueue);
-  root.querySelector('#refreshAll')?.addEventListener('click', () => { loadApplications(); loadUsers(); programmes.load(); loadPrivacyQueue(); records.reload(); });
+  root.querySelector('#refreshAll')?.addEventListener('click', () => { loadApplications(); loadUsers(); programmes.load(); loadPrivacyQueue(); records.reload(); serviceRequests.load(); });
 
   createForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
@@ -371,4 +373,5 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
   loadApplications();
   loadUsers();
   loadPrivacyQueue();
+  serviceRequests.load();
 }

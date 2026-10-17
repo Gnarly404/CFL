@@ -132,3 +132,9 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--navy)}
   .btn:active{transform:none}
   .btn[aria-busy="true"]::before{animation-duration:2s}
 }
+
+/* Student service request status, used on the student dashboard and in the admin console. */
+.badge-status[data-service-status="submitted"]{background:var(--info-bg);color:var(--info)}
+.badge-status[data-service-status="in_progress"],.badge-status[data-service-status="needs_student"]{background:var(--warn-bg);color:var(--warn)}
+.badge-status[data-service-status="completed"]{background:var(--ok-bg);color:var(--ok)}
+.badge-status[data-service-status="declined"]{background:var(--bad-bg);color:var(--bad)}

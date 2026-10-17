@@ -69,6 +69,12 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Service requests are created and answered by Cloud Functions only.
+    match /serviceRequests/{requestId} {
+      allow read: if isAdmin() || (isStudent() && isUser(resource.data.studentId));
+      allow write: if false;
+    }
+
     // ---------- catalogue and curriculum ----------
     match /programmes/{programmeId} {
       allow read: if resource.data.get('active', false) == true || isStaff();

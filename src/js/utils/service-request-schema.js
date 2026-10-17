@@ -1,0 +1,63 @@
+import { cleanText } from './validation.js';
+
+/** Requests a student can make of the Centre, other than privacy requests (which have their own flow). */
+export const SERVICE_REQUEST_TYPES = Object.freeze(['programme_transfer', 'deferment_withdrawal', 'academic_support', 'transcript', 'payment_dispute']);
+export const SERVICE_REQUEST_LABELS = Object.freeze({
+  programme_transfer: 'Programme transfer',
+  deferment_withdrawal: 'Deferment or withdrawal',
+  academic_support: 'Academic support',
+  transcript: 'Transcript request',
+  payment_dispute: 'Payment dispute',
+});
+/** What to tell the Centre, so the first reply is an answer and not a question. */
+export const SERVICE_REQUEST_PROMPTS = Object.freeze({
+  programme_transfer: 'Which programme you want to move to, and why.',
+  deferment_withdrawal: 'Whether you want to defer or withdraw, from when, and the reason.',
+  academic_support: 'Which subject or lesson you need help with, and what is hard about it.',
+  transcript: 'What the transcript is for and where it should be sent.',
+  payment_dispute: 'Which payment or charge is wrong, the date, and what you think it should be.',
+});
+
+export const SERVICE_REQUEST_STATUSES = Object.freeze(['submitted', 'in_progress', 'needs_student', 'completed', 'declined']);
+export const SERVICE_REQUEST_STATUS_LABELS = Object.freeze({
+  submitted: 'Received', in_progress: 'In progress', needs_student: 'Needs your reply', completed: 'Completed', declined: 'Not approved',
+});
+export const OPEN_SERVICE_STATUSES = Object.freeze(['submitted', 'in_progress', 'needs_student']);
+/** Statuses an admin can move a request to (it cannot go back to "received"). */
+export const REVIEW_STATUSES = Object.freeze(['in_progress', 'needs_student', 'completed', 'declined']);
+/** A student may have this many open requests at once, so one person cannot flood the queue. */
+export const MAX_OPEN_REQUESTS = 8;
+
+export function validateServiceRequest(input) {
+  const src = input && typeof input === 'object' ? input : {};
+  const errors = {};
+  const value = {};
+  if (!SERVICE_REQUEST_TYPES.includes(src.requestType)) errors.requestType = 'Choose what you need.';
+  else value.requestType = src.requestType;
+
+  const details = cleanText(src.details);
+  if (details.length < 12) errors.details = 'Add a few details so the Centre can act on this (at least a sentence).';
+  else if (details.length > 2000) errors.details = 'Keep the details under 2,000 characters.';
+  else value.details = details;
+
+  const reference = cleanText(src.reference);
+  if (reference.length > 60) errors.reference = 'The reference must be 60 characters or fewer.';
+  else value.reference = value.requestType === 'payment_dispute' ? reference : '';
+  return { ok: Object.keys(errors).length === 0, value, errors };
+}
+
+export function validateServiceReview(input) {
+  const src = input && typeof input === 'object' ? input : {};
+  const errors = {};
+  const status = REVIEW_STATUSES.includes(src.status) ? src.status : '';
+  const response = cleanText(src.response).slice(0, 3000);
+  const nextAction = cleanText(src.nextAction).slice(0, 1000);
+  if (!status) errors.status = 'Choose a status.';
+  if (['needs_student', 'completed', 'declined'].includes(status) && response.length < 3) errors.response = 'Write a response the student will see.';
+  if (status === 'needs_student' && nextAction.length < 3) errors.nextAction = 'Say what the student needs to do.';
+  return {
+    ok: Object.keys(errors).length === 0,
+    value: { status, response, nextAction: status === 'needs_student' ? nextAction : '' },
+    errors,
+  };
+}

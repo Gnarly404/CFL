@@ -22,6 +22,7 @@ import { icon } from '@/ui/icons.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
 import { mountNotificationBadge } from '@/ui/notification-badge.js';
 import { setReduceMotionPreference } from '@/motion/reduced-motion.js';
+import { initServiceRequests } from '@/student/service-requests.js';
 import { buildFeesView, renderFees } from '@/student/fees.js';
 import { listMyPrivacyRequests, submitPrivacyRequest } from '@/services/privacy-request-service.js';
 
@@ -436,6 +437,14 @@ async function loadPrivacyHistory() {
     privacyRequestList.replaceChildren();
   }
 }
+
+initServiceRequests({ uid: session.user.uid });
+// Record corrections already have a flow (they are personal-data requests), so this button opens it.
+document.getElementById('correctRecordLink')?.addEventListener('click', () => {
+  if (studentSettingsDialog && !studentSettingsDialog.open) studentSettingsDialog.showModal?.();
+  document.getElementById('openPrivacyData')?.click();
+  privacyPanel?.querySelector('[data-privacy-request="correction"]')?.click();
+});
 
 document.getElementById('openPrivacyData')?.addEventListener('click', () => {
   settingsContent.hidden = true;

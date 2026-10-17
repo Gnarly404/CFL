@@ -9,7 +9,7 @@ import { play, settle } from '@/motion/dom.js';
  * The location hash is the single source of truth: a link only changes the hash, this reacts to it.
  */
 export const WORKSPACES = Object.freeze({
-  admissions: { title: 'Admissions', blurb: 'Decide on applications and answer personal-data requests.', sections: ['applications', 'privacy-requests'] },
+  admissions: { title: 'Admissions', blurb: 'Decide on applications and answer student and personal-data requests.', sections: ['applications', 'privacy-requests', 'service-requests'] },
   people: { title: 'People', blurb: 'Accounts, roles, and who teaches whom.', sections: ['accounts', 'create-account', 'teaching-assignments'] },
   academics: { title: 'Academics', blurb: 'The programme catalogue and its teaching staff.', sections: ['programmes', 'programme-staff'] },
   students: { title: 'Students', blurb: 'Every student\'s details and fees. Open a record to edit it.', sections: ['student-records'] },

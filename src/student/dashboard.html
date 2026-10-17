@@ -139,15 +139,16 @@
 
       <section class="card" aria-labelledby="requestsTitle">
         <div class="student-card-heading"><div><p class="eyebrow">Student services</p><h2 id="requestsTitle">Requests and support</h2></div></div>
-        <p class="muted">Manage personal-information requests in Privacy &amp; Data. Other service requests are handled by the Centre.</p>
+        <p class="muted">Send a request to the Centre and follow its status here. Personal-information requests are handled in Privacy &amp; Data.</p>
         <div class="student-request-links">
-          <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Programme%20transfer%20request">Programme transfer</a>
-          <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Deferment%20or%20withdrawal%20request">Deferment or withdrawal</a>
-          <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Student%20record%20correction">Correct personal record</a>
-          <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Academic%20support%20request">Academic support</a>
-          <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Transcript%20request">Transcript request</a>
-          <a class="student-dashboard-action" href="mailto:cfllearning33@gmail.com?subject=Payment%20dispute">Payment dispute</a>
+          <button type="button" class="student-dashboard-action" data-service-request="programme_transfer">Programme transfer</button>
+          <button type="button" class="student-dashboard-action" data-service-request="deferment_withdrawal">Deferment or withdrawal</button>
+          <button type="button" class="student-dashboard-action" id="correctRecordLink">Correct personal record</button>
+          <button type="button" class="student-dashboard-action" data-service-request="academic_support">Academic support</button>
+          <button type="button" class="student-dashboard-action" data-service-request="transcript">Transcript request</button>
+          <button type="button" class="student-dashboard-action" data-service-request="payment_dispute">Payment dispute</button>
         </div>
+        <div id="serviceRequestList" aria-live="polite"></div>
       </section>
 
       <dialog id="studentSettingsDialog" class="student-settings-dialog" aria-labelledby="accountSettingsTitle">
