@@ -179,7 +179,9 @@ export async function adminSaveStudentRecordCore(deps, { actor, data, now = new 
     for (const key of ['firstName', 'middleName', 'surname', 'dateOfBirth', 'gender', 'phoneNumber', 'nationality']) profile[key] = after[key];
     profile.guardian = { ...(profile.guardian ?? {}) };
     for (const [from, to] of Object.entries(GUARDIAN_KEYS)) profile.guardian[to] = after[from];
-    if (Object.keys(parts.student).length) await db.collection('students').doc(uid).update({ profile, displayName, updatedAt: FieldValue.serverTimestamp() });
+    if (Object.keys(parts.student).length) await db.collection('students').doc(uid).update({
+      profile, displayName, feeDueMinor: Number.isInteger(after.feeDueMinor) ? after.feeDueMinor : null, updatedAt: FieldValue.serverTimestamp(),
+    });
     await db.collection('users').doc(uid).update({ displayName });
     if (auth?.updateUser && displayName && displayName !== parts.user.displayName) await auth.updateUser(uid, { displayName });
   } catch (error) {

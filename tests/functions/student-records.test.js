@@ -119,7 +119,7 @@ describe('saving a student record', () => {
     expect(saved).toMatchObject({ surname: 'Kamau-Mutua', phoneNumber: '+254711222333', feeDueMinor: 4500000, updatedBy: 'admin1', createdAt: 'SERVER_TS' });
     expect(result.record).toMatchObject({ displayName: 'Amina Kamau-Mutua', studentNumber: 'CFL-2026-00001', feeDueMinor: 4500000 });
     expect(deps.db.store.get('users/stu1').displayName).toBe('Amina Kamau-Mutua');
-    expect(deps.db.store.get('students/stu1')).toMatchObject({ displayName: 'Amina Kamau-Mutua' });
+    expect(deps.db.store.get('students/stu1')).toMatchObject({ displayName: 'Amina Kamau-Mutua', feeDueMinor: 4500000 }); // the student's own page reads the fee from here
     expect(deps.db.store.get('students/stu1').profile).toMatchObject({
       surname: 'Kamau-Mutua', phoneNumber: '+254711222333', photoURL: 'p.png', guardian: { name: 'Grace Kamau', emergencyContact: 'Grace' },
     });

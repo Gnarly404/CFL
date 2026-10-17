@@ -22,6 +22,7 @@ import { icon } from '@/ui/icons.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
 import { mountNotificationBadge } from '@/ui/notification-badge.js';
 import { setReduceMotionPreference } from '@/motion/reduced-motion.js';
+import { buildFeesView, renderFees } from '@/student/fees.js';
 import { listMyPrivacyRequests, submitPrivacyRequest } from '@/services/privacy-request-service.js';
 
 mountPortalShell('dashboard');
@@ -110,6 +111,19 @@ try {
 } catch (error) {
   console.warn('Could not load student dashboard records', error?.code ?? error);
   setDashboardNote('Some student records could not be loaded. Check your connection and refresh.');
+}
+
+const feesSummaryEl = document.getElementById('feesSummary');
+if (feesSummaryEl && studentRecord) {
+  try {
+    const paymentSnap = await getDocs(query(collection(dbService(), 'payments'), where('studentId', '==', session.user.uid)));
+    renderFees(feesSummaryEl, buildFeesView({
+      feeDueMinor: studentRecord.feeDueMinor,
+      payments: paymentSnap.docs.map((entry) => ({ id: entry.id, ...entry.data() })),
+    }));
+  } catch (error) {
+    console.warn('Could not load fees and payments', error?.code ?? error);
+  }
 }
 
 const savedProfile = studentRecord?.profile ?? {};

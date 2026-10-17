@@ -108,3 +108,13 @@
 @media(max-width:700px){.student-dashboard-page .student-enrolment-facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.student-dashboard-page .student-record-grid,.student-dashboard-page .student-account-layout,.student-dashboard-page .student-preferences-form,.privacy-data-actions{grid-template-columns:1fr}.student-dashboard-page .student-progress-summary{grid-template-columns:auto minmax(0,1fr)}.student-dashboard-page .student-progress-summary>.student-dashboard-action{grid-column:1/-1;justify-self:start}.student-dashboard-page .student-enrolment-header{align-items:flex-start;flex-direction:column;gap:var(--s2)}.student-dashboard-page .student-enrolment-facts{grid-template-columns:minmax(0,1fr)}.student-dashboard-page .student-enrolment-panel.is-empty{grid-template-columns:minmax(0,1fr);justify-items:start}.student-dashboard-page .student-enrolment-action{justify-self:start}.student-dashboard-page .student-preferences-form h3,.student-dashboard-page .student-preferences-form #accountSettingsNote{grid-column:auto}.privacy-data-panel{padding:var(--s4)}.privacy-request-item-header{flex-direction:column}.privacy-form-actions .student-dashboard-action{width:100%}}
 @media(max-width:520px){.student-dashboard-heading{grid-template-columns:56px minmax(0,1fr);align-items:start;gap:var(--s3)}.student-avatar{width:56px;height:56px;flex-basis:56px}.student-dashboard-heading>.voice-chip{grid-column:2;justify-self:start}.student-settings-dialog-header,.student-settings-content{padding:var(--s4)}}
+
+.student-dashboard-page .fees-summary{display:grid;grid-template-columns:max-content 1fr;gap:var(--s1) var(--s4);margin:var(--s3) 0}
+.student-dashboard-page .fees-summary dt{color:var(--muted)}
+.student-dashboard-page .fees-summary dd{margin:0;font-weight:700;font-variant-numeric:tabular-nums}
+.student-dashboard-page .fees-list{list-style:none;margin:var(--s3) 0;padding:0;display:grid;gap:var(--s2)}
+.student-dashboard-page .fees-list li{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s3);font-size:.9rem}
+.student-dashboard-page .fees-list li.is-reversed strong{text-decoration:line-through;color:var(--muted)}
+.student-dashboard-page .badge-status[data-balance="cleared"],.student-dashboard-page .badge-status[data-balance="over"]{background:var(--ok-bg);color:var(--ok)}
+.student-dashboard-page .badge-status[data-balance="part"]{background:var(--warn-bg);color:var(--warn)}
+.student-dashboard-page .badge-status[data-balance="unpaid"]{background:var(--bad-bg);color:var(--bad)}
