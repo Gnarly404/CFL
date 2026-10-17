@@ -12,11 +12,15 @@ const shape = (entry) => {
 };
 const unreachable = () => new AppError('unavailable', "We can't reach the database right now. Check your connection and refresh.");
 
-export const submitServiceRequest = ({ requestType, details, reference }) => call('submitServiceRequest', { requestType, details, reference });
+export const submitServiceRequest = ({
+  requestType, details, reference, programmeId,
+}) => call('submitServiceRequest', {
+  requestType, details, reference, programmeId,
+});
 export const updateServiceRequest = ({
-  requestId, status, response, nextAction,
+  requestId, status, response, nextAction, enrol,
 }) => call('adminUpdateServiceRequest', {
-  requestId, status, response, nextAction,
+  requestId, status, response, nextAction, enrol,
 });
 
 /** A student's own requests, newest first. */

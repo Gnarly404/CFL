@@ -1,8 +1,10 @@
+import { PROGRAMME_ID_RE } from './programme-schema.js';
 import { cleanText } from './validation.js';
 
 /** Requests a student can make of the Centre, other than privacy requests (which have their own flow). */
-export const SERVICE_REQUEST_TYPES = Object.freeze(['programme_transfer', 'deferment_withdrawal', 'academic_support', 'transcript', 'payment_dispute']);
+export const SERVICE_REQUEST_TYPES = Object.freeze(['new_programme', 'programme_transfer', 'deferment_withdrawal', 'academic_support', 'transcript', 'payment_dispute']);
 export const SERVICE_REQUEST_LABELS = Object.freeze({
+  new_programme: 'Apply for another programme',
   programme_transfer: 'Programme transfer',
   deferment_withdrawal: 'Deferment or withdrawal',
   academic_support: 'Academic support',
@@ -11,6 +13,7 @@ export const SERVICE_REQUEST_LABELS = Object.freeze({
 });
 /** What to tell the Centre, so the first reply is an answer and not a question. */
 export const SERVICE_REQUEST_PROMPTS = Object.freeze({
+  new_programme: 'Why you want this programme and when you would like to start.',
   programme_transfer: 'Which programme you want to move to, and why.',
   deferment_withdrawal: 'Whether you want to defer or withdraw, from when, and the reason.',
   academic_support: 'Which subject or lesson you need help with, and what is hard about it.',
@@ -43,6 +46,13 @@ export function validateServiceRequest(input) {
   const reference = cleanText(src.reference);
   if (reference.length > 60) errors.reference = 'The reference must be 60 characters or fewer.';
   else value.reference = value.requestType === 'payment_dispute' ? reference : '';
+
+  const programmeId = cleanText(src.programmeId);
+  if (value.requestType === 'new_programme') {
+    if (!programmeId) errors.programmeId = 'Choose the programme you want to join.';
+    else if (!PROGRAMME_ID_RE.test(programmeId)) errors.programmeId = 'That programme is not recognised.';
+    else value.programmeId = programmeId;
+  } else value.programmeId = '';
   return { ok: Object.keys(errors).length === 0, value, errors };
 }
 
@@ -57,7 +67,9 @@ export function validateServiceReview(input) {
   if (status === 'needs_student' && nextAction.length < 3) errors.nextAction = 'Say what the student needs to do.';
   return {
     ok: Object.keys(errors).length === 0,
+    // `enrol` only means something on a completed "apply for another programme" request; the server checks that too.
     value: { status, response, nextAction: status === 'needs_student' ? nextAction : '' },
+    enrol: status === 'completed' && src.enrol === true,
     errors,
   };
 }

@@ -17,8 +17,15 @@ export async function submitServiceRequestCore(deps, { actor, data }) {
   const mine = await db.collection('serviceRequests').where('studentId', '==', actor.uid).get();
   const open = mine.docs.map((entry) => entry.data()).filter((entry) => OPEN_SERVICE_STATUSES.includes(entry.status));
   if (open.length >= MAX_OPEN_REQUESTS) throw new HttpsError('resource-exhausted', 'You have several requests still open. Wait for the Centre to answer them first.');
-  if (open.some((entry) => entry.requestType === value.requestType)) {
+  // One open request of a kind, except that a student may apply for several different programmes at once.
+  if (open.some((entry) => entry.requestType === value.requestType && (entry.programmeId ?? '') === value.programmeId)) {
     throw new HttpsError('already-exists', 'You already have an open request of this kind. The Centre will reply there, and you can see its status below.');
+  }
+  if (value.programmeId) {
+    const enrolment = await db.collection('enrolments').doc(`${actor.uid}_${value.programmeId}`).get();
+    if (enrolment.exists && !['withdrawn', 'completed'].includes(enrolment.data().status)) {
+      throw new HttpsError('failed-precondition', 'You are already enrolled in that programme.');
+    }
   }
 
   const [user, student] = await Promise.all([
@@ -33,6 +40,7 @@ export async function submitServiceRequestCore(deps, { actor, data }) {
     requestType: value.requestType,
     details: value.details,
     reference: value.reference,
+    programmeId: value.programmeId,
     status: 'submitted',
     response: '',
     nextAction: '',
@@ -54,7 +62,7 @@ export async function adminUpdateServiceRequestCore(deps, { actor, data, now = (
   const { db, FieldValue, audit } = deps;
   const requestId = typeof data?.requestId === 'string' ? data.requestId.trim() : '';
   if (!requestId || requestId.length > 150 || requestId.includes('/')) throw invalid('Choose a valid request.');
-  const { ok, value, errors } = validateServiceReview(data);
+  const { ok, value, errors, enrol } = validateServiceReview(data);
   if (!ok) throw invalid(firstMessage(errors), errors);
 
   const ref = db.collection('serviceRequests').doc(requestId);
@@ -70,13 +78,37 @@ export async function adminUpdateServiceRequestCore(deps, { actor, data, now = (
     updatedAt: FieldValue.serverTimestamp(),
     updates: [...updates, { ...value, reviewedBy: actor.uid, reviewedAt }],
   });
+  // Completing an application for another programme can enrol the student in it, the same record an approved
+  // application creates. An existing enrolment is never overwritten.
+  let enrolled = false;
+  if (enrol && request.requestType === 'new_programme' && request.programmeId && request.studentId) {
+    const enrolmentRef = db.collection('enrolments').doc(`${request.studentId}_${request.programmeId}`);
+    const existing = await enrolmentRef.get();
+    if (!existing.exists) {
+      await enrolmentRef.set({
+        studentId: request.studentId,
+        programmeId: request.programmeId,
+        serviceRequestId: requestId,
+        status: 'pending_start',
+        instructorIds: [],
+        createdAt: FieldValue.serverTimestamp(),
+      });
+      enrolled = true;
+      await audit?.({
+        actorId: actor.uid,
+        action: 'enrolment.create',
+        resource: { type: 'enrolment', id: enrolmentRef.id },
+        metadata: { programmeId: request.programmeId, source: 'service_request' },
+      });
+    }
+  }
   await audit?.({
     actorId: actor.uid,
     action: 'service_request.review',
     resource: { type: 'serviceRequest', id: requestId },
     metadata: { status: value.status, requestType: request.requestType },
   });
-  return { requestId, status: value.status };
+  return { requestId, status: value.status, enrolled };
 }
 
 export const submitServiceRequest = onCall({ cors: true }, async (request) => {

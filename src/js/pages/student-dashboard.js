@@ -438,7 +438,11 @@ async function loadPrivacyHistory() {
   }
 }
 
-initServiceRequests({ uid: session.user.uid });
+initServiceRequests({
+  uid: session.user.uid,
+  loadProgrammes: listPublicProgrammes,
+  enrolledIds: enrolments.map((entry) => entry.programmeId),
+});
 // Record corrections already have a flow (they are personal-data requests), so this button opens it.
 document.getElementById('correctRecordLink')?.addEventListener('click', () => {
   if (studentSettingsDialog && !studentSettingsDialog.open) studentSettingsDialog.showModal?.();

@@ -57,7 +57,7 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
   const assignments = initAssignments({ root, say, getUsers: () => knownUsers });
   const programmeStaff = initProgrammeStaff({ root, say, getUsers: () => knownUsers });
   const records = initRecords({ root, say });
-  const serviceRequests = initServiceRequests({ root, say });
+  const serviceRequests = initServiceRequests({ root, say, programmeNameOf: (id) => records.store.programmeNames([id])[0] });
   const programmes = initProgrammes({
     root,
     say,

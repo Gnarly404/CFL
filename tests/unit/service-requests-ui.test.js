@@ -47,6 +47,28 @@ describe('student requests', () => {
     expect(submitServiceRequest).toHaveBeenCalledWith(expect.objectContaining({ requestType: 'payment_dispute' }));
   });
 
+  it('asks which programme for a new-programme request, hiding ones already joined', async () => {
+    document.body.insertAdjacentHTML('beforeend', '<button data-service-request="new_programme"></button>');
+    const { initServiceRequests } = await import('@/student/service-requests.js');
+    const { submitServiceRequest } = await import('@/services/service-request-service.js');
+    initServiceRequests({
+      uid: 'u1',
+      loadProgrammes: async () => [{ id: 'english-b1', name: 'English B1' }, { id: 'french-a1', name: 'French A1' }],
+      enrolledIds: ['english-b1'],
+    });
+    await flush();
+    document.querySelector('[data-service-request="new_programme"]').click();
+    expect([...document.querySelectorAll('#serviceRequestProgramme option')].map((o) => o.textContent)).toEqual(['Choose a programme…', 'French A1']);
+    document.querySelector('#serviceRequestDetails').value = 'I want to start French next term.';
+    document.querySelector('#serviceRequestForm').dispatchEvent(new Event('submit', { cancelable: true }));
+    await flush();
+    expect(submitServiceRequest).not.toHaveBeenCalledWith(expect.objectContaining({ requestType: 'new_programme' }));
+    document.querySelector('#serviceRequestProgramme').value = 'french-a1';
+    document.querySelector('#serviceRequestForm').dispatchEvent(new Event('submit', { cancelable: true }));
+    await flush();
+    expect(submitServiceRequest).toHaveBeenCalledWith(expect.objectContaining({ requestType: 'new_programme', programmeId: 'french-a1' }));
+  });
+
   it('lets an admin open a request and answer it', async () => {
     const { initServiceRequests } = await import('@/admin/service-requests.js');
     const { updateServiceRequest } = await import('@/services/service-request-service.js');
@@ -59,7 +81,7 @@ describe('student requests', () => {
     document.querySelector('#serviceReviewForm').dispatchEvent(new Event('submit', { cancelable: true }));
     await flush();
     expect(updateServiceRequest).toHaveBeenCalledWith({
-      requestId: 'r1', status: 'completed', response: 'Sent to the registrar.', nextAction: '',
+      requestId: 'r1', status: 'completed', response: 'Sent to the registrar.', nextAction: '', enrol: false,
     });
   });
 });

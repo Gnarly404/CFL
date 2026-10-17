@@ -86,3 +86,48 @@ describe('answering a service request', () => {
     await expect(adminUpdateServiceRequestCore(d, { actor: admin, data: { requestId: 'nope', status: 'in_progress' } })).rejects.toMatchObject({ code: 'not-found' });
   });
 });
+
+describe('applying for another programme', () => {
+  const apply = (d, over = {}) => submit(d, { requestType: 'new_programme', programmeId: 'english-b2', details: 'I finished level B1 and want to continue.', ...over });
+
+  it('needs a valid programme and stores which one', async () => {
+    const d = deps();
+    await expect(apply(d, { programmeId: '' })).rejects.toMatchObject({ code: 'invalid-argument' });
+    await expect(apply(d, { programmeId: '../x' })).rejects.toMatchObject({ code: 'invalid-argument' });
+    await apply(d);
+    expect(d.db.store.get('serviceRequests/auto1')).toMatchObject({ requestType: 'new_programme', programmeId: 'english-b2' });
+  });
+
+  it('refuses a programme the student is already in, but allows a different second one', async () => {
+    const d = deps();
+    d.db.store.set('enrolments/stu1_english-b2', { status: 'active' });
+    await expect(apply(d)).rejects.toMatchObject({ code: 'failed-precondition' });
+    await expect(apply(d, { programmeId: 'french-a1' })).resolves.toBeTruthy();
+    await expect(apply(d, { programmeId: 'german-a1' })).resolves.toBeTruthy();
+    await expect(apply(d, { programmeId: 'german-a1' })).rejects.toMatchObject({ code: 'already-exists' });
+  });
+
+  it('enrols the student only when the admin completes it with enrolment ticked', async () => {
+    const d = deps();
+    await apply(d);
+    await adminUpdateServiceRequestCore(d, { actor: admin, data: { requestId: 'auto1', status: 'in_progress', enrol: true } });
+    expect(d.db.store.has('enrolments/stu1_english-b2')).toBe(false);
+    const result = await adminUpdateServiceRequestCore(d, {
+      actor: admin, data: { requestId: 'auto1', status: 'completed', response: 'Welcome to B2.', enrol: true },
+    });
+    expect(result.enrolled).toBe(true);
+    expect(d.db.store.get('enrolments/stu1_english-b2')).toMatchObject({ studentId: 'stu1', programmeId: 'english-b2', status: 'pending_start' });
+    expect(d.audit).toHaveBeenCalledWith(expect.objectContaining({ action: 'enrolment.create' }));
+  });
+
+  it('does not enrol without the tick, and never overwrites an existing enrolment', async () => {
+    const d = deps();
+    await apply(d);
+    await adminUpdateServiceRequestCore(d, { actor: admin, data: { requestId: 'auto1', status: 'completed', response: 'Noted.' } });
+    expect(d.db.store.has('enrolments/stu1_english-b2')).toBe(false);
+    d.db.store.set('enrolments/stu1_english-b2', { status: 'active', marker: 'keep' });
+    const again = await adminUpdateServiceRequestCore(d, { actor: admin, data: { requestId: 'auto1', status: 'completed', response: 'Done.', enrol: true } });
+    expect(again.enrolled).toBe(false);
+    expect(d.db.store.get('enrolments/stu1_english-b2').marker).toBe('keep');
+  });
+});
