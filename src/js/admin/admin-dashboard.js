@@ -77,6 +77,8 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
       return result;
     } catch (error) {
       say(error.message || 'That did not work. Try again.', 'error');
+      // The action may have partly happened (an account created, then the email failed): show what is there now.
+      if (reload.includes('users')) await loadUsers().catch(() => {});
       return null;
     }
   }

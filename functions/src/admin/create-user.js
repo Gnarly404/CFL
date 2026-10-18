@@ -26,6 +26,7 @@ export async function adminCreateUserCore(deps, { actor, data }) {
   return {
     uid: result.uid,
     invited: result.invited,
+    ...(result.emailed === false ? { emailed: false } : {}),
     // Only in the local emulator, where email is logged rather than sent.
     ...(deps.exposeLinks && result.activationUrl ? { activationUrl: result.activationUrl } : {}),
   };

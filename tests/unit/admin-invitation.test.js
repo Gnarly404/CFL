@@ -24,6 +24,16 @@ describe('invitation delivery', () => {
     expect(say.mock.calls[0][1]).toBe('info');
     expect(say.mock.calls[0][0]).not.toContain('emulator');
   });
+  it('warns when the deployed server only logs emails instead of sending them', async () => {
+    expect(await deliverInvitation({ uid: 'u', invited: true, emailed: false }, person, { send, say })).toBe(false);
+    expect(say.mock.calls[0][0]).toContain('MAIL_TRANSPORT');
+    expect(say.mock.calls[0][1]).toBe('error');
+    expect(send).not.toHaveBeenCalled();
+  });
+  it('still uses EmailJS locally even though the emulator only logs mail', async () => {
+    expect(await deliverInvitation({ activationUrl: 'https://x/a', emailed: false }, person, { send, say })).toBe(true);
+    expect(send).toHaveBeenCalled();
+  });
   it('says so when the account is already active', async () => {
     expect(await deliverInvitation({ uid: 'u', invited: false }, person, { send, say })).toBe(false);
     expect(say.mock.calls[0][0]).toContain('already active');

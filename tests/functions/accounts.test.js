@@ -46,6 +46,26 @@ describe('provisionAccount', () => {
     expect(d.mailer.sent[0].text).toContain('https://cfl.test/activate?mode=resetPassword&oobCode=');
   });
 
+  it('explains a failed email clearly: the account exists, nothing leaks, and a resend can fix it', async () => {
+    const d = env();
+    d.log = { error: vi.fn() };
+    d.mailer.send.mockRejectedValueOnce(Object.assign(new Error('Invalid login: 535 5.7.8 password=hunter2'), { code: 'EAUTH', responseCode: 535, command: 'AUTH PLAIN' }));
+    await expect(provisionAccount(d, input)).rejects.toMatchObject({ code: 'failed-precondition', message: expect.stringContaining('account was created') });
+    expect(d.auth.users.size).toBe(1);
+    expect(d.log.error).toHaveBeenCalledWith('invitation email failed', expect.objectContaining({ code: 'EAUTH', responseCode: 535 }));
+    const again = await provisionAccount(d, { ...input, resendOnly: true });
+    expect(again.invited).toBe(true);
+  });
+
+  it('reports emailed:false when the server only logs mail', async () => {
+    const d = env();
+    d.mailer.mode = 'console';
+    const result = await provisionAccount(d, input);
+    expect(result.emailed).toBe(false);
+    d.mailer.mode = 'smtp';
+    expect((await provisionAccount(d, { ...input, resendOnly: true })).emailed).toBeUndefined();
+  });
+
   it('is safe to repeat: no duplicate account, profile data kept, link re-sent', async () => {
     const d = env();
     const first = await provisionAccount(d, input);

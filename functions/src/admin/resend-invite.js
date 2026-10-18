@@ -21,7 +21,7 @@ export async function adminResendInviteCore(deps, { actor, data }) {
   await deps.audit({
     actorId: actor.uid, action: 'user.resend_invite', resource: { type: 'user', id: uid }, metadata: {},
   });
-  return { uid, ...(deps.exposeLinks && result.activationUrl ? { activationUrl: result.activationUrl } : {}) };
+  return { uid, ...(result.emailed === false ? { emailed: false } : {}), ...(deps.exposeLinks && result.activationUrl ? { activationUrl: result.activationUrl } : {}) };
 }
 
 export const adminResendInvite = onCall({ cors: true, secrets: [SMTP_PASS] }, async (request) => {

@@ -16,6 +16,10 @@ export async function deliverInvitation(result, person, { send, say }) {
       return false;
     }
   }
+  if (result?.emailed === false) {
+    say(`The account for ${person.email} was created, but this server is set to log emails instead of sending them (MAIL_TRANSPORT is "console"), so no invitation was delivered. Set MAIL_TRANSPORT=smtp and the SMTP settings, then use Resend invitation.`, 'error');
+    return false;
+  }
   if (result?.invited === false) {
     say('This account is already active, so no invitation was needed.', 'info');
     return false;

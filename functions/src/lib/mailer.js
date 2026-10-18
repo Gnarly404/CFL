@@ -4,8 +4,9 @@ import {
   MAIL_FROM, MAIL_TRANSPORT, SMTP_HOST, SMTP_PASS, SMTP_PORT, SMTP_USER,
 } from './config.js';
 
-export function createMailer(transport, from) {
+export function createMailer(transport, from, mode = 'smtp') {
   return {
+    mode,
     async send({ to, subject, text, html }) {
       await transport.sendMail({ from, to, subject, text, html });
     },
@@ -34,5 +35,5 @@ export function getMailer() {
     });
     return createMailer(transport, from);
   }
-  return createMailer(consoleTransport(), from);
+  return createMailer(consoleTransport(), from, 'console');
 }

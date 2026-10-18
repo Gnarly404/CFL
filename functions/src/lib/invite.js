@@ -42,7 +42,9 @@ export async function ensureRoleProfile({ db, FieldValue }, { uid, email, displa
 export async function provisionAccount(deps, {
   email, displayName, role, profile = null, createdBy, applicationId = null, resendOnly = false,
 }) {
-  const { auth, db, FieldValue, mailer, baseUrl } = deps;
+  const {
+    auth, db, FieldValue, mailer, baseUrl, log,
+  } = deps;
 
   let user = null;
   try {
@@ -82,6 +84,16 @@ export async function provisionAccount(deps, {
 
   const link = await auth.generatePasswordResetLink(email, { url: new URL('/login', baseUrl).toString() });
   const activationUrl = buildActivationUrl(link, baseUrl);
-  await mailer.send({ to: email, ...accountInvite({ name: displayName, activationUrl, role }) });
-  return { uid, activationUrl, invited: true };
+  try {
+    await mailer.send({ to: email, ...accountInvite({ name: displayName, activationUrl, role }) });
+  } catch (error) {
+    // The account and its link already exist, so say so: the admin can fix the email settings and resend.
+    // Log the failure's code and response (never the password or the link) so the cause can be found.
+    log?.error?.('invitation email failed', {
+      code: error?.code, responseCode: error?.responseCode, command: error?.command, message: String(error?.message ?? error).slice(0, 300),
+    });
+    throw new HttpsError('failed-precondition', 'The account was created, but the invitation email could not be sent. Check the server\'s email settings, then use "Resend invitation".', { accountCreated: true, uid });
+  }
+  // `emailed: false` means the server only logged the message (its mail setting is "console"), so nobody received it.
+  return { uid, activationUrl, invited: true, ...(mailer.mode === 'console' ? { emailed: false } : {}) };
 }
