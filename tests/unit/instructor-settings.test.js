@@ -6,7 +6,7 @@ const flush = () => new Promise((resolve) => { setTimeout(resolve, 0); });
 const markup = `<dialog id="instructorSettingsDialog"><form id="instructorSettingsForm">
   <div id="instructorBioGroup"><textarea id="instructorBioInput"></textarea><span id="instructorBioCount"></span></div>
   <select id="instructorVoice"><option value="female"></option><option value="male"></option></select><button id="instructorVoiceSample" type="button"></button>
-  <input id="instructorReduceMotion" type="checkbox"><button type="submit">Save</button>
+  <input id="instructorSounds" type="checkbox"><input id="instructorReduceMotion" type="checkbox"><button type="submit">Save</button>
   <button id="instructorPasswordReset" type="button"></button><p id="instructorSettingsNote" hidden></p></form></dialog>
   <button id="openInstructorSettings"></button>`;
 
@@ -27,7 +27,7 @@ describe('instructor settings', () => {
     document.getElementById('instructorReduceMotion').checked = true;
     document.getElementById('instructorSettingsForm').dispatchEvent(new Event('submit', { cancelable: true }));
     await flush();
-    expect(saveProfile).toHaveBeenCalledWith({ bio: 'Teaches French', preferences: { reduceMotion: true, voice: 'female' } });
+    expect(saveProfile).toHaveBeenCalledWith({ bio: 'Teaches French', preferences: { reduceMotion: true, voice: 'female', interfaceSounds: true } });
     expect(onBio).toHaveBeenCalledWith('Teaches French');
     expect(document.documentElement.dataset.reduceMotion).toBe('true');
   });

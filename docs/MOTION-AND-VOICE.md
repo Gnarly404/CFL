@@ -56,3 +56,14 @@ All of these are handled by the scanner in `js/motion/index.js`, so content a sc
 | `details.application-details`, `.privacy-review-item`, `.curriculum-item` | admin, curriculum | The content rises when the panel opens. |
 
 Spring settings for movement that should settle live in `SPRING` in `motion/tokens.js` (`glide`, `pop`).
+
+## Result feedback (sounds, pulse, shake, vibration)
+
+`js/ui/feedback.js` (started from `motion/boot.js`, so every page has it) watches for the places the app already reports results: a status
+message that becomes visible with `data-kind="success"` or `"error"` (toasts, form alerts, notes) and any inline `.field-error` being added.
+Each result gets a short synthesised cue (`js/ui/feedback-sound.js`, Web Audio, no files), a pulse (success) or shake (error) on the message
+or field (`.fb-pop` / `.fb-shake` in `components.css`, off under Reduce motion), and a short vibration on phones. One cue per batch, so three
+bad fields make one error sound; an error outranks a success. Only results that follow a click, key press or submit in the last 15 seconds are
+announced, so messages painted while a page loads stay silent. New pages need no code: use `showMessage()` or set `data-kind` as now.
+The "Interface sounds" setting (student Account settings, instructor Settings; `cfl.sounds` in the browser, `preferences.interfaceSounds`
+on the account) turns the sound and vibration off; it is on by default.

@@ -1,4 +1,5 @@
 import { setReduceMotionPreference } from '@/motion/reduced-motion.js';
+import { mountSoundSetting } from '@/ui/feedback-sound.js';
 import { mountVoiceSetting } from '@/ui/voice-setting.js';
 
 export const BIO_MAX = 500;
@@ -21,6 +22,7 @@ export function initInstructorSettings({
   const reset = root.getElementById('instructorPasswordReset');
   const count = root.getElementById('instructorBioCount');
   const hasProfile = Boolean(profile);
+  const sounds = mountSoundSetting({ input: root.getElementById('instructorSounds'), saved: profile?.preferences?.interfaceSounds });
   const voice = mountVoiceSetting({ select: root.getElementById('instructorVoice'), sample: root.getElementById('instructorVoiceSample'), saved: profile?.preferences?.voice });
 
   const say = (text, kind = 'info') => { note.textContent = text; note.dataset.kind = kind; note.hidden = !text; };
@@ -41,14 +43,15 @@ export function initInstructorSettings({
     button.disabled = true;
     try {
       if (hasProfile) {
-        const preferences = { ...profile.preferences, reduceMotion: reduce.checked, voice: voice.value() };
+        const preferences = { ...profile.preferences, reduceMotion: reduce.checked, voice: voice.value(), interfaceSounds: sounds.value() };
         await saveProfile({ bio: text, preferences });
         profile = { ...profile, bio: text, preferences };
         onBio?.(text);
       }
       setReduceMotionPreference(reduce.checked);
       voice.apply();
-      say(hasProfile ? 'Settings saved. Reduced motion and your voice choice now apply on every page.' : 'Saved in this browser. Your account has no instructor profile to store it on.', 'success');
+      sounds.apply();
+      say(hasProfile ? 'Settings saved. Reduced motion, your voice and interface sounds now apply on every page.' : 'Saved in this browser. Your account has no instructor profile to store it on.', 'success');
     } catch (error) {
       console.warn('Could not save instructor settings', error?.code ?? error);
       say('Your settings could not be saved. Check your connection and try again.', 'error');
