@@ -18,7 +18,7 @@ import {
 } from '@/utils/dom.js';
 import {
   countOpenApplications, createUser, decideApplication, listApplications, listPrivacyRequests, listUsers,
-  resendInvite, reviewPrivacyRequest, deleteDeclinedPrivacyRequest, deleteRejectedApplication, setUserDisabled, setUserRole,
+  resendInvite, reviewPrivacyRequest, deleteDeclinedPrivacyRequest, deleteRejectedApplication, deleteUser, setUserDisabled, setUserRole,
 } from '@/services/admin-service.js';
 import { sendAccountInvitation } from '@/services/email.js';
 import { deliverInvitation as deliverInvitationTo } from './invitation.js';
@@ -180,6 +180,19 @@ export function initAdminDashboard({ currentUid, root = document } = {}) {
           }
         },
       }, 'Resend invitation'));
+    }
+    if (!isSelf) {
+      actions.push(el('button', {
+        type: 'button',
+        class: 'btn btn-sm btn-outline-danger',
+        title: `Delete account for ${user.email}`,
+        'aria-label': `Delete account for ${user.email}`,
+        onclick: async () => {
+          const message = `Permanently delete ${user.email}'s sign-in and account profile? Historical academic and payment records will remain.`;
+          if (!window.confirm(message)) return;
+          await run('Account deleted', () => deleteUser({ uid: user.uid }), { reload: ['users'] });
+        },
+      }, icon('trash', { size: 18 })));
     }
     return el('tr', {},
       el('td', {}, el('strong', {}, user.displayName ?? '—'), el('br'), el('small', {}, user.email)),

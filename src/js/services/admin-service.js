@@ -39,6 +39,7 @@ export async function listUsers({ max = 200 } = {}) {
 export const decideApplication = ({ applicationId, decision, note = '' }) => call('decideApplication', { applicationId, decision, note });
 export const deleteRejectedApplication = ({ applicationId }) => call('adminDeleteRejectedApplication', { applicationId });
 export const createUser = ({ email, displayName, role }) => call('adminCreateUser', { email, displayName, role });
+export const deleteUser = ({ uid }) => call('adminDeleteUser', { uid });
 export const setUserDisabled = ({ uid, disabled }) => call('adminSetUserStatus', { uid, disabled });
 export const setUserRole = ({ uid, role }) => call('adminSetUserRole', { uid, role });
 export const assignInstructor = ({ studentId, instructorId, assigned }) => call('adminAssignInstructor', { studentId, instructorId, assigned });

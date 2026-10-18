@@ -100,6 +100,9 @@ export function fakeAuth(seed = []) {
     },
     async setCustomUserClaims(uid, claims) { users.get(uid).customClaims = claims; },
     async updateUser(uid, patch) { Object.assign(users.get(uid), patch); },
+    async deleteUser(uid) {
+      if (!users.delete(uid)) throw authError('auth/user-not-found');
+    },
     async revokeRefreshTokens(uid) { this.revoked.push(uid); },
     async generatePasswordResetLink(email, settings) {
       return `https://project.firebaseapp.com/__/auth/action?mode=resetPassword&oobCode=CODE-${encodeURIComponent(email)}&apiKey=k&continueUrl=${encodeURIComponent(settings.url)}`;

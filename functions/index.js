@@ -10,6 +10,7 @@ export { submitPrivacyRequest, adminReviewPrivacyRequest, adminDeletePrivacyRequ
 
 // Account administration
 export { adminCreateUser } from './src/admin/create-user.js';
+export { adminDeleteUser } from './src/admin/delete-user.js';
 export { adminSetUserStatus } from './src/admin/set-user-status.js';
 export { adminSetUserRole } from './src/admin/set-user-role.js';
 export { adminResendInvite } from './src/admin/resend-invite.js';

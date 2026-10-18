@@ -3,6 +3,7 @@ import { buildActivationUrl, provisionAccount } from '../../functions/src/lib/in
 import { requireRole } from '../../functions/src/lib/require-role.js';
 import { adminCreateUserCore } from '../../functions/src/admin/create-user.js';
 import { adminSetUserStatusCore } from '../../functions/src/admin/set-user-status.js';
+import { adminDeleteUserCore } from '../../functions/src/admin/delete-user.js';
 import { adminSetUserRoleCore } from '../../functions/src/admin/set-user-role.js';
 import { adminResendInviteCore } from '../../functions/src/admin/resend-invite.js';
 import { activateAccountCore } from '../../functions/src/auth/activate-account.js';
@@ -167,6 +168,35 @@ describe('adminSetUserStatus', () => {
     d.db.store.set(`users/${uid}`, { ...d.db.store.get(`users/${uid}`), activatedAt: 'ts' });
     const active = await adminSetUserStatusCore(d, { actor, data: { uid, disabled: false } });
     expect(active.status).toBe('active');
+  });
+});
+
+describe('adminDeleteUser', () => {
+  it('blocks self-deletion, invalid input, and unknown accounts', async () => {
+    const d = env();
+    await expect(adminDeleteUserCore(d, { actor, data: { uid: 'admin1' } })).rejects.toMatchObject({ code: 'failed-precondition' });
+    await expect(adminDeleteUserCore(d, { actor, data: {} })).rejects.toMatchObject({ code: 'invalid-argument' });
+    await expect(adminDeleteUserCore(d, { actor, data: { uid: 'ghost' } })).rejects.toMatchObject({ code: 'not-found' });
+  });
+
+  it('deletes the sign-in and core profile documents and audits the action', async () => {
+    const d = env();
+    const { uid } = await provisionAccount(d, { email: 'p@example.com', displayName: 'Pat Doe', role: 'student', createdBy: 'admin1' });
+    d.db.store.set(`studentRecords/${uid}`, { studentNumber: 'CFL-12345' });
+    const result = await adminDeleteUserCore(d, { actor, data: { uid } });
+
+    expect(result).toEqual({ uid, deleted: true });
+    expect(d.auth.users.has(uid)).toBe(false);
+    expect(d.db.store.has(`users/${uid}`)).toBe(false);
+    expect(d.db.store.has(`students/${uid}`)).toBe(false);
+    expect(d.db.store.has(`instructors/${uid}`)).toBe(false);
+    expect(d.db.store.has(`studentRecords/${uid}`)).toBe(false);
+    expect(d.audit).toHaveBeenCalledWith(expect.objectContaining({
+      actorId: actor.uid,
+      action: 'user.delete',
+      resource: { type: 'user', id: uid },
+      metadata: { role: 'student', status: 'invited' },
+    }));
   });
 });
 
