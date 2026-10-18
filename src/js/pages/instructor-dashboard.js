@@ -5,24 +5,43 @@ import { initSchedule } from '@/schedule/manager.js';
 import { h } from '@/ui/h.js';
 import { setAttentionBadge } from '@/ui/attention-badge.js';
 import { mountInstructorShell } from '@/ui/instructor-shell.js';
+import { mountGreeting } from '@/ui/greeting.js';
+import { initInstructorSettings } from '@/instructor/settings.js';
+import { dbService } from '@/services/firebase-db.js';
+import { requestPasswordReset } from '@/services/password-service.js';
+import { doc, serverTimestamp, updateDoc } from 'firebase/firestore';
 
 const session = await guardPage({ roles: ['instructor', 'admin'] });
 mountInstructorShell('dashboard', session.role);
 const $ = (id) => document.getElementById(id);
 const note = (text, kind = 'error') => { $('dashNote').hidden = false; $('dashNote').dataset.kind = kind; $('dashNote').textContent = text; };
 let instructorName = session.user.displayName || session.user.email;
+mountGreeting({ greetingEl: $('instructorGreeting'), lineEl: $('instructorDayLine'), audience: 'instructor' });
+let instructorProfile = null;
 
 try {
   const data = await getInstructorDashboardData(session.user.uid);
   instructorName = data.displayName || instructorName;
   $('instructorName').textContent = instructorName;
   $('instructorBio').textContent = data.bio || 'No biography has been added yet.';
+  instructorProfile = data.exists ? { bio: data.bio, preferences: data.preferences } : null;
 } catch (error) {
   console.warn('Could not load the instructor profile', error?.code ?? error);
   $('instructorName').textContent = session.user.displayName || session.user.email;
   $('instructorBio').textContent = '';
   note('Your profile could not be loaded.');
 }
+
+const settings = initInstructorSettings({
+  profile: session.role === 'instructor' ? instructorProfile : null,
+  email: session.user.email,
+  saveProfile: (changes) => updateDoc(doc(dbService(), 'instructors', session.user.uid), { ...changes, updatedAt: serverTimestamp() }),
+  sendReset: requestPasswordReset,
+  onBio: (text) => { $('instructorBio').textContent = text || 'No biography has been added yet.'; },
+});
+document.querySelector('[data-close-settings]')?.addEventListener('click', () => $('instructorSettingsDialog').close());
+if (window.location.hash === '#settings') settings.open();
+window.addEventListener('hashchange', () => { if (window.location.hash === '#settings') settings.open(); });
 
 if (session.role === 'instructor') {
   const schedule = initSchedule({ root: document, say: note, instructor: { uid: session.user.uid, displayName: instructorName } });

@@ -20,7 +20,13 @@
   <aside class="portal-side" id="portalSide"></aside>
   <main class="portal-main">
     <header class="portal-head">
-      <h1>Welcome, <span id="instructorName">…</span></h1>
+      <div class="portal-head-row">
+        <div>
+          <p id="instructorDayLine" class="muted"></p>
+          <h1><span id="instructorGreeting">Welcome</span>, <span id="instructorName">…</span></h1>
+        </div>
+        <button id="openInstructorSettings" type="button" class="btn btn-outline-secondary">Settings</button>
+      </div>
       <p id="instructorBio" class="muted">Loading your profile…</p>
     </header>
     <p id="dashNote" class="form-alert" role="status" hidden></p>
@@ -57,6 +63,25 @@
     </div>
   </main>
 </div>
+<dialog id="instructorSettingsDialog" class="instructor-settings-dialog" aria-labelledby="instructorSettingsTitle">
+  <form id="instructorSettingsForm" class="instructor-settings-form" novalidate>
+    <header class="instructor-settings-head">
+      <div><p class="eyebrow">Account</p><h2 id="instructorSettingsTitle">Settings</h2></div>
+      <button type="button" class="btn btn-outline-secondary" data-close-settings>Close</button>
+    </header>
+    <div id="instructorBioGroup" class="form-group">
+      <label for="instructorBioInput" class="form-label">About you</label>
+      <textarea id="instructorBioInput" class="form-control" rows="4" maxlength="500"></textarea>
+      <p class="hint">Shown under your name on your dashboard. <span id="instructorBioCount"></span></p>
+    </div>
+    <label class="setting-toggle"><input id="instructorReduceMotion" type="checkbox"> Reduce motion <span class="hint">Turns off page animations on every page.</span></label>
+    <div class="instructor-settings-actions">
+      <button type="submit" class="btn btn-primary">Save settings</button>
+      <button id="instructorPasswordReset" type="button" class="btn btn-outline-secondary">Send password reset link</button>
+    </div>
+    <p id="instructorSettingsNote" class="form-alert" role="status" hidden></p>
+  </form>
+</dialog>
 <nav class="portal-bottom" id="portalBottom" aria-label="Instructor mobile"></nav>
 </body>
 </html>

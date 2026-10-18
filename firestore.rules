@@ -53,7 +53,7 @@ service cloud.firestore {
     match /instructors/{uid} {
       allow read: if signedIn();
       allow update: if isAdmin()
-                    || (isUser(uid) && changesOnly(['bio', 'photoURL', 'displayName', 'updatedAt']));
+                    || (isUser(uid) && changesOnly(['bio', 'photoURL', 'displayName', 'preferences', 'updatedAt']));
       allow create, delete: if false;
     }
 

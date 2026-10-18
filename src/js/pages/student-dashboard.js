@@ -22,6 +22,7 @@ import { icon } from '@/ui/icons.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
 import { mountNotificationBadge } from '@/ui/notification-badge.js';
 import { setReduceMotionPreference } from '@/motion/reduced-motion.js';
+import { mountGreeting } from '@/ui/greeting.js';
 import { initServiceRequests } from '@/student/service-requests.js';
 import { buildFeesView, renderFees } from '@/student/fees.js';
 import { listMyPrivacyRequests, submitPrivacyRequest } from '@/services/privacy-request-service.js';
@@ -44,10 +45,7 @@ studentSettingsDialog?.addEventListener('close', () => {
 });
 window.addEventListener('hashchange', openSettingsFromLocation);
 openSettingsFromLocation();
-const hour = new Date().getHours();
-const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-const dayMessage = document.getElementById('dayMessage');
-if (dayMessage) dayMessage.textContent = `${greeting}. Here is what you can work on today.`;
+mountGreeting({ greetingEl: document.getElementById('studentGreeting'), lineEl: document.getElementById('dayMessage'), audience: 'student' });
 
 const nameEl = document.getElementById('studentName');
 const studentNumberEl = document.getElementById('studentNumber');

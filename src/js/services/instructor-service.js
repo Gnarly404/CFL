@@ -14,6 +14,8 @@ export async function getInstructorDashboardData(uid) {
   const students = studentSnap.docs.map((doc) => ({ uid: doc.id, ...doc.data() }));
 
   return {
+    exists: instructorSnap.docs.some((doc) => doc.id === uid),
+    preferences: instructor.preferences && typeof instructor.preferences === 'object' ? instructor.preferences : {},
     displayName: instructor.displayName ?? null,
     bio: instructor.bio ?? '',
     assignedCourses: Array.isArray(instructor.assignedCourses) ? instructor.assignedCourses : [],
