@@ -32,8 +32,8 @@ describe('clip keys', () => {
   });
 });
 
-describe('rendered clip manifest', () => {
-  const manifest = read('public/audio/voice/manifest.json');
+describe.each(['female', 'male'])('rendered clip manifest (%s voice)', (voiceName) => {
+  const manifest = read(`public/audio/voice/${voiceName}/manifest.json`);
 
   it('has a clip for every spoken line in the lessons (re-run npm run voice after editing lesson text)', () => {
     const spoken = [];
@@ -50,7 +50,7 @@ describe('rendered clip manifest', () => {
     for (const [id, text] of Object.entries(lines)) {
       const clip = manifest.clips[manifest.lines[id]];
       expect(clip?.text, id).toBe(normalise(text));
-      expect(() => readFileSync(resolve(root, 'public/audio/voice', clip.file)), id).not.toThrow();
+      expect(() => readFileSync(resolve(root, 'public/audio/voice', voiceName, clip.file)), id).not.toThrow();
     }
   });
 });
@@ -88,7 +88,7 @@ describe('playback', () => {
     const onend = vi.fn();
     playClip({ file: 'one.mp3' }, { rate: 0.8, onend });
     const [first] = FakeAudio.made.slice(-1);
-    expect(first.src).toBe('/audio/voice/one.mp3');
+    expect(first.src).toBe('/audio/voice/female/one.mp3');
     expect(first.playbackRate).toBe(0.8);
     expect(first.preservesPitch).toBe(true);
     playClip({ file: 'two.mp3' });
@@ -104,5 +104,37 @@ describe('playback', () => {
     playClip({ file: 'x.mp3' }, { onerror });
     await Promise.resolve(); await Promise.resolve();
     expect(onerror).toHaveBeenCalledOnce();
+  });
+});
+
+describe('choosing a voice', () => {
+  it('defaults to the female voice, remembers a choice, and ignores anything else', async () => {
+    vi.resetModules();
+    const store = new Map();
+    vi.stubGlobal('window', { localStorage: { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, v) }, dispatchEvent: vi.fn() });
+    const voice = await import('@/ui/voice.js');
+    expect(voice.getVoicePreference()).toBe('female');
+    expect(voice.setVoicePreference('male')).toBe('male');
+    expect(voice.getVoicePreference()).toBe('male');
+    expect(voice.setVoicePreference('robot')).toBe('male');
+    store.set('cfl.voice', 'alien');
+    expect(voice.getVoicePreference()).toBe('female');
+    vi.unstubAllGlobals();
+  });
+
+  it('loads each voice from its own folder and plays a clip from the voice it was found in', async () => {
+    vi.resetModules();
+    const store = new Map([['cfl.voice', 'male']]);
+    vi.stubGlobal('window', { localStorage: { getItem: (k) => store.get(k) ?? null, setItem: (k, v) => store.set(k, v) }, dispatchEvent: vi.fn() });
+    const fetched = [];
+    vi.stubGlobal('fetch', vi.fn((url) => { fetched.push(url); return Promise.resolve({ ok: true, json: () => Promise.resolve({ clips: { k: { text: 'Hi', file: 'h.mp3' } }, lines: {} }) }); }));
+    vi.stubGlobal('Audio', FakeAudio);
+    const voice = await import('@/ui/voice.js');
+    const clip = await voice.findClip('Hi').catch(() => null);
+    expect(fetched).toEqual(['/audio/voice/male/manifest.json']);
+    voice.playClip({ file: 'h.mp3', voice: 'male' });
+    expect(FakeAudio.made.at(-1).src).toBe('/audio/voice/male/h.mp3');
+    expect(clip === null || clip.voice === 'male').toBe(true);
+    vi.unstubAllGlobals();
   });
 });

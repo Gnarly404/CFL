@@ -1,0 +1,361 @@
+{
+ "version": 1,
+ "voice": {
+  "name": "female",
+  "model": "en-us-lessac-medium.onnx",
+  "sampleRate": 16000,
+  "lengthScale": 1.08
+ },
+ "lines": {
+  "home.welcome": "6eaaeb56",
+  "dash.morning": "0f3c0d6d",
+  "dash.afternoon": "ac2174f1",
+  "dash.evening": "c15ba869",
+  "hub.intro": "9aafcd45",
+  "results.perfect": "5adb2547",
+  "results.good": "fea131e9",
+  "results.retry": "6e9becaf"
+ },
+ "clips": {
+  "0ecc0de1": {
+   "text": "I am hungry after the long walk.",
+   "file": "0ecc0de1-en-us-lessac-mediu-108.mp3",
+   "seconds": 2.02
+  },
+  "0f3c0d6d": {
+   "text": "Good morning. Ready to improve your English today? Pick up where you left off, or choose a skill to practise.",
+   "file": "0f3c0d6d-en-us-lessac-mediu-108.mp3",
+   "seconds": 6.8
+  },
+  "10f5d87c": {
+   "text": "hungry",
+   "file": "10f5d87c-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.83
+  },
+  "1fc2355c": {
+   "text": "My father drives to work.",
+   "file": "1fc2355c-en-us-lessac-mediu-108.mp3",
+   "seconds": 1.73
+  },
+  "225c9a2e": {
+   "text": "We watch the news in the evening.",
+   "file": "225c9a2e-en-us-lessac-mediu-108.mp3",
+   "seconds": 1.98
+  },
+  "23e3d71a": {
+   "text": "mother",
+   "file": "23e3d71a-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.72
+  },
+  "2acbb175": {
+   "text": "Hello Sara, this is Peter. I cannot come to class on Tuesday because I have a doctor's appointment. I will come on Wednesday at ten o'clock instead. Please tell the teacher. Thank you. Goodbye.",
+   "file": "2acbb175-en-us-lessac-mediu-108.mp3",
+   "seconds": 12.46
+  },
+  "3530569c": {
+   "text": "early",
+   "file": "3530569c-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.72
+  },
+  "35bc1205": {
+   "text": "brother",
+   "file": "35bc1205-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.72
+  },
+  "37607cbb": {
+   "text": "Introduce yourself: your name, where you live and who you live with.",
+   "file": "37607cbb-en-us-lessac-mediu-108.mp3",
+   "seconds": 4.36
+  },
+  "3799e184": {
+   "text": "cousin",
+   "file": "3799e184-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.79
+  },
+  "3b952e97": {
+   "text": "bank",
+   "file": "3b952e97-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.72
+  },
+  "3c0df6de": {
+   "text": "I wake up early on school days.",
+   "file": "3c0df6de-en-us-lessac-mediu-108.mp3",
+   "seconds": 2.3
+  },
+  "3f565bc0": {
+   "text": "We play football in the afternoon.",
+   "file": "3f565bc0-en-us-lessac-mediu-108.mp3",
+   "seconds": 1.94
+  },
+  "411bea55": {
+   "text": "Our school is on this street.",
+   "file": "411bea55-en-us-lessac-mediu-108.mp3",
+   "seconds": 1.76
+  },
+  "4626414d": {
+   "text": "She follows a recipe to bake a cake.",
+   "file": "4626414d-en-us-lessac-mediu-108.mp3",
+   "seconds": 2.2
+  },
+  "481a0b42": {
+   "text": "He goes to the bank on Friday.",
+   "file": "481a0b42-en-us-lessac-mediu-108.mp3",
+   "seconds": 1.76
+  },
+  "487cc3b1": {
+   "text": "She always says thank you.",
+   "file": "487cc3b1-en-us-lessac-mediu-108.mp3",
+   "seconds": 1.55
+  },
+  "4f9cd7b3": {
+   "text": "hospital",
+   "file": "4f9cd7b3-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.86
+  },
+  "57b20f7d": {
+   "text": "dinner",
+   "file": "57b20f7d-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.65
+  },
+  "5adb2547": {
+   "text": "Excellent. Every answer was correct.",
+   "file": "5adb2547-en-us-lessac-mediu-108.mp3",
+   "seconds": 2.7
+  },
+  "5b2455e8": {
+   "text": "neighbour",
+   "file": "5b2455e8-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.76
+  },
+  "628db649": {
+   "text": "What do you do, or what do you study?",
+   "file": "628db649-en-us-lessac-mediu-108.mp3",
+   "seconds": 2.16
+  },
+  "64d204c0": {
+   "text": "What time do you wake up, and what do you do first?",
+   "file": "64d204c0-en-us-lessac-mediu-108.mp3",
+   "seconds": 3.1
+  },
+  "652f2c70": {
+   "text": "thirsty",
+   "file": "652f2c70-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.86
+  },
+  "6736afe4": {
+   "text": "always",
+   "file": "6736afe4-en-us-lessac-mediu-108.mp3",
+   "seconds": 1.01
+  },
+  "6e9becaf": {
+   "text": "Good effort. Read the explanations, then try this lesson again.",
+   "file": "6e9becaf-en-us-lessac-mediu-108.mp3",
+   "seconds": 4.18
+  },
+  "6eaaeb56": {
+   "text": "Welcome to the Centre of Foreign Learning. Knowledge to empower. Explore our programmes, and start speaking with confidence.",
+   "file": "6eaaeb56-en-us-lessac-mediu-108.mp3",
+   "seconds": 7.49
+  },
+  "7665043e": {
+   "text": "street",
+   "file": "7665043e-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.68
+  },
+  "7c3f812f": {
+   "text": "morning",
+   "file": "7c3f812f-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.76
+  },
+  "82db4d21": {
+   "text": "late",
+   "file": "82db4d21-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.72
+  },
+  "83d7a1bb": {
+   "text": "My cousin lives in another town.",
+   "file": "83d7a1bb-en-us-lessac-mediu-108.mp3",
+   "seconds": 2.02
+  },
+  "8cac251b": {
+   "text": "I wait at the station for the train.",
+   "file": "8cac251b-en-us-lessac-mediu-108.mp3",
+   "seconds": 2.02
+  },
+  "90e949a5": {
+   "text": "Tell me about your daily routine.",
+   "file": "90e949a5-en-us-lessac-mediu-108.mp3",
+   "seconds": 1.98
+  },
+  "90f6fbd0": {
+   "text": "library",
+   "file": "90f6fbd0-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.94
+  },
+  "922c8d9c": {
+   "text": "We have lunch at school.",
+   "file": "922c8d9c-en-us-lessac-mediu-108.mp3",
+   "seconds": 1.51
+  },
+  "97bea7a1": {
+   "text": "We buy vegetables at the market.",
+   "file": "97bea7a1-en-us-lessac-mediu-108.mp3",
+   "seconds": 1.98
+  },
+  "9a32f866": {
+   "text": "breakfast",
+   "file": "9a32f866-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.9
+  },
+  "9aafcd45": {
+   "text": "Choose a skill. Short, regular practice works best, so even ten minutes today will help.",
+   "file": "9aafcd45-en-us-lessac-mediu-108.mp3",
+   "seconds": 5.87
+  },
+  "9d12da41": {
+   "text": "Our neighbour says hello every morning.",
+   "file": "9d12da41-en-us-lessac-mediu-108.mp3",
+   "seconds": 2.16
+  },
+  "9db7efdb": {
+   "text": "Good morning. I would like two kilos of rice and one litre of milk, please. Of course. That will be four hundred and fifty shillings. Here you are. Thank you, and have a nice day.",
+   "file": "9db7efdb-en-us-lessac-mediu-108.mp3",
+   "seconds": 11.92
+  },
+  "9e2ced27": {
+   "text": "My brother plays football.",
+   "file": "9e2ced27-en-us-lessac-mediu-108.mp3",
+   "seconds": 1.84
+  },
+  "ab285923": {
+   "text": "What is your favourite food, and why do you like it?",
+   "file": "ab285923-en-us-lessac-mediu-108.mp3",
+   "seconds": 3.02
+  },
+  "ac2174f1": {
+   "text": "Good afternoon. Ready to improve your English today? Pick up where you left off, or choose a skill to practise.",
+   "file": "ac2174f1-en-us-lessac-mediu-108.mp3",
+   "seconds": 7.38
+  },
+  "ac247217": {
+   "text": "afternoon",
+   "file": "ac247217-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.97
+  },
+  "acf83cb2": {
+   "text": "To get to the hospital, walk straight along this street for two hundred metres. Turn left at the bank. The hospital is next to the library, on the right. It takes about five minutes.",
+   "file": "acf83cb2-en-us-lessac-mediu-108.mp3",
+   "seconds": 10.73
+  },
+  "aed72c13": {
+   "text": "station",
+   "file": "aed72c13-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.79
+  },
+  "b0fee263": {
+   "text": "father",
+   "file": "b0fee263-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.72
+  },
+  "b5f82e71": {
+   "text": "market",
+   "file": "b5f82e71-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.76
+  },
+  "c15ba869": {
+   "text": "Good evening. Ready to improve your English today? Pick up where you left off, or choose a skill to practise.",
+   "file": "c15ba869-en-us-lessac-mediu-108.mp3",
+   "seconds": 7.02
+  },
+  "c35176ad": {
+   "text": "I eat breakfast at seven.",
+   "file": "c35176ad-en-us-lessac-mediu-108.mp3",
+   "seconds": 1.73
+  },
+  "c3b8342f": {
+   "text": "evening",
+   "file": "c3b8342f-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.79
+  },
+  "c7ba54d3": {
+   "text": "She reads at the library after class.",
+   "file": "c7ba54d3-en-us-lessac-mediu-108.mp3",
+   "seconds": 2.23
+  },
+  "c7f8afb0": {
+   "text": "My mother cooks dinner every evening.",
+   "file": "c7f8afb0-en-us-lessac-mediu-108.mp3",
+   "seconds": 2.12
+  },
+  "c873861e": {
+   "text": "What do you usually do in the evening?",
+   "file": "c873861e-en-us-lessac-mediu-108.mp3",
+   "seconds": 2.27
+  },
+  "cdd836db": {
+   "text": "Tell me about a place where you buy food.",
+   "file": "cdd836db-en-us-lessac-mediu-108.mp3",
+   "seconds": 2.3
+  },
+  "ceccb674": {
+   "text": "Dinner is ready at eight.",
+   "file": "ceccb674-en-us-lessac-mediu-108.mp3",
+   "seconds": 1.48
+  },
+  "cf1ef61f": {
+   "text": "lunch",
+   "file": "cf1ef61f-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.9
+  },
+  "d5ad2377": {
+   "text": "I study in the morning.",
+   "file": "d5ad2377-en-us-lessac-mediu-108.mp3",
+   "seconds": 1.62
+  },
+  "db6876e0": {
+   "text": "My sister is two years older than me.",
+   "file": "db6876e0-en-us-lessac-mediu-108.mp3",
+   "seconds": 2.2
+  },
+  "e232afd1": {
+   "text": "The hospital is near the bus station.",
+   "file": "e232afd1-en-us-lessac-mediu-108.mp3",
+   "seconds": 2.12
+  },
+  "e5ec86e9": {
+   "text": "What do you like doing in your free time?",
+   "file": "e5ec86e9-en-us-lessac-mediu-108.mp3",
+   "seconds": 2.12
+  },
+  "ec7e97cf": {
+   "text": "recipe",
+   "file": "ec7e97cf-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.9
+  },
+  "f1f159bf": {
+   "text": "He was late for the lesson.",
+   "file": "f1f159bf-en-us-lessac-mediu-108.mp3",
+   "seconds": 1.58
+  },
+  "f2036da9": {
+   "text": "The children are thirsty on a hot day.",
+   "file": "f2036da9-en-us-lessac-mediu-108.mp3",
+   "seconds": 2.16
+  },
+  "fcda1b82": {
+   "text": "Describe what you usually eat for breakfast.",
+   "file": "fcda1b82-en-us-lessac-mediu-108.mp3",
+   "seconds": 2.84
+  },
+  "fe691321": {
+   "text": "sister",
+   "file": "fe691321-en-us-lessac-mediu-108.mp3",
+   "seconds": 0.72
+  },
+  "fea131e9": {
+   "text": "Good work. Review the questions you missed, then try again.",
+   "file": "fea131e9-en-us-lessac-mediu-108.mp3",
+   "seconds": 4.32
+  }
+ }
+}

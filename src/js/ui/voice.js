@@ -3,8 +3,37 @@
  * Clips are looked up by a hash of the exact text, so lesson content and the interface's own lines
  * share one mechanism. When there is no clip for some text, callers fall back to browser speech.
  */
-const BASE = '/audio/voice/';
-const MANIFEST_URL = `${BASE}manifest.json`;
+const ROOT = '/audio/voice/';
+
+/** The two voices the app offers. Each has its own folder of clips and its own manifest. */
+export const VOICES = Object.freeze(['female', 'male']);
+export const VOICE_LABELS = Object.freeze({ female: 'Female voice', male: 'Male voice' });
+export const DEFAULT_VOICE = 'female';
+const KEY = 'cfl.voice';
+const EVENT = 'cfl:voice';
+
+/**
+ * The listener's chosen voice. It is kept in this browser as well as on their account, so every page speaks in
+ * it from the first sound, the same way the Reduce motion setting works.
+ */
+export function getVoicePreference() {
+  try {
+    const saved = window.localStorage.getItem(KEY);
+    return VOICES.includes(saved) ? saved : DEFAULT_VOICE;
+  } catch { return DEFAULT_VOICE; }
+}
+
+/** Saves the choice, stops anything playing in the old voice, and tells the page. Unknown values are ignored. */
+export function setVoicePreference(voice) {
+  if (!VOICES.includes(voice)) return getVoicePreference();
+  const changed = voice !== getVoicePreference();
+  try { window.localStorage.setItem(KEY, voice); } catch { /* private mode: the choice lasts for this page only */ }
+  if (changed) {
+    stopClips();
+    if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent(EVENT, { detail: voice }));
+  }
+  return voice;
+}
 
 /** Collapse whitespace. Must match normalise() in scripts/build-voice.py. */
 export const normalise = (text) => String(text).split(/\s+/).filter(Boolean).join(' ');
@@ -24,33 +53,38 @@ export function clipsSupported() {
   try { return Boolean(new Audio().canPlayType('audio/mpeg')); } catch { return false; }
 }
 
-let manifest = null;
-let loading = null;
+const manifests = new Map();
+const loading = new Map();
 
-/** Fetches the manifest once. Resolves to null (never rejects) when it is missing or unreadable. */
-export function loadManifest() {
-  if (manifest) return Promise.resolve(manifest);
-  if (!loading) {
-    loading = (typeof fetch === 'function' ? fetch(MANIFEST_URL) : Promise.reject(new Error('no fetch')))
+/** Fetches a voice's manifest once. Resolves to null (never rejects) when it is missing or unreadable. */
+export function loadManifest(voice = getVoicePreference()) {
+  if (manifests.has(voice)) return Promise.resolve(manifests.get(voice));
+  if (!loading.has(voice)) {
+    loading.set(voice, (typeof fetch === 'function' ? fetch(`${ROOT}${voice}/manifest.json`) : Promise.reject(new Error('no fetch')))
       .then((response) => (response.ok ? response.json() : null))
-      .then((data) => { manifest = data?.clips ? data : null; return manifest; })
+      .then((data) => { const ok = data?.clips ? data : null; if (ok) manifests.set(voice, ok); return ok; })
       .catch(() => null)
-      .finally(() => { loading = null; });
+      .finally(() => { loading.delete(voice); }));
   }
-  return loading;
+  return loading.get(voice);
 }
 
-const entryFor = (data, key, text) => {
+const entryFor = (data, key, text, voice) => {
   const clip = data?.clips?.[key];
   // The stored text must match exactly: a hash collision or an edited lesson falls back to browser speech.
-  return clip && (text === undefined || clip.text === normalise(text)) ? clip : null;
+  // The clip remembers its voice, so it is fetched from the right folder even if the choice changes mid-way.
+  return clip && (text === undefined || clip.text === normalise(text)) ? { ...clip, voice } : null;
 };
 
 /** The clip for some text, or null. */
-export const findClip = (text) => loadManifest().then((data) => entryFor(data, clipKey(text), text));
+export const findClip = (text, voice = getVoicePreference()) => {
+  return loadManifest(voice).then((data) => entryFor(data, clipKey(text), text, voice));
+};
 
 /** The clip for a named interface line (see src/data/voice-lines.json), or null. */
-export const findLine = (id) => loadManifest().then((data) => entryFor(data, data?.lines?.[id]));
+export const findLine = (id, voice = getVoicePreference()) => {
+  return loadManifest(voice).then((data) => entryFor(data, data?.lines?.[id], undefined, voice));
+};
 
 let current = null;
 
@@ -64,7 +98,7 @@ export function stopClips() {
 /** Plays a clip. `rate` slows playback without changing pitch. Only one clip plays at a time. */
 export function playClip(clip, { rate = 1, onend, onerror } = {}) {
   stopClips();
-  const audio = new Audio(`${BASE}${clip.file}`);
+  const audio = new Audio(`${ROOT}${clip.voice ?? getVoicePreference()}/${clip.file}`);
   audio.preservesPitch = true;
   audio.mozPreservesPitch = true;
   audio.webkitPreservesPitch = true;

@@ -39,7 +39,7 @@ describe('audio player with rendered clips', () => {
     await tick();
     expect(element.dataset.state).toBe('playing');
     const audio = FakeAudio.made.at(-1);
-    expect(audio.src).toBe('/audio/voice/gm.mp3');
+    expect(audio.src).toBe('/audio/voice/female/gm.mp3');
     slow.click();
     expect(audio.playbackRate).toBe(0.8);
     audio.listeners.ended();
@@ -84,7 +84,7 @@ describe('audio player with rendered clips', () => {
     window.speechSynthesis = { cancel: vi.fn(), speak: vi.fn((u) => spoken.push(u)), getVoices: () => [] };
     speech.speak('mother');
     await tick();
-    expect(FakeAudio.made.at(-1).src).toBe('/audio/voice/mother.mp3');
+    expect(FakeAudio.made.at(-1).src).toBe('/audio/voice/female/mother.mp3');
     expect(spoken).toHaveLength(0);
     speech.speak('xylophone');
     await tick();

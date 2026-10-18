@@ -23,13 +23,22 @@ Links stay ordinary links: modified clicks, `target`, `download`, files, other s
 
 ## Voice
 
-`npm run voice` (needs `pip install piper-tts` and ffmpeg) reads the listening passages, vocabulary words and examples, speaking
-prompts and `src/data/voice-lines.json`, then writes small mono MP3s and `manifest.json` to `public/audio/voice/`. Clips are found by a
-hash of the exact text, so after editing lesson text run it again; unchanged lines are skipped, and a unit test fails if any line has no clip.
-File names include the voice and pace, so changing either gets new URLs and nothing cached goes stale.
+The app offers two voices, **female** and **male**, chosen in the student Account settings and the instructor Settings (and kept in this
+browser as `cfl.voice`, so every page follows it). Each voice has its own folder, `public/audio/voice/<voice>/`, with its own `manifest.json`.
+Re-render a voice with (needs `pip install piper-tts` and ffmpeg):
 
-`--model path/to/voice.onnx` uses another Piper voice (its `.onnx.json` beside it); `--length-scale` sets pace (default 1.08);
-`--force` re-renders everything. Buttons: `<button data-voice-line="home.welcome">` plays an interface line (`dash.auto` picks the greeting for the time of day); lesson results add one for the score. Text with no clip, and browsers that cannot play MP3, fall back to browser speech.
+    python scripts/build-voice.py --voice female --model path/to/female-voice.onnx
+    python scripts/build-voice.py --voice male   --model path/to/male-voice.onnx
+
+The current clips were rendered with Piper's `en-us-lessac-medium` (female) and `en-us-ryan-medium` (male), both from the
+`v0.0.2` release of github.com/rhasspy/piper (`voice-<name>.tar.gz`, containing the `.onnx` and `.onnx.json`).
+The script reads the listening passages, vocabulary words and examples, speaking prompts and `src/data/voice-lines.json` and writes small
+mono MP3s. Clips are found by a hash of the exact text, so after editing lesson text run it again for **both** voices; unchanged lines
+are skipped, and a unit test fails if either voice lacks a clip. File names include the voice model and pace, so nothing cached goes stale.
+
+`--length-scale` sets pace (default 1.08); `--force` re-renders everything. Buttons: `<button data-voice-line="home.welcome">` plays an
+interface line (`dash.auto` picks the greeting for the time of day); lesson results add one for the score. Text with no clip, and browsers
+that cannot play MP3, fall back to browser speech, where the chosen gender is honoured only if the browser's voice names make it clear.
 
 
 ## Attributes added in the UI/UX redesign round

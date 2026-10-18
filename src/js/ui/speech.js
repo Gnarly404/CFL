@@ -1,5 +1,7 @@
 import { h } from './h.js';
-import { clipsSupported, findClip, playClip, stopClips } from './voice.js';
+import {
+  clipsSupported, findClip, getVoicePreference, playClip, stopClips,
+} from './voice.js';
 
 /**
  * Speech for lessons. Piper-rendered clips (see voice.js) are used whenever one exists for the text;
@@ -8,9 +10,18 @@ import { clipsSupported, findClip, playClip, stopClips } from './voice.js';
 const browserSpeech = () => typeof window !== 'undefined' && 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance === 'function';
 export const speechSupported = () => browserSpeech() || clipsSupported();
 
-function pickVoice(lang) {
-  const voices = window.speechSynthesis.getVoices?.() ?? [];
-  return voices.find((v) => v.lang === lang) ?? voices.find((v) => v.lang?.toLowerCase().startsWith('en')) ?? null;
+// Browsers do not say whether a voice is male or female, so this goes by the names the common ones use. When
+// nothing matches, any English voice is used: the chosen gender is honoured only where it can be told.
+const FEMALE_NAME = /female|woman|zira|samantha|susan|hazel|karen|moira|tessa|fiona|victoria|serena|catherine|libby|sonia/i;
+const MALE_NAME = /(^|[^a-z])male|daniel|david|alex|fred|george|mark|oliver|ryan|james|thomas|guy|brian/i;
+
+export function pickVoice(lang, gender = getVoicePreference(), voices = window.speechSynthesis?.getVoices?.() ?? []) {
+  const wanted = gender === 'male' ? MALE_NAME : FEMALE_NAME;
+  const other = gender === 'male' ? FEMALE_NAME : MALE_NAME;
+  const english = voices.filter((v) => v.lang?.toLowerCase().startsWith('en'));
+  const inLang = english.filter((v) => v.lang === lang);
+  const matching = (list) => list.find((v) => wanted.test(v.name) && !(other.test(v.name) && !wanted.test(v.name)));
+  return matching(inLang) ?? matching(english) ?? inLang[0] ?? english[0] ?? null;
 }
 
 function utteranceFor(text, lang, rate) {

@@ -163,3 +163,5 @@ a.skill:hover .skill-cta svg{transform:translateX(3px)}
 .setting-toggle input{width:18px;height:18px}
 .setting-toggle .hint{flex-basis:100%;font-weight:400}
 .instructor-settings-actions{display:flex;flex-wrap:wrap;gap:var(--s2)}
+.voice-setting-row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2)}
+.voice-setting-row .form-select{flex:1 1 12rem;width:auto}

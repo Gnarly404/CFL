@@ -75,6 +75,14 @@
       <p class="hint">Shown under your name on your dashboard. <span id="instructorBioCount"></span></p>
     </div>
     <label class="setting-toggle"><input id="instructorReduceMotion" type="checkbox"> Reduce motion <span class="hint">Turns off page animations on every page.</span></label>
+    <div class="form-group">
+      <label for="instructorVoice" class="form-label">Spoken audio voice</label>
+      <div class="voice-setting-row">
+        <select id="instructorVoice" class="form-select"><option value="female">Female voice</option><option value="male">Male voice</option></select>
+        <button id="instructorVoiceSample" type="button" class="btn btn-outline-secondary">Hear a sample</button>
+      </div>
+      <p class="hint">Used for lesson audio and spoken greetings on this device.</p>
+    </div>
     <div class="instructor-settings-actions">
       <button type="submit" class="btn btn-primary">Save settings</button>
       <button id="instructorPasswordReset" type="button" class="btn btn-outline-secondary">Send password reset link</button>

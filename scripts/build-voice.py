@@ -9,10 +9,12 @@ only needs this script to be run again; unchanged lines are skipped.
 
     pip install piper-tts
     python scripts/build-voice.py                       # uses the voice bundled in piper_tts-master/etc
-    python scripts/build-voice.py --model path/to/en_GB-alba-medium.onnx
+    python scripts/build-voice.py --voice female --model path/to/female-voice.onnx
+    python scripts/build-voice.py --voice male --model path/to/male-voice.onnx
     python scripts/build-voice.py --force               # re-render everything
 
-Any Piper voice works (.onnx plus its .onnx.json next to it). Needs ffmpeg on PATH.
+Each voice the app offers ("female", "male") is rendered into its own folder, public/audio/voice/<voice>/,
+with its own manifest. Any Piper voice works (.onnx plus its .onnx.json next to it). Needs ffmpeg on PATH.
 """
 from __future__ import annotations
 
@@ -27,7 +29,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "src" / "data"
-OUT = ROOT / "public" / "audio" / "voice"
+VOICES = ("female", "male")
+OUT_ROOT = ROOT / "public" / "audio" / "voice"
 DEFAULT_MODEL = ROOT.parent / "piper_tts-master" / "etc" / "test_voice.onnx"
 SENTENCE_GAP = 0.32  # seconds of silence between sentences, so dialogue turns do not run together
 
@@ -122,12 +125,15 @@ def encode(wav_path: Path, mp3_path: Path) -> float:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--voice", choices=VOICES, required=True, help="which of the app's voices this model is")
     parser.add_argument("--model", type=Path, default=DEFAULT_MODEL, help="Piper .onnx voice (its .onnx.json must sit beside it)")
     parser.add_argument("--length-scale", type=float, default=1.08, help="1.0 is natural pace; above 1 is slower (default suits learners)")
     parser.add_argument("--force", action="store_true", help="re-render clips that already exist")
     args = parser.parse_args()
 
     from piper import PiperVoice, SynthesisConfig
+
+    out = OUT_ROOT / args.voice
 
     if not args.model.exists():
         print(f"Voice model not found: {args.model}", file=sys.stderr)
@@ -138,13 +144,13 @@ def main() -> int:
     tag = f"{args.model.stem[:18]}-{int(args.length_scale * 100)}".replace("_", "-")
 
     texts, lines = collect()
-    OUT.mkdir(parents=True, exist_ok=True)
+    out.mkdir(parents=True, exist_ok=True)
     clips: dict[str, dict] = {}
     done = 0
     with tempfile.TemporaryDirectory() as tmp:
         for key, text in sorted(texts.items()):
             name = f"{key}-{tag}.mp3"
-            target = OUT / name
+            target = out / name
             existing = duration(target) if target.exists() and not args.force else None
             if existing:
                 clips[key] = {"text": text, "file": name, "seconds": existing}
@@ -156,18 +162,18 @@ def main() -> int:
             print(f"  {key}  {clips[key]['seconds']:>5.1f}s  {text[:60]}")
 
     keep = {c["file"] for c in clips.values()}
-    for old in [*OUT.glob("*.mp3"), *OUT.glob("*.partial")]:
+    for old in [*out.glob("*.mp3"), *out.glob("*.partial")]:
         if old.name not in keep:
             old.unlink()
     manifest = {
         "version": 1,
-        "voice": {"model": args.model.name, "sampleRate": voice.config.sample_rate, "lengthScale": args.length_scale},
+        "voice": {"name": args.voice, "model": args.model.name, "sampleRate": voice.config.sample_rate, "lengthScale": args.length_scale},
         "lines": lines,
         "clips": clips,
     }
-    (OUT / "manifest.json").write_text(json.dumps(manifest, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
-    total = sum(p.stat().st_size for p in OUT.glob("*.mp3"))
-    print(f"Rendered {done} new, {len(clips)} total clips, {total / 1024:.0f} KB -> {OUT.relative_to(ROOT)}")
+    (out / "manifest.json").write_text(json.dumps(manifest, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
+    total = sum(p.stat().st_size for p in out.glob("*.mp3"))
+    print(f"Rendered {done} new, {len(clips)} total clips, {total / 1024:.0f} KB -> {out.relative_to(ROOT)}")
     return 0
 
 

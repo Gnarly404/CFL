@@ -130,3 +130,5 @@
 .service-dialog::backdrop{background:rgba(15,37,64,.5)}
 .service-dialog h2{margin:0 0 var(--s2);font-size:1.25rem}
 .service-dialog-actions{display:flex;justify-content:flex-end;gap:var(--s2);margin-top:var(--s4)}
+.voice-setting-row{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2)}
+.voice-setting-row .form-select{flex:1 1 12rem;width:auto}

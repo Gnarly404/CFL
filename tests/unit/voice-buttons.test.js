@@ -35,7 +35,7 @@ describe('voice buttons', () => {
     await tick();
     expect(b.hasAttribute('data-playing')).toBe(true);
     expect(b.getAttribute('aria-pressed')).toBe('true');
-    expect(FakeAudio.made.at(-1).src).toBe('/audio/voice/good.mp3');
+    expect(FakeAudio.made.at(-1).src).toBe('/audio/voice/female/good.mp3');
     FakeAudio.made.at(-1).listeners.ended();
     expect(b.hasAttribute('data-playing')).toBe(false);
     expect(b.getAttribute('aria-pressed')).toBe('false');
@@ -59,7 +59,7 @@ describe('voice buttons', () => {
     document.querySelector('button').click();
     vi.useRealTimers();
     await tick();
-    expect(FakeAudio.made.at(-1).src).toBe('/audio/voice/pm.mp3');
+    expect(FakeAudio.made.at(-1).src).toBe('/audio/voice/female/pm.mp3');
   });
 
   it('does nothing visible when a line has no clip', async () => {

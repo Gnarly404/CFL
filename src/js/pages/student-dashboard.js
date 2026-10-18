@@ -22,6 +22,7 @@ import { icon } from '@/ui/icons.js';
 import { mountPortalShell } from '@/ui/portal-shell.js';
 import { mountNotificationBadge } from '@/ui/notification-badge.js';
 import { setReduceMotionPreference } from '@/motion/reduced-motion.js';
+import { mountVoiceSetting } from '@/ui/voice-setting.js';
 import { mountGreeting } from '@/ui/greeting.js';
 import { initServiceRequests } from '@/student/service-requests.js';
 import { buildFeesView, renderFees } from '@/student/fees.js';
@@ -321,6 +322,9 @@ if (emailUpdatesEl) emailUpdatesEl.checked = savedPreferences.emailUpdates === t
 // Class reminders are on unless the student has switched them off.
 if (classRemindersEl) classRemindersEl.checked = savedPreferences.classReminders !== false;
 if (reduceMotionEl) reduceMotionEl.checked = savedPreferences.reduceMotion === true;
+const voiceSetting = mountVoiceSetting({
+  select: document.getElementById('voicePreference'), sample: document.getElementById('voiceSample'), saved: savedPreferences.voice,
+});
 // Keep this browser in step with the saved choice, so every page follows it.
 if (studentRecord) setReduceMotionPreference(savedPreferences.reduceMotion === true);
 
@@ -338,12 +342,14 @@ preferencesForm?.addEventListener('submit', async (event) => {
     emailUpdates: emailUpdatesEl.checked,
     classReminders: classRemindersEl.checked,
     reduceMotion: reduceMotionEl.checked,
+    voice: voiceSetting.value(),
   };
   try {
     await updateDoc(doc(dbService(), 'students', session.user.uid), { preferences, updatedAt: serverTimestamp() });
     studentRecord = { ...studentRecord, preferences };
     setReduceMotionPreference(preferences.reduceMotion);
-    accountNote('Preferences saved. Reduced motion now applies on every page, and class reminders follow your choice. Email updates and language are saved for when they become available.', 'success');
+    voiceSetting.apply();
+    accountNote('Preferences saved. Reduced motion and your voice choice now apply on every page, and class reminders follow your choice. Email updates and language are saved for when they become available.', 'success');
   } catch (error) {
     console.warn('Could not save student preferences', error?.code ?? error);
     accountNote('Preferences could not be saved. Check your connection and try again.', 'error');

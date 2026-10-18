@@ -80,3 +80,19 @@ describe('speech with browser support', () => {
     expect(spoken[0].text).toBe('market');
   });
 });
+
+describe('browser voice fallback by gender', async () => {
+  const { pickVoice } = await import('@/ui/speech.js');
+  const v = (name, lang = 'en-GB') => ({ name, lang });
+  const voices = [v('Google UK English Female'), v('Google UK English Male'), v('Microsoft Zira', 'en-US'), v('Daniel')];
+
+  it('prefers a voice whose name says it matches the choice', () => {
+    expect(pickVoice('en-GB', 'female', voices).name).toBe('Google UK English Female');
+    expect(pickVoice('en-GB', 'male', voices).name).toBe('Google UK English Male');
+  });
+
+  it('falls back to any English voice when no name tells the gender, and to none when there is none', () => {
+    expect(pickVoice('en-GB', 'male', [v('Voice 1'), v('Voice 2')]).name).toBe('Voice 1');
+    expect(pickVoice('en-GB', 'female', [v('Amelie', 'fr-FR')])).toBeNull();
+  });
+});
