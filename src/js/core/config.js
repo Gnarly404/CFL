@@ -14,3 +14,7 @@ export const firebaseConfig = Object.freeze({
 export const useEmulators = env.VITE_USE_EMULATORS === 'true';
 export const emulatorHost = env.VITE_EMULATOR_HOST || '127.0.0.1';
 export const functionsRegion = env.VITE_FUNCTIONS_REGION || 'europe-west1';
+
+// reCAPTCHA Enterprise site key for Firebase App Check. Public by design. Leave empty to keep App Check off.
+export const appCheckSiteKey = env.VITE_APPCHECK_SITE_KEY || '';
+export const isDevBuild = Boolean(env.DEV);

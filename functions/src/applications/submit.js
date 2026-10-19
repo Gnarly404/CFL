@@ -1,5 +1,5 @@
 import { onCall, HttpsError } from 'firebase-functions/https';
-import { SMTP_PASS } from '../lib/config.js';
+import { ENFORCE_APP_CHECK, SMTP_PASS } from '../lib/config.js';
 import { buildRuntime } from '../lib/runtime.js';
 import { DAY, HOUR } from '../lib/rate-limit.js';
 import { applicationReceived } from '../lib/templates.js';
@@ -88,6 +88,6 @@ export async function submitApplicationCore(deps, { data, ip, now = () => new Da
   return { reference, status: 'submitted' };
 }
 
-export const submitApplication = onCall({ cors: true, secrets: [SMTP_PASS] }, (request) => (
+export const submitApplication = onCall({ cors: true, enforceAppCheck: ENFORCE_APP_CHECK, secrets: [SMTP_PASS] }, (request) => (
   submitApplicationCore(buildRuntime(), { data: request.data, ip: request.rawRequest?.ip })
 ));

@@ -51,6 +51,15 @@ describe('hosting sends a Content-Security-Policy', () => {
     expect(csp.value).not.toMatch(/script-src[^;]*'unsafe-(inline|eval)'/);
   });
 
+  it('allows the reCAPTCHA hosts Google documents for App Check, and nothing broader for scripts', () => {
+    const directive = (name) => csp.value.split(';').map((part) => part.trim()).find((part) => part.startsWith(`${name} `)) ?? '';
+    expect(directive('script-src')).toContain('https://www.google.com/recaptcha/');
+    expect(directive('script-src')).toContain('https://www.gstatic.com/recaptcha/');
+    expect(directive('frame-src')).toContain('https://recaptcha.google.com/recaptcha/');
+    expect(directive('connect-src')).toContain('https://www.google.com/recaptcha/');
+    expect(directive('script-src')).not.toMatch(/\*|https:\s|https:$/);
+  });
+
   it('allows the services the app really uses', () => {
     for (const host of ['https://*.googleapis.com', 'https://api.emailjs.com', 'https://www.google.com']) expect(csp.value).toContain(host);
   });

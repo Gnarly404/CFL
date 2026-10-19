@@ -1,4 +1,4 @@
-import { defineInt, defineSecret, defineString } from 'firebase-functions/params';
+import { defineBoolean, defineInt, defineSecret, defineString } from 'firebase-functions/params';
 
 /** Keep in sync with VITE_FUNCTIONS_REGION. Callable functions can live in any region. */
 export const REGION = 'europe-west1';
@@ -20,3 +20,10 @@ export const IP_HASH_SALT = defineString('IP_HASH_SALT', { default: 'cfl' });
 
 // Secret: `firebase functions:secrets:set SMTP_PASS` (never put it in a .env file).
 export const SMTP_PASS = defineSecret('SMTP_PASS');
+
+// Off by default. Turn it on only after the web app sends App Check tokens (VITE_APPCHECK_SITE_KEY is set and
+// deployed) and the debug tokens you need are registered, otherwise real visitors are rejected.
+export const ENFORCE_APP_CHECK = defineBoolean('ENFORCE_APP_CHECK', {
+  default: false,
+  description: 'Reject public callable requests that carry no valid App Check token.',
+});

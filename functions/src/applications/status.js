@@ -1,4 +1,5 @@
 import { onCall, HttpsError } from 'firebase-functions/https';
+import { ENFORCE_APP_CHECK } from '../lib/config.js';
 import { buildRuntime } from '../lib/runtime.js';
 import { HOUR } from '../lib/rate-limit.js';
 import { normaliseEmail, validateEmail } from '../lib/shared/validation.js';
@@ -35,6 +36,6 @@ export async function getApplicationStatusCore(deps, { data, ip }) {
   };
 }
 
-export const getApplicationStatus = onCall({ cors: true }, (request) => (
+export const getApplicationStatus = onCall({ cors: true, enforceAppCheck: ENFORCE_APP_CHECK }, (request) => (
   getApplicationStatusCore(buildRuntime(), { data: request.data, ip: request.rawRequest?.ip })
 ));
