@@ -31,6 +31,19 @@ export function applicationReceived({ name, reference, baseUrl }) {
   };
 }
 
+export function verificationCodeEmail({ name, code, minutes }) {
+  const lines = [
+    `Hello ${name},`,
+    `Your Centre of Foreign Learning verification code is ${code}.`,
+    `It works for ${minutes} minutes. If you did not start an application, you can ignore this email.`,
+  ];
+  return {
+    subject: `Your verification code: ${code}`,
+    text: `${lines.join('\n\n')}\n\nCentre of Foreign Learning`,
+    html: layout('Verify your email address', lines),
+  };
+}
+
 export function accountInvite({ name, activationUrl, role }) {
   const lines = [
     `Hello ${name},`,

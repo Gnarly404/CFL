@@ -1,8 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { submitApplicationCore } from '../../functions/src/applications/submit.js';
 import {
-  allowAllLimiter, fakeMailer, fakeRepo, hash, log,
+  allowAllLimiter, fakeMailer, fakeRepo, fakeVerifications, hash, log,
 } from './helpers/fakes.js';
+import { verificationKey } from '../../functions/src/applications/email-verification.js';
 
 const NOW = new Date('2026-10-06T12:00:00Z');
 const valid = {
@@ -17,7 +18,14 @@ const valid = {
 
 function deps(overrides = {}) {
   return {
-    limiter: allowAllLimiter(), repo: fakeRepo(), mailer: fakeMailer(), baseUrl: 'https://cfl.test', hash, log: log(), ...overrides,
+    limiter: allowAllLimiter(),
+    repo: fakeRepo(),
+    mailer: fakeMailer(),
+    verifications: fakeVerifications({ verified: ['parent@example.com'], until: NOW.getTime() + 10 * 60 * 1000 }),
+    baseUrl: 'https://cfl.test',
+    hash,
+    log: log(),
+    ...overrides,
   };
 }
 const run = (d, data, ip = '203.0.113.9') => submitApplicationCore(d, { data, ip, now: () => NOW });
@@ -108,5 +116,54 @@ describe('submitApplication', () => {
     const d = deps({ mailer });
     await expect(run(d, valid)).resolves.toMatchObject({ reference: 'CFL-2026-00001' });
     expect(d.log.warn).toHaveBeenCalled();
+  });
+
+  describe('email verification', () => {
+    it('refuses an address that was never verified and stores nothing', async () => {
+      const d = deps({ verifications: fakeVerifications() });
+      await expect(run(d, valid)).rejects.toMatchObject({ code: 'failed-precondition', details: { reason: 'email-not-verified' } });
+      expect(d.repo.create).not.toHaveBeenCalled();
+      expect(d.mailer.send).not.toHaveBeenCalled();
+    });
+
+    it('refuses a verification that has run out', async () => {
+      const d = deps({ verifications: fakeVerifications({ verified: ['parent@example.com'], until: NOW.getTime() - 1 }) });
+      await expect(run(d, valid)).rejects.toMatchObject({ code: 'failed-precondition' });
+    });
+
+    it('cannot be satisfied by a verification for a different address', async () => {
+      const d = deps({ verifications: fakeVerifications({ verified: ['someone.else@example.com'], until: NOW.getTime() + 60000 }) });
+      await expect(run(d, valid)).rejects.toMatchObject({ code: 'failed-precondition' });
+    });
+
+    it('uses a verification up: the same proof cannot back a second application', async () => {
+      const d = deps({ repo: fakeRepo() });
+      await run(d, valid);
+      d.repo.apps.clear(); // pretend the first one was decided, so only the proof is in the way
+      await expect(run(d, valid)).rejects.toMatchObject({ code: 'failed-precondition' });
+    });
+
+    it('does not reveal whether an address already applied to someone who has not verified it', async () => {
+      const repo = fakeRepo([{ id: 'x', email: 'parent@example.com', status: 'under_review' }]);
+      const d = deps({ repo, verifications: fakeVerifications() });
+      await expect(run(d, valid)).rejects.toMatchObject({ code: 'failed-precondition' });
+      expect(repo.findOpenByEmail).not.toHaveBeenCalled();
+    });
+
+    it('keeps the verification when the save fails, so the applicant can retry', async () => {
+      const repo = fakeRepo();
+      repo.create.mockRejectedValueOnce(new Error('firestore down'));
+      const d = deps({ repo });
+      await expect(run(d, valid)).rejects.toThrow('firestore down');
+      await expect(run(d, valid)).resolves.toMatchObject({ status: 'submitted' });
+    });
+
+    it('keeps the verification when the duplicate check refuses, so nothing is lost', async () => {
+      const repo = fakeRepo([{ id: 'x', email: 'parent@example.com', status: 'under_review' }]);
+      const d = deps({ repo });
+      await expect(run(d, valid)).rejects.toMatchObject({ code: 'already-exists' });
+      const record = d.verifications.records.get(verificationKey(hash, 'parent@example.com'));
+      expect(record.verifiedUntil).toBe(NOW.getTime() + 10 * 60 * 1000);
+    });
   });
 });

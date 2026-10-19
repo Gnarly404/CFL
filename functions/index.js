@@ -3,6 +3,7 @@ import './global-options.js';
 // Admissions
 export { submitApplication } from './src/applications/submit.js';
 export { getApplicationStatus } from './src/applications/status.js';
+export { requestEmailVerification, verifyEmailCode } from './src/applications/email-verification.js';
 export { decideApplication, adminDeleteRejectedApplication } from './src/applications/decide.js';
 
 // Student privacy requests
