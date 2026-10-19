@@ -70,7 +70,7 @@ describe('Privacy and Terms pages', () => {
 
   it('the privacy policy states the facts the code relies on', () => {
     const html = read('src/privacy.html');
-    for (const phrase of ['Data Protection Act, 2019', 'odpc.go.ke', 'not uploaded to us', 'EmailJS', 'Google Maps', 'Keep me signed in']) expect(html, phrase).toContain(phrase);
+    for (const phrase of ['Data Protection Act, 2019', 'odpc.go.ke', 'not uploaded to us', 'email delivery provider', 'Google Maps', 'Keep me signed in']) expect(html, phrase).toContain(phrase);
   });
 });
 

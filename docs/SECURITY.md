@@ -19,7 +19,7 @@
 | Authentication > Settings > Password policy | Require at least 8 characters (the app also enforces letter + number). |
 | Authentication > Settings > Authorized domains | Add your production and staging domains. Invitation links are rejected otherwise. |
 | Authentication > Templates | Optional: set the action URL to `https://<your-domain>/activate` so "Forgot password" emails open the CFL page. Invitations already do. |
-| Firestore > TTL policies | Add a TTL policy for collection `rateLimits`, field `expiresAt`, so counters clear themselves. |
+| Firestore > TTL policies | Add a TTL policy for collection `rateLimits`, field `expiresAt`, so counters clear themselves. Add a second one for collection `emailVerifications`, field `expiresAt`, so used and abandoned verification codes disappear. |
 | Firestore > Rules | Deploy `firestore.rules` from this repo. Check the live rules are not "test mode". |
 | Project settings > Your apps | Restrict the web API key to your domains (HTTP referrers) in Google Cloud > Credentials. |
 | Billing | Set a budget alert. Functions are limited to 10 instances each. |
@@ -33,7 +33,12 @@
 - **Privileged functions** (`decideApplication`, `adminCreateUser`, `adminSetUserStatus`, `adminSetUserRole`,
   `adminResendInvite`, `adminAssignProgramme`, `adminSaveProgramme`) look the caller up in Firebase Auth on every call, so demoting or disabling someone takes effect
   immediately, not when their token expires. Disabling an account also revokes its sessions.
-- **Public functions** (`submitApplication`, `getApplicationStatus`) validate input on the server, rate-limit by hashed
+- **Email verification** happens on the server. `requestEmailVerification` creates a six-digit code, stores only a salted
+  hash of it in `emailVerifications`, and emails it. `verifyEmailCode` allows 5 guesses per code (counted in a transaction),
+  a code lasts 10 minutes, a new one can be requested after 60 seconds, and requests are also rate-limited per connection and
+  per address. A verified address stays valid for 30 minutes. `submitApplication` refuses an address that is not verified and
+  uses the verification up, so one code cannot back several applications. The browser holds no code and decides nothing.
+- **Public functions** (`submitApplication`, `getApplicationStatus`, `requestEmailVerification`, `verifyEmailCode`) validate input on the server, rate-limit by hashed
   IP and by email or reference, ignore a hidden honeypot field, and never reveal whether an email or reference exists.
 - **Sign-in** gives the same message for unknown email and wrong password, and `?next=` can only point at the same site.
 - **Passwords** are never handled by CFL code: Firebase Authentication owns them. New accounts get a random password the

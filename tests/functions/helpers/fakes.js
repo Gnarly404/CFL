@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { vi } from 'vitest';
 import { OPEN_STATUSES } from '../../../functions/src/lib/shared/application-status.js';
+import { verificationKey } from '../../../functions/src/applications/email-verification.js';
 
 export const fakeFieldValue = () => ({ serverTimestamp: () => 'SERVER_TS' });
 
@@ -139,3 +140,20 @@ export function fakeRepo(seed = []) {
 
 export const hash = (value) => createHash('sha256').update(String(value)).digest('hex').slice(0, 16);
 export const log = () => ({ warn: vi.fn(), info: vi.fn() });
+
+/** In-memory stand-in for emailVerificationsRepo. `verified` lists emails already verified until `until`. */
+export function fakeVerifications({ verified = [], until = 0 } = {}) {
+  const records = new Map(verified.map((email) => [
+    verificationKey(hash, email),
+    { codeDigest: null, codeExpiresAt: 0, attempts: 1, resendAvailableAt: 0, verifiedUntil: until },
+  ]));
+  return {
+    records,
+    mutate: vi.fn(async (key, fn) => {
+      const { next, result } = fn(records.has(key) ? structuredClone(records.get(key)) : null);
+      if (next) records.set(key, next);
+      return { next, result };
+    }),
+    delete: vi.fn(async (key) => { records.delete(key); }),
+  };
+}

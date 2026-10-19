@@ -4,6 +4,7 @@ import { buildRuntime } from '../lib/runtime.js';
 import { DAY, HOUR } from '../lib/rate-limit.js';
 import { applicationReceived } from '../lib/templates.js';
 import { CONSENT_VERSION, validateApplication } from '../lib/shared/application-schema.js';
+import { consumeVerification, restoreVerification } from './email-verification.js';
 
 /**
  * Stores an admissions application and returns its reference.
@@ -28,11 +29,17 @@ export async function submitApplicationCore(deps, { data, ip, now = () => new Da
     throw new HttpsError('resource-exhausted', 'Too many applications from this connection. Try again later or contact admissions.');
   }
 
-  if (await repo.findOpenByEmail(value.email)) {
-    throw new HttpsError('already-exists', 'An application for this email address is already in progress. Check your inbox for the confirmation, or contact admissions.');
-  }
+  // The server, not the browser, decides whether this address was verified. Checked before the
+  // duplicate lookup so unverified callers cannot probe which addresses already applied.
+  const verifiedUntil = await consumeVerification(deps, value.email, now().getTime());
 
-  const { reference } = await repo.create({
+  let reference;
+  try {
+    if (await repo.findOpenByEmail(value.email)) {
+      throw new HttpsError('already-exists', 'An application for this email address is already in progress. Check your inbox for the confirmation, or contact admissions.');
+    }
+
+    ({ reference } = await repo.create({
     email: value.email,
     applicantName: `${value.firstName} ${value.surname}`,
     programmeId: value.programmeId,
@@ -65,7 +72,12 @@ export async function submitApplicationCore(deps, { data, ip, now = () => new Da
       guardianConsent: value.guardianConsent === true,
     },
     source: 'web',
-  }, now().getUTCFullYear());
+    }, now().getUTCFullYear()));
+  } catch (error) {
+    // Nothing was saved, so let the applicant retry without a new code.
+    await restoreVerification(deps, value.email, verifiedUntil).catch(() => {});
+    throw error;
+  }
 
   try {
     await mailer.send({ to: value.email, ...applicationReceived({ name: value.firstName, reference, baseUrl }) });

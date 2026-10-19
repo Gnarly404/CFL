@@ -64,3 +64,24 @@ export function applicationsRepo({ db, FieldValue, Timestamp }) {
     },
   };
 }
+
+/**
+ * Email-verification state, one document per hashed address in `emailVerifications`.
+ * `mutate` runs inside a transaction, so guesses and consumption cannot race.
+ * Add a Firestore TTL policy on emailVerifications.expiresAt so old records clear themselves.
+ */
+export function emailVerificationsRepo({ db }) {
+  const doc = (key) => db.collection('emailVerifications').doc(key);
+  return {
+    async mutate(key, fn) {
+      const ref = doc(key);
+      return db.runTransaction(async (tx) => {
+        const snap = await tx.get(ref);
+        const { next, result } = fn(snap.exists ? snap.data() : null);
+        if (next && next !== (snap.exists ? snap.data() : null)) tx.set(ref, next);
+        return { next, result };
+      });
+    },
+    async delete(key) { await doc(key).delete(); },
+  };
+}

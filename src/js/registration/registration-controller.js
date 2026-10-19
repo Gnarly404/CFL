@@ -1,16 +1,10 @@
 import { applicantIsUnder18, STEP_FIELDS } from '@/utils/application-schema.js';
 import { submitApplication } from '@/services/application-service.js';
 import fallbackProgrammes from '../../data/programmes.json';
-import { sendVerificationCode } from '@/services/email.js';
+import { requestEmailVerification, verifyEmailCode } from '@/services/email-verification-service.js';
 import {
   debounce, el, setBusy, setFieldError, showMessage,
 } from '@/utils/dom.js';
-import {
-  canResendOtp, createOtpSession, getRemainingSeconds, refreshOtpSession, verifyOtp,
-} from '@/auth/otp.js';
-import {
-  clearOtpSession, getOtpSession, saveOtpSession,
-} from '@/auth/otp-storage.js';
 import { createDraftStore } from './registration-storage.js';
 import {
   collectFormData, firstStepWithError, validateAll, validateStep,
@@ -64,14 +58,8 @@ export function initRegistration({
   submit = submitApplication,
   store = createDraftStore(),
   now = () => new Date(),
-  send = sendVerificationCode,
-  createSession = createOtpSession,
-  getSession = getOtpSession,
-  saveSession = saveOtpSession,
-  clearSession = clearOtpSession,
-  verifySession = verifyOtp,
-  canResend = canResendOtp,
-  refreshSession = refreshOtpSession,
+  requestCode = requestEmailVerification,
+  checkCode = verifyEmailCode,
   programmes = fallbackProgrammes,
 } = {}) {
   const form = root.querySelector('#registrationForm');
@@ -105,6 +93,9 @@ export function initRegistration({
   const otpCountdown = root.querySelector('#otpCountdown');
   const changeEmailButton = root.querySelector('#changeEmailButton');
   let current = 0;
+  // Only timing information lives here. The code itself is created, stored and checked on the server.
+  let otpSession = null;
+  let verifiedEmail = '';
   let shownStep = null;
 
   // A programme can be chosen before arriving here: /register?programme=general-english
@@ -205,25 +196,26 @@ export function initRegistration({
     return Object.keys(errors).length === 0;
   }
 
-  function showOtpError(reason) {
+  const secondsLeft = (timestamp) => Math.max(0, Math.ceil((timestamp - Date.now()) / 1000));
+
+  function showOtpError(reason, fallback = '') {
     const messages = {
       missing: 'Your verification session could not be found. Please request a new code.',
       expired: 'This code has expired. Please request a new code.',
       invalid: 'That verification code is incorrect.',
       'too-many-attempts': 'Too many incorrect attempts. Please request a new code.',
     };
-    otpError.textContent = messages[reason] || 'Something went wrong. Please try again.';
+    otpError.textContent = messages[reason] || fallback || 'Something went wrong. Please try again.';
   }
 
   function startResendCountdown() {
-    const session = getSession();
+    const session = otpSession;
     if (!session || !otpCountdown || !resendOtpButton) return;
 
     resendOtpButton.disabled = true;
     let intervalId;
     const tick = () => {
-      const currentSession = getSession();
-      const seconds = currentSession ? getRemainingSeconds(currentSession.resendAvailableAt) : 0;
+      const seconds = otpSession ? secondsLeft(otpSession.resendAvailableAt) : 0;
       if (seconds <= 0) {
         clearInterval(intervalId);
         otpCountdown.textContent = 'You can request another code.';
@@ -312,43 +304,31 @@ export function initRegistration({
     focusStep();
   });
 
-  verifyOtpButton?.addEventListener('click', async () => {
-    const session = getSession();
-    const enteredCode = otpCode?.value.trim() ?? '';
-
-    if (!session) {
-      showOtpError('missing');
-      return;
-    }
-
-    if (Date.now() > session.expiresAt) {
-      clearSession();
-      showOtpExpired();
-      return;
-    }
-
-    const result = verifySession(session, enteredCode);
-    if (!result.success) {
-      if (result.reason === 'expired') {
-        clearSession();
-      }
-      showOtpError(result.reason);
-      return;
-    }
-
-    clearSession();
-    setBusy(verifyOtpButton, true, 'Verifying your email…');
+  /**
+   * Sends the application. The server refuses it unless the address was verified there, so
+   * `verifiedEmail` below is only a hint that saves the applicant a second code after a failed send.
+   */
+  async function sendApplication(busyButton, { direct = false } = {}) {
     try {
       const payload = { ...collectFormData(form), website: form.querySelector('[name="website"]')?.value ?? '' };
       const { reference } = await submit(payload);
       store.clear();
+      verifiedEmail = '';
       form.hidden = true;
       otpVerification?.classList.add('hidden');
       root.querySelector('.progress-container')?.setAttribute('hidden', '');
       root.querySelector('#referenceNumber').textContent = reference;
       confirmation.hidden = false;
       confirmation.querySelector('h2')?.focus();
+      return 'sent';
     } catch (error) {
+      if (error.details?.reason === 'email-not-verified') {
+        verifiedEmail = '';
+        if (direct) {
+          setBusy(busyButton, false);
+          return 'needs-verification';
+        }
+      }
       if (error.fieldErrors) {
         const bad = firstStepWithError(error.fieldErrors);
         if (bad >= 0) {
@@ -359,36 +339,62 @@ export function initRegistration({
       showMessage(formError, error.message || 'We could not send your application. Please try again.', 'error');
       otpVerification?.classList.add('hidden');
       form.hidden = false;
-      setBusy(verifyOtpButton, false);
+      setBusy(busyButton, false);
+      return 'failed';
     }
+  }
+
+  verifyOtpButton?.addEventListener('click', async () => {
+    const enteredCode = otpCode?.value.trim() ?? '';
+
+    if (!otpSession) {
+      showOtpError('missing');
+      return;
+    }
+
+    if (Date.now() > otpSession.expiresAt) {
+      otpSession = null;
+      showOtpExpired();
+      return;
+    }
+
+    setBusy(verifyOtpButton, true, 'Verifying your email…');
+    try {
+      await checkCode({ email: otpSession.email, code: enteredCode });
+    } catch (error) {
+      const reason = error?.details?.reason;
+      if (reason === 'expired' || reason === 'missing' || reason === 'too-many-attempts') {
+        otpSession = null;
+        if (resendOtpButton) resendOtpButton.disabled = false;
+        if (otpCountdown) otpCountdown.textContent = 'You can request another code.';
+      }
+      showOtpError(reason, error?.message);
+      setBusy(verifyOtpButton, false);
+      return;
+    }
+
+    verifiedEmail = otpSession.email;
+    otpSession = null;
+    await sendApplication(verifyOtpButton);
   });
 
   resendOtpButton?.addEventListener('click', async () => {
-    const session = getSession();
-    if (!session || !canResend(session)) return;
+    if (!otpSession || secondsLeft(otpSession.resendAvailableAt) > 0) return;
 
-    const firstName = form.querySelector('#firstName')?.value.trim() ?? '';
-    const surname = form.querySelector('#surname')?.value.trim() ?? '';
-    const refreshedSession = refreshSession(session);
-
-    saveSession(refreshedSession);
+    const email = otpSession.email;
+    const name = [form.querySelector('#firstName')?.value.trim(), form.querySelector('#surname')?.value.trim()].filter(Boolean).join(' ');
     try {
-      await send({
-        email: refreshedSession.email,
-        name: [firstName, surname].filter(Boolean).join(' '),
-        passcode: refreshedSession.code,
-        expiresIn: '10 minutes',
-      });
+      const { expiresAt, resendAvailableAt } = await requestCode({ email, name });
+      otpSession = { email, expiresAt, resendAvailableAt };
       startResendCountdown();
       otpError.textContent = '';
     } catch (error) {
-      showMessage(formError, 'We could not send a new verification code. Please try again.', 'error');
-      showOtpError('missing');
+      showOtpError(error?.details?.reason, error?.message || 'We could not send a new verification code. Please try again.');
     }
   });
 
   changeEmailButton?.addEventListener('click', () => {
-    clearSession();
+    otpSession = null;
     returnToRegistration();
   });
 
@@ -406,18 +412,18 @@ export function initRegistration({
       return;
     }
 
+    const email = form.querySelector('#email')?.value.trim() ?? '';
+    const name = [form.querySelector('#firstName')?.value.trim(), form.querySelector('#surname')?.value.trim()].filter(Boolean).join(' ');
+
     setBusy(submitButton, true, 'Sending your application…');
+    if (verifiedEmail && verifiedEmail === email) {
+      const outcome = await sendApplication(submitButton, { direct: true });
+      if (outcome !== 'needs-verification') return;
+      setBusy(submitButton, true, 'Sending your application…');
+    }
     try {
-      const email = form.querySelector('#email')?.value.trim() ?? '';
-      const name = [form.querySelector('#firstName')?.value.trim(), form.querySelector('#surname')?.value.trim()].filter(Boolean).join(' ');
-      const session = createSession(email);
-      saveSession(session);
-      await send({
-        email,
-        name,
-        passcode: session.code,
-        expiresIn: '10 minutes',
-      });
+      const { expiresAt, resendAvailableAt } = await requestCode({ email, name });
+      otpSession = { email, expiresAt, resendAvailableAt };
       openOtpVerification(email, name);
       setBusy(submitButton, false);
     } catch (error) {

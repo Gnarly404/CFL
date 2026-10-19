@@ -258,7 +258,7 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    // Everything else (counters, rateLimits, ...) is server-only.
+    // Everything else (counters, rateLimits, emailVerifications, ...) is server-only.
     match /{document=**} {
       allow read, write: if false;
     }

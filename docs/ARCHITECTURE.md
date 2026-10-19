@@ -101,5 +101,5 @@ Written by "server" means Cloud Functions (Admin SDK); rules deny browser writes
 | Roles in custom claims, re-verified server-side | Rules can read them cheaply; functions never trust a stale token. |
 | Shared validators copied into `functions/` by a script | Firebase deploys only `functions/`; a test fails if the copy drifts. |
 | Functions in `europe-west1`, Node 22 | Closer to Kenya than `us-central1`; Node 20 is at end of life. Change `REGION` and `VITE_FUNCTIONS_REGION` together. |
-| Data Connect and the OTP prototype removed | Unused (Data Connect needs Cloud SQL and nothing referenced it); OTP trusted client-supplied identity. Kept in `archive/` for reference. |
+| Data Connect and the OTP prototype removed | Unused (Data Connect needs Cloud SQL and nothing referenced it); OTP trusted client-supplied identity. Kept in `archive/` for reference. The application form's email check now runs on the server (`requestEmailVerification`, `verifyEmailCode`, enforced in `submitApplication`). |
 | No client-side password handling | Firebase Authentication owns credentials. |

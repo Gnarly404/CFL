@@ -3,7 +3,7 @@ import { services, inEmulator } from './admin.js';
 import { APP_BASE_URL, IP_HASH_SALT } from './config.js';
 import { getMailer } from './mailer.js';
 import { createRateLimiter, hashKey } from './rate-limit.js';
-import { applicationsRepo } from './repos.js';
+import { applicationsRepo, emailVerificationsRepo } from './repos.js';
 import { writeAudit } from './audit.js';
 import { provisionAccount } from './invite.js';
 
@@ -18,6 +18,7 @@ export function buildRuntime() {
     hash: (value) => hashKey(value, IP_HASH_SALT.value()),
     limiter: createRateLimiter({ db }),
     repo: applicationsRepo({ db, FieldValue, Timestamp }),
+    verifications: emailVerificationsRepo({ db }),
   };
   deps.audit = (entry) => writeAudit(deps, entry);
   deps.provision = (input) => provisionAccount(deps, input);

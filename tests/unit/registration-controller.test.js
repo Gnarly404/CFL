@@ -4,7 +4,6 @@ import { initRegistration } from '@/registration/registration-controller.js';
 import { fill, loadPage, tick } from '../helpers.js';
 
 const NOW = new Date('2026-10-06T12:00:00Z');
-const OTP_SESSION = { email: 'parent@example.com', code: '482731', expiresAt: Date.now() + 10 * 60 * 1000, attempts: 0, maxAttempts: 5, resendAvailableAt: Date.now() + 60 * 1000 };
 const step1 = { firstName: 'Wanjiku', surname: 'Kamau', dateOfBirth: '2012-05-14' };
 const step2 = { gender: 'female', nationality: 'Kenyan' };
 const step3 = { identificationType: 'national_id', identificationNumber: '12345678' };
@@ -21,18 +20,15 @@ function memoryStore(initial = null) {
   };
 }
 
+const rejection = (reason, message) => Object.assign(new Error(message), { code: 'invalid-argument', details: { reason } });
+const freshCode = () => vi.fn(async () => ({ expiresAt: Date.now() + 10 * 60 * 1000, resendAvailableAt: Date.now() + 60 * 1000 }));
+
 function setup({
   submit = vi.fn().mockResolvedValue({ reference: 'CFL-2026-00001' }),
   store = memoryStore(),
   search = '',
-  sendVerificationCode = vi.fn().mockResolvedValue(undefined),
-  createSession = () => ({ ...OTP_SESSION }),
-  getSession = () => null,
-  saveSession = vi.fn(),
-  clearSession = vi.fn(),
-  verifySession = vi.fn(() => ({ success: true })),
-  canResend = vi.fn(() => true),
-  refreshSession = vi.fn((session) => ({ ...session, code: '999999', resendAvailableAt: NOW.getTime() + 60 * 1000 })),
+  requestCode = freshCode(),
+  checkCode = vi.fn().mockResolvedValue({ verified: true }),
   programmes,
 } = {}) {
   loadPage('register.html');
@@ -41,18 +37,12 @@ function setup({
     submit,
     store,
     now: () => NOW,
-    send: sendVerificationCode,
-    createSession,
-    getSession,
-    saveSession,
-    clearSession,
-    verifySession,
-    canResend,
-    refreshSession,
+    requestCode,
+    checkCode,
     programmes,
   });
   const form = document.querySelector('#registrationForm');
-  return { controller, form, submit, store, sendVerificationCode, saveSession, clearSession, verifySession, canResend, refreshSession };
+  return { controller, form, submit, store, requestCode, checkCode };
 }
 
 const activeStep = () => [...document.querySelectorAll('.step')].findIndex((s) => s.classList.contains('active')) + 1;
@@ -153,18 +143,22 @@ describe('application form', () => {
     expect(document.querySelector('#consent-error')).not.toBeNull();
   });
 
-  it('sends the application, shows the reference and discards the draft after valid email verification', async () => {
-    const { form, submit, store } = setup({
-      search: '?programme=english-intake',
-      getSession: () => OTP_SESSION,
-      verifySession: vi.fn(() => ({ success: true })),
-    });
-    completeAllSteps(form);
-    fill(form, { consent: true });
-    submitForm(form);
+  async function reachCodeStep(options = {}) {
+    const ctx = setup(options);
+    completeAllSteps(ctx.form);
+    fill(ctx.form, { consent: true });
+    submitForm(ctx.form);
     await vi.waitFor(() => expect(document.querySelector('#otpVerification').hidden).toBe(false));
-    document.querySelector('#otpCode').value = '482731';
+    return ctx;
+  }
+  const enterCode = (code = '482731') => {
+    document.querySelector('#otpCode').value = code;
     document.querySelector('#verifyOtpButton').click();
+  };
+
+  it('sends the application, shows the reference and discards the draft after the server confirms the code', async () => {
+    const { submit, store, form } = await reachCodeStep({ search: '?programme=english-intake' });
+    enterCode();
     await vi.waitFor(() => expect(document.querySelector('#confirmation').hidden).toBe(false));
     expect(submit).toHaveBeenCalledOnce();
     expect(submit.mock.calls[0][0]).toMatchObject({
@@ -175,105 +169,100 @@ describe('application form', () => {
     expect(store.clear).toHaveBeenCalled();
   });
 
-  it('requires email verification before submitting the application', async () => {
-    const { form, sendVerificationCode, submit, saveSession } = setup();
-    completeAllSteps(form);
-    fill(form, { consent: true });
-    submitForm(form);
-    await vi.waitFor(() => expect(document.querySelector('#otpVerification').hidden).toBe(false));
-    expect(sendVerificationCode).toHaveBeenCalledWith({
-      email: 'parent@example.com',
-      name: 'Wanjiku Kamau',
-      passcode: '482731',
-      expiresIn: '10 minutes',
-    });
-    expect(saveSession).toHaveBeenCalledWith(expect.objectContaining({ email: 'parent@example.com', code: '482731' }));
+  it('asks the server for a code and does not submit until it is confirmed', async () => {
+    const { form, requestCode, submit, checkCode } = await reachCodeStep();
+    expect(requestCode).toHaveBeenCalledWith({ email: 'parent@example.com', name: 'Wanjiku Kamau' });
+    expect(checkCode).not.toHaveBeenCalled();
     expect(submit).not.toHaveBeenCalled();
     expect(form.hidden).toBe(true);
   });
 
-  it('submits only after a valid OTP is verified', async () => {
-    const { form, submit, verifySession } = setup({ getSession: () => OTP_SESSION });
-    completeAllSteps(form);
-    fill(form, { consent: true });
-    submitForm(form);
-    await vi.waitFor(() => expect(document.querySelector('#otpVerification').hidden).toBe(false));
-    document.querySelector('#otpCode').value = '482731';
-    document.querySelector('#verifyOtpButton').click();
+  it('never keeps a verification code in the browser', async () => {
+    await reachCodeStep();
+    enterCode();
+    await vi.waitFor(() => expect(document.querySelector('#confirmation').hidden).toBe(false));
+    expect(sessionStorage.length).toBe(0);
+    expect(localStorage.getItem('cfl_otp_session')).toBeNull();
+  });
+
+  it('checks the entered code with the server, for the address the code was sent to', async () => {
+    const { checkCode, submit } = await reachCodeStep();
+    enterCode('482731');
     await vi.waitFor(() => expect(submit).toHaveBeenCalledOnce());
-    expect(verifySession).toHaveBeenCalledWith(OTP_SESSION, '482731');
+    expect(checkCode).toHaveBeenCalledWith({ email: 'parent@example.com', code: '482731' });
     expect(document.querySelector('#confirmation').hidden).toBe(false);
   });
 
-  it('updates the resend countdown from the current session time', async () => {
+  it('updates the resend countdown from the times the server returned', async () => {
     vi.useFakeTimers();
-    const startedAt = Date.now();
-    const session = { ...OTP_SESSION, resendAvailableAt: startedAt + 30000 };
-    const { form } = setup({ getSession: () => session });
-    completeAllSteps(form);
-    fill(form, { consent: true });
-    submitForm(form);
-    await vi.waitFor(() => expect(document.querySelector('#otpCountdown').textContent).toContain('30 seconds'));
+    await reachCodeStep({
+      requestCode: vi.fn(async () => ({ expiresAt: Date.now() + 600000, resendAvailableAt: Date.now() + 30000 })),
+    });
+    expect(document.querySelector('#otpCountdown').textContent).toContain('30 seconds');
     vi.advanceTimersByTime(1000);
     expect(document.querySelector('#otpCountdown').textContent).toContain('29 seconds');
   });
 
-  it('shows an expired-code message and enables resend when the session has expired', async () => {
-    const expiredSession = { ...OTP_SESSION, expiresAt: Date.now() - 1000 };
-    const { form, clearSession } = setup({ getSession: () => expiredSession });
-    completeAllSteps(form);
-    fill(form, { consent: true });
-    submitForm(form);
-    await vi.waitFor(() => expect(document.querySelector('#otpVerification').hidden).toBe(false));
-    document.querySelector('#otpCode').value = '482731';
-    document.querySelector('#verifyOtpButton').click();
-    expect(clearSession).toHaveBeenCalled();
+  it('shows an expired-code message and enables resend when the code has run out, without calling the server', async () => {
+    const { checkCode } = await reachCodeStep({
+      requestCode: vi.fn(async () => ({ expiresAt: Date.now() - 1000, resendAvailableAt: Date.now() + 60000 })),
+    });
+    enterCode();
+    expect(checkCode).not.toHaveBeenCalled();
     expect(document.querySelector('#otpError').textContent).toContain('expired');
     expect(document.querySelector('#resendOtpButton').disabled).toBe(false);
   });
 
-  it('shows a clear error for an invalid OTP without submitting', async () => {
-    const { form, submit, verifySession } = setup({
-      getSession: () => OTP_SESSION,
-      verifySession: vi.fn(() => ({ success: false, reason: 'invalid' })),
+  it('shows a clear error when the server says the code is wrong, and does not submit', async () => {
+    const { submit, checkCode } = await reachCodeStep({
+      checkCode: vi.fn().mockRejectedValue(rejection('invalid', 'That verification code is incorrect.')),
     });
-    completeAllSteps(form);
-    fill(form, { consent: true });
-    submitForm(form);
-    await vi.waitFor(() => expect(document.querySelector('#otpVerification').hidden).toBe(false));
-    document.querySelector('#otpCode').value = '000000';
-    document.querySelector('#verifyOtpButton').click();
-    await tick();
+    enterCode('000000');
+    await vi.waitFor(() => expect(document.querySelector('#otpError').textContent).toContain('incorrect'));
+    expect(checkCode).toHaveBeenCalledOnce();
     expect(submit).not.toHaveBeenCalled();
-    expect(verifySession).toHaveBeenCalled();
-    expect(document.querySelector('#otpError').textContent).toContain('incorrect');
+    expect(document.querySelector('#verifyOtpButton').disabled).toBe(false);
   });
 
-  it('resends a new OTP only after the cooldown expires', async () => {
-    const { form, refreshSession } = setup({ getSession: () => OTP_SESSION, canResend: vi.fn(() => false) });
-    completeAllSteps(form);
-    fill(form, { consent: true });
-    submitForm(form);
+  it.each(['expired', 'too-many-attempts'])('asks for a new code and enables resend when the server reports %s', async (reason) => {
+    await reachCodeStep({ checkCode: vi.fn().mockRejectedValue(rejection(reason, 'x')) });
+    enterCode();
+    await vi.waitFor(() => expect(document.querySelector('#resendOtpButton').disabled).toBe(false));
+    expect(document.querySelector('#otpError').textContent).toContain('new code');
+  });
+
+  it('does not let the applicant ask for another code before the cooldown ends', async () => {
+    const { requestCode } = await reachCodeStep();
     document.querySelector('#resendOtpButton').click();
-    expect(refreshSession).not.toHaveBeenCalled();
+    await tick();
+    expect(requestCode).toHaveBeenCalledOnce();
     expect(document.querySelector('#otpCountdown').textContent).toContain('60 seconds');
+  });
+
+  it('asks for a new code once the cooldown has ended', async () => {
+    vi.useFakeTimers();
+    const { requestCode } = await reachCodeStep();
+    vi.advanceTimersByTime(61000);
+    document.querySelector('#resendOtpButton').click();
+    await vi.waitFor(() => expect(requestCode).toHaveBeenCalledTimes(2));
+  });
+
+  it('shows the server message when a new code is refused', async () => {
+    vi.useFakeTimers();
+    const requestCode = freshCode();
+    await reachCodeStep({ requestCode });
+    requestCode.mockRejectedValueOnce(Object.assign(new Error('Too many code requests. Please try again later.'), { details: { reason: 'rate-limited' } }));
+    vi.advanceTimersByTime(61000);
+    document.querySelector('#resendOtpButton').click();
+    await vi.waitFor(() => expect(document.querySelector('#otpError').textContent).toContain('Too many code requests'));
   });
 
   it('returns to the right step and field when the server rejects a value after verification', async () => {
     const failure = Object.assign(new Error('Check the highlighted fields and try again.'), {
       fieldErrors: { email: 'That email address is not accepted.' },
     });
-    const { form } = setup({
-      submit: vi.fn().mockRejectedValue(failure),
-      getSession: () => OTP_SESSION,
-      verifySession: vi.fn(() => ({ success: true })),
-    });
-    completeAllSteps(form);
-    fill(form, { consent: true });
-    submitForm(form);
-    await vi.waitFor(() => expect(document.querySelector('#otpVerification').hidden).toBe(false));
-    document.querySelector('#otpCode').value = '482731';
-    document.querySelector('#verifyOtpButton').click();
+    const { form } = await reachCodeStep({ submit: vi.fn().mockRejectedValue(failure) });
+    enterCode();
     await vi.waitFor(() => expect(document.querySelector('#formError').hidden).toBe(false));
     expect(form.hidden).toBe(false);
     expect(activeStep()).toBe(4);
@@ -282,20 +271,47 @@ describe('application form', () => {
   });
 
   it('keeps the form and the draft when the network fails after verification', async () => {
-    const { form, store } = setup({
-      submit: vi.fn().mockRejectedValue(new Error("We can't reach the server.")),
-      getSession: () => OTP_SESSION,
-      verifySession: vi.fn(() => ({ success: true })),
+    const { form, store } = await reachCodeStep({ submit: vi.fn().mockRejectedValue(new Error("We can't reach the server.")) });
+    enterCode();
+    await vi.waitFor(() => expect(document.querySelector('#formError').textContent).toMatch(/reach the server/));
+    expect(form.hidden).toBe(false);
+    expect(store.clear).not.toHaveBeenCalled();
+  });
+
+  it('does not ask for a second code when a failed send is retried for the same address', async () => {
+    const submit = vi.fn().mockRejectedValueOnce(new Error("We can't reach the server.")).mockResolvedValue({ reference: 'CFL-2026-00002' });
+    const { form, requestCode } = await reachCodeStep({ submit });
+    enterCode();
+    await vi.waitFor(() => expect(document.querySelector('#formError').textContent).toMatch(/reach the server/));
+    submitForm(form);
+    await vi.waitFor(() => expect(document.querySelector('#confirmation').hidden).toBe(false));
+    expect(requestCode).toHaveBeenCalledOnce();
+    expect(submit).toHaveBeenCalledTimes(2);
+  });
+
+  it('falls back to a fresh code when the server no longer treats the address as verified', async () => {
+    const stale = Object.assign(new Error('Please verify your email address before sending your application.'), {
+      code: 'failed-precondition', details: { reason: 'email-not-verified' },
+    });
+    const submit = vi.fn().mockRejectedValueOnce(new Error("We can't reach the server.")).mockRejectedValueOnce(stale);
+    const { form, requestCode } = await reachCodeStep({ submit });
+    enterCode();
+    await vi.waitFor(() => expect(document.querySelector('#formError').textContent).toMatch(/reach the server/));
+    submitForm(form);
+    await vi.waitFor(() => expect(requestCode).toHaveBeenCalledTimes(2));
+    await vi.waitFor(() => expect(document.querySelector('#otpVerification').hidden).toBe(false));
+  });
+
+  it('shows the server message when the verification email cannot be sent', async () => {
+    const { form, submit } = setup({
+      requestCode: vi.fn().mockRejectedValue(new Error('We could not send the verification email. Please try again in a moment.')),
     });
     completeAllSteps(form);
     fill(form, { consent: true });
     submitForm(form);
-    await vi.waitFor(() => expect(document.querySelector('#otpVerification').hidden).toBe(false));
-    document.querySelector('#otpCode').value = '482731';
-    document.querySelector('#verifyOtpButton').click();
-    await vi.waitFor(() => expect(document.querySelector('#formError').textContent).toMatch(/reach the server/));
+    await vi.waitFor(() => expect(document.querySelector('#formError').textContent).toContain('could not send the verification email'));
+    expect(submit).not.toHaveBeenCalled();
     expect(form.hidden).toBe(false);
-    expect(store.clear).not.toHaveBeenCalled();
   });
 
   it('restores a saved draft and tells the person', () => {

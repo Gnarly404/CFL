@@ -5,26 +5,7 @@ emailjs.init({
 });
 
 const EMAIL_SERVICE_ID = 'service_6a534o8';
-const OTP_TEMPLATE_ID = 'template_mx4dnx9';
 const INVITATION_TEMPLATE_ID = 'template_6s9xdja';
-
-export async function sendVerificationCode({
-  email,
-  name,
-  passcode,
-  expiresIn,
-}) {
-  return emailjs.send(
-    EMAIL_SERVICE_ID,
-    OTP_TEMPLATE_ID,
-    {
-      email,
-      name,
-      passcode,
-      time: expiresIn,
-    },
-  );
-}
 
 export async function sendAccountInvitation({
   email,
