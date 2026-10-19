@@ -6,16 +6,19 @@ import { createRateLimiter, hashKey } from './rate-limit.js';
 import { applicationsRepo } from './repos.js';
 import { writeAudit } from './audit.js';
 import { provisionAccount } from './invite.js';
+import { resolveSalt } from './salt.js';
 
 /** Wires the real Firebase services for one request. Handlers receive this; tests pass fakes instead. */
 export function buildRuntime() {
   const { auth, db, FieldValue, Timestamp } = services();
   const baseUrl = APP_BASE_URL.value();
   const mailer = getMailer();
+  let cachedSalt;
+  const salt = () => (cachedSalt ??= resolveSalt(IP_HASH_SALT.value(), { emulator: inEmulator() }));
   const deps = {
     auth, db, FieldValue, Timestamp, mailer, baseUrl, log: logger,
     exposeLinks: inEmulator(),
-    hash: (value) => hashKey(value, IP_HASH_SALT.value()),
+    hash: (value) => hashKey(value, salt()),
     limiter: createRateLimiter({ db }),
     repo: applicationsRepo({ db, FieldValue, Timestamp }),
   };

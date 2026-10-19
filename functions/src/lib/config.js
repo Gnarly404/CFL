@@ -16,7 +16,10 @@ export const MAIL_FROM = defineString('MAIL_FROM', { default: 'Centre of Foreign
 export const SMTP_HOST = defineString('SMTP_HOST', { default: 'smtp.gmail.com' });
 export const SMTP_PORT = defineInt('SMTP_PORT', { default: 465 });
 export const SMTP_USER = defineString('SMTP_USER', { default: '' });
-export const IP_HASH_SALT = defineString('IP_HASH_SALT', { default: 'cfl' });
+// No default on purpose: a deploy without a value fails instead of using a guessable salt.
+export const IP_HASH_SALT = defineString('IP_HASH_SALT', {
+  description: 'Random string, 16+ characters, that salts hashed IPs and emails in rate-limit keys.',
+});
 
 // Secret: `firebase functions:secrets:set SMTP_PASS` (never put it in a .env file).
 export const SMTP_PASS = defineSecret('SMTP_PASS');
