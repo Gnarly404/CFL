@@ -1,6 +1,6 @@
 import { randomInt } from 'node:crypto';
 import { onCall, HttpsError } from 'firebase-functions/https';
-import { SMTP_PASS } from '../lib/config.js';
+import { ENFORCE_APP_CHECK, SMTP_PASS } from '../lib/config.js';
 import { buildRuntime } from '../lib/runtime.js';
 import { HOUR } from '../lib/rate-limit.js';
 import { verificationCodeEmail } from '../lib/templates.js';
@@ -141,10 +141,10 @@ export async function restoreVerification({ verifications, hash }, email, verifi
   }));
 }
 
-export const requestEmailVerification = onCall({ cors: true, secrets: [SMTP_PASS] }, (request) => (
+export const requestEmailVerification = onCall({ cors: true, enforceAppCheck: ENFORCE_APP_CHECK, secrets: [SMTP_PASS] }, (request) => (
   requestEmailVerificationCore(buildRuntime(), { data: request.data, ip: request.rawRequest?.ip })
 ));
 
-export const verifyEmailCode = onCall({ cors: true }, (request) => (
+export const verifyEmailCode = onCall({ cors: true, enforceAppCheck: ENFORCE_APP_CHECK }, (request) => (
   verifyEmailCodeCore(buildRuntime(), { data: request.data, ip: request.rawRequest?.ip })
 ));
