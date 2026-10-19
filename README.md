@@ -78,7 +78,7 @@ archive/                 Material that is kept for reference and not shipped (OT
 
 1. Create the Firebase projects, enable Authentication (Email/Password), Firestore and Storage.
 2. Put the project ids in `.firebaserc` (`staging`, `production`). The `default` alias deliberately points at staging, so a plain `firebase deploy` can never reach production by accident.
-3. Copy `.env.example` to `.env.production` (and `.env.staging`) and fill in the web-app settings from the Firebase console.
+3. Copy `.env.development.example` to `.env.production` (and `.env.staging`), set `VITE_USE_EMULATORS=false`, and replace every value with the web-app settings from the Firebase console. Leave `VITE_APPCHECK_SITE_KEY` empty until you set up App Check.
 4. Copy `functions/.env.example` to `functions/.env.<projectId>` and fill it in.
 5. Store the mail password as a secret: `firebase use <alias>` then `firebase functions:secrets:set SMTP_PASS`.
 6. Work through the console checklist in [docs/SECURITY.md](docs/SECURITY.md) (authorized domains, password policy, TTL policy).

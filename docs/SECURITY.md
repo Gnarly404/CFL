@@ -5,6 +5,8 @@
 1. **Revoke the Gmail app password that was committed in `functions/functions/.env`** of the original upload, and
    create a new one if you still want to send mail through Gmail. Treat the old one as public.
    Also remove it from every copy of the old repository and from any place it was pasted.
+   (Checked 19 October 2026: this repository's history contains no `.env` file and no password, so the exposure is in the
+   original upload and wherever it was shared. Rotation happens in the Google account, not in this repo.)
 2. The new code never reads that file. Mail settings now live in `functions/.env.<projectId>` (non-secret) and
    Secret Manager (`SMTP_PASS`). `.env` files, `.secret.local` and service-account keys are git-ignored.
 3. Google Workspace or Gmail SMTP is fine for a pilot (about 500 messages a day). For production volume use a
@@ -23,7 +25,9 @@
 | Firestore > Rules | Deploy `firestore.rules` from this repo. Check the live rules are not "test mode". |
 | Project settings > Your apps | Restrict the web API key to your domains (HTTP referrers) in Google Cloud > Credentials. |
 | Billing | Set a budget alert. Functions are limited to 10 instances each. |
-| App Check | Recommended before launch: enable reCAPTCHA Enterprise App Check and set `enforceAppCheck: true` on `submitApplication`. |
+| App Check | The code is ready but off. Register the web app under App Check with reCAPTCHA Enterprise, set `VITE_APPCHECK_SITE_KEY`, deploy, watch the metrics, and only then set `ENFORCE_APP_CHECK=true` in `functions/.env.<projectId>`. It applies to the four public callables (`submitApplication`, `getApplicationStatus`, `requestEmailVerification`, `verifyEmailCode`). |
+| Function settings | `IP_HASH_SALT` in `functions/.env.<projectId>` must be a random value of 16+ characters (`openssl rand -hex 24`). The functions refuse a short or placeholder value. |
+| EmailJS dashboard | The EmailJS public key and template ids are in the public web bundle (`src/js/services/email.js`). The key is meant to be public, but restrict it to your domains in EmailJS so nobody can send mail through your account. Production invitations are sent by the server over SMTP; the EmailJS path only runs in the local emulator. |
 
 ## How access control works
 
@@ -53,7 +57,11 @@
 - Messages are created only by the `sendMessage` function. A student may message only a teacher listed in their `instructorIds`, and a teacher only students who list them; both accounts must exist and be active, text is plain (cleaned, 2000 characters, shown as text never markup), and each sender is limited to 30 messages an hour. Each message lists both people in `participants`; only they can read it. Admins cannot read conversations. Browsers can only mark a message they received as read.
 - A signed-in token stays valid up to an hour. Role changes and disabling revoke refresh tokens, and privileged functions
   re-check the live role, but Firestore rules read the token. Keep that in mind for anything highly sensitive.
-- No Content-Security-Policy yet: the pages still load Bootstrap, Font Awesome and fonts from CDNs. The design-system
-  session self-hosts them and adds a strict policy.
-- The security-rules tests (`npm run test:rules`) were written but could not be executed where this checkpoint was built
-  (the emulator download was blocked). Run them once locally or in CI before trusting the rules.
+- The Content-Security-Policy is sent as `Content-Security-Policy-Report-Only` (see `firebase.json`). Fonts, icons and
+  Bootstrap are self-hosted and the pages pass an enforced policy in test, but real sign-in, Firestore, Functions and mail
+  traffic has not been observed. Sign in, apply, run a lesson and send a contact message with the browser console open; if
+  no "[Report Only] Refused to..." lines appear, rename the header key to `Content-Security-Policy` to enforce it.
+- The security-rules tests (`npm run test:rules`) need the Firebase emulators and Java 21. The first 26 were run on the
+  owner's machine and passed (`docs/PROGRESS.md`); rules added since, including `/messages`, schedules, programme staff and
+  `emailVerifications`, were written with tests that have not been run. CI runs them on every push to `main` and every pull request, so check
+  the latest CI result before trusting the rules.

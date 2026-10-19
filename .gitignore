@@ -11,8 +11,12 @@ coverage/
 .env.*.local
 .env.development
 .env.production
+.env.staging
 functions/.env.local
 functions/.env.*.local
+# Per-project function settings (they include IP_HASH_SALT): keep them out of git, share only the example
+functions/.env.*
+!functions/.env.example
 functions/.secret.local
 *.pem
 serviceAccount*.json
