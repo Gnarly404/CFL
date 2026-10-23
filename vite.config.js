@@ -36,6 +36,15 @@ export default defineConfig({
     target: 'es2022',
     rollupOptions: { input: htmlEntries(srcRoot) },
   },
-  server: { port: 5173, strictPort: true },
+  server: {
+    port: 5173,
+    strictPort: true,
+    proxy: {
+      '/demo-cfl': {
+        target: 'http://127.0.0.1:5001',
+        changeOrigin: true,
+      },
+    },
+  },
   preview: { port: 4173, strictPort: true },
 });
