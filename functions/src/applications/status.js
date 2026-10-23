@@ -1,4 +1,4 @@
-import { onCall, HttpsError } from 'firebase-functions/https';
+import { onCall, HttpsError } from '../lib/secure-call.js';
 import { buildRuntime } from '../lib/runtime.js';
 import { HOUR } from '../lib/rate-limit.js';
 import { normaliseEmail, validateEmail } from '../lib/shared/validation.js';

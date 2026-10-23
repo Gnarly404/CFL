@@ -14,3 +14,4 @@ export const firebaseConfig = Object.freeze({
 export const useEmulators = env.VITE_USE_EMULATORS === 'true';
 export const emulatorHost = env.VITE_EMULATOR_HOST || '127.0.0.1';
 export const functionsRegion = env.VITE_FUNCTIONS_REGION || 'europe-west1';
+export const appCheckSiteKey = env.VITE_RECAPTCHA_ENTERPRISE_SITE_KEY || '';

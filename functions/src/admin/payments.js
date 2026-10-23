@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { onCall, HttpsError } from 'firebase-functions/https';
+import { onCall, HttpsError } from '../lib/secure-call.js';
 import { buildRuntime } from '../lib/runtime.js';
 import { requireRole } from '../lib/require-role.js';
 import { CURRENCY, paymentFingerprint, validatePayment } from '../lib/shared/payment-schema.js';

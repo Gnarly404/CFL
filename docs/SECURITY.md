@@ -22,8 +22,9 @@
 | Firestore > TTL policies | Add a TTL policy for collection `rateLimits`, field `expiresAt`, so counters clear themselves. |
 | Firestore > Rules | Deploy `firestore.rules` from this repo. Check the live rules are not "test mode". |
 | Project settings > Your apps | Restrict the web API key to your domains (HTTP referrers) in Google Cloud > Credentials. |
-| Billing | Set a budget alert. Functions are limited to 10 instances each. |
-| App Check | Recommended before launch: enable reCAPTCHA Enterprise App Check and set `enforceAppCheck: true` on `submitApplication`. |
+| Resource limits and billing | Callable functions are capped at 5 instances each, with 40 concurrent requests per instance. Create Cloud Billing budget notifications and alert recipients; budgets notify but do not cap spend. Set function quotas and monitor estimated charges. |
+| App Check | Register each deployed web app with reCAPTCHA Enterprise App Check, put its site key in `VITE_RECAPTCHA_ENTERPRISE_SITE_KEY` before building Hosting, then deploy. Every callable requires a valid App Check token. The Functions emulator deliberately skips enforcement. |
+| Logging alerts | In Cloud Logging, create a log-based counter metric with filter `jsonPayload.event="security.rate_limit"` and alert on a sustained increase. Also alert on Cloud Functions error rate and App Check rejections. Rate-limit events are sampled to at most one log per IP/account dimension every five minutes. |
 
 ## How access control works
 
@@ -35,6 +36,8 @@
   immediately, not when their token expires. Disabling an account also revokes its sessions.
 - **Public functions** (`submitApplication`, `getApplicationStatus`) validate input on the server, rate-limit by hashed
   IP and by email or reference, ignore a hidden honeypot field, and never reveal whether an email or reference exists.
+- **All callable functions** require App Check, and share hashed IP (300 calls/hour) and authenticated-account (600 calls/hour) limits. Endpoint-specific limits remain in place. Password-reset emails are generated server-side, limited to one per email every 15 minutes and five per email per day, and the response does not reveal whether the account exists.
+- **Network edge limits** are not configurable for Firebase Hosting or callable function URLs in this repository. These server limits run after a request reaches the Firebase function platform; App Check rejects unattested clients before handler code but is not a volumetric DDoS control. True edge rate limiting requires an external HTTPS Load Balancer with Cloud Armor and a backend topology that prevents clients from bypassing the protected load balancer. Treat that as a separate infrastructure change before claiming edge-level protection.
 - **Sign-in** gives the same message for unknown email and wrong password, and `?next=` can only point at the same site.
 - **Passwords** are never handled by CFL code: Firebase Authentication owns them. New accounts get a random password the
   nobody knows and must use the emailed one-time link.

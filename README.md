@@ -78,10 +78,10 @@ archive/                 Material that is kept for reference and not shipped (OT
 
 1. Create the Firebase projects, enable Authentication (Email/Password), Firestore and Storage.
 2. Put the project ids in `.firebaserc` (`staging`, `production`). The `default` alias deliberately points at staging, so a plain `firebase deploy` can never reach production by accident.
-3. Copy `.env.example` to `.env.production` (and `.env.staging`) and fill in the web-app settings from the Firebase console.
+3. Copy `.env.example` to `.env.production` (and `.env.staging`) and fill in the web-app settings from the Firebase console. Add `VITE_RECAPTCHA_ENTERPRISE_SITE_KEY` from the Firebase App Check web-app registration before building.
 4. Copy `functions/.env.example` to `functions/.env.<projectId>` and fill it in.
 5. Store the mail password as a secret: `firebase use <alias>` then `firebase functions:secrets:set SMTP_PASS`.
-6. Work through the console checklist in [docs/SECURITY.md](docs/SECURITY.md) (authorized domains, password policy, TTL policy).
+6. Register and configure reCAPTCHA Enterprise App Check, then work through the console checklist in [docs/SECURITY.md](docs/SECURITY.md) (authorized domains, password policy, TTL, monitoring and budget alerts).
 7. `firebase deploy` (it builds the site and lints the functions first).
 8. Create the first administrator from your own machine:
 

@@ -44,6 +44,19 @@ export function accountInvite({ name, activationUrl, role }) {
   };
 }
 
+export function passwordReset({ name, actionUrl }) {
+  const lines = [
+    `Hello ${name},`,
+    'A password reset was requested for your Centre of Foreign Learning account.',
+    'If you did not request this, you can ignore this email. The link expires automatically.',
+  ];
+  return {
+    subject: 'Reset your CFL password',
+    text: `${lines.join('\n\n')}\n\nReset your password: ${actionUrl}\n\nCentre of Foreign Learning`,
+    html: layout('Reset your CFL password', lines, { url: actionUrl, label: 'Reset password' }),
+  };
+}
+
 const UPDATE_COPY = {
   waitlisted: 'Your application has been placed on the waiting list. We will contact you when a place opens.',
   rejected: 'We are not able to offer you a place at this time. Contact admissions if you would like to talk it through.',

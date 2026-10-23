@@ -35,6 +35,7 @@ export { sendMessage, messageContacts } from './src/messages/messages.js';
 
 // Account lifecycle
 export { activateAccount } from './src/auth/activate-account.js';
+export { requestPasswordReset } from './src/auth/request-password-reset.js';
 
 // Student service requests (transfer, deferment, support, transcript, payment dispute)
 export { submitServiceRequest, adminUpdateServiceRequest } from './src/student-services/requests.js';

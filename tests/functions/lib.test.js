@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createRateLimiter, hashKey, nextWindowState } from '../../functions/src/lib/rate-limit.js';
 import { formatReference } from '../../functions/src/lib/repos.js';
-import { accountInvite, applicationReceived, applicationUpdate } from '../../functions/src/lib/templates.js';
+import { accountInvite, applicationReceived, applicationUpdate, passwordReset } from '../../functions/src/lib/templates.js';
 import { fakeDb } from './helpers/fakes.js';
 
 describe('nextWindowState', () => {
@@ -60,5 +60,11 @@ describe('email templates', () => {
     expect(received.text).toContain('https://cfl.test/admissions/status');
     const update = applicationUpdate({ name: 'Wanjiku', reference: 'CFL-2026-00001', status: 'waitlisted', baseUrl: 'https://cfl.test' });
     expect(update.text).toMatch(/waiting list/);
+  });
+  it('includes the reset link in escaped HTML and plain-text email', () => {
+    const reset = passwordReset({ name: '<Student>', actionUrl: 'https://cfl.test/activate?oobCode=a&mode=resetPassword' });
+    expect(reset.text).toContain('https://cfl.test/activate?oobCode=a&mode=resetPassword');
+    expect(reset.html).toContain('&lt;Student&gt;');
+    expect(reset.html).toContain('oobCode=a&amp;mode=resetPassword');
   });
 });

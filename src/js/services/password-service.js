@@ -1,16 +1,12 @@
 import {
-  applyActionCode, confirmPasswordReset, sendPasswordResetEmail, verifyPasswordResetCode,
+  applyActionCode, confirmPasswordReset, verifyPasswordResetCode,
 } from 'firebase/auth';
-import { ROUTES } from '@/core/routes.js';
 import { authService } from './firebase-auth.js';
+import { call } from './callable.js';
 
-/** Sends a reset link. Unknown addresses are ignored so the form cannot be used to discover accounts. */
+/** Requests a quota-limited reset email without disclosing whether the address has an account. */
 export async function requestPasswordReset(email) {
-  try {
-    await sendPasswordResetEmail(authService(), email, { url: `${window.location.origin}${ROUTES.login}` });
-  } catch (error) {
-    if (error?.code !== 'auth/user-not-found') throw error;
-  }
+  return call('requestPasswordReset', { email });
 }
 
 /** Checks a reset or invitation code and returns the email it belongs to. */
