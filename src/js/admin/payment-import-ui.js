@@ -82,7 +82,7 @@ export function initPaymentImport({
     try {
       const data = await readSpreadsheetFile(file);
       state.file = file;
-      state.table = toTable(data);
+      state.table = toTable(data.data);
       state.mapping = autoMap(state.table.headers);
       state.method = ''; state.purpose = 'tuition'; state.filter = 'all'; state.shown = SHOWN;
       rebuild();
