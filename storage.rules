@@ -16,9 +16,21 @@ service firebase.storage {
     function isImage() { return request.resource.contentType.matches('image/(png|jpeg|webp)'); }
 
     // Public marketing assets (gallery, brochure): world-readable, admin-managed.
-    match /public/{allPaths=**} {
+    match /public/{fileName} {
       allow read: if true;
       allow create, update: if isAdmin() && underMb(15);
+      allow delete: if isAdmin();
+    }
+
+    match /public/{folder}/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if isAdmin() && folder != 'gallery' && underMb(15);
+      allow delete: if isAdmin();
+    }
+
+    match /public/gallery/{imageName} {
+      allow read: if true;
+      allow create, update: if isAdmin() && isImage() && underMb(15);
       allow delete: if isAdmin();
     }
 

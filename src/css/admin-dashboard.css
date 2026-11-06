@@ -51,6 +51,25 @@ html[data-motion="on"] .console-nav a[aria-current="page"]{background:transparen
 .panel-tools .form-select{width:auto;min-width:11rem}
 .panel-body{padding:0 var(--s5) var(--s5)}
 .panel>.table-scroll,.split>.table-scroll{border-top:1px solid var(--line)}
+.gallery-admin-status{margin:0;padding:0 var(--s5) var(--s3);color:var(--muted);font-size:.88rem}
+.gallery-admin-status[data-kind="error"]{color:var(--bad)}
+.gallery-admin-status[data-kind="success"]{color:var(--ok)}
+.gallery-admin-manager{min-width:0;margin:0;padding:0;border:0}
+.gallery-admin-manager>legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.gallery-image-form{display:grid;gap:var(--s3);padding:0 var(--s5) var(--s4)}
+.gallery-image-form h3{margin:0;color:var(--text-strong);font:650 1rem/1.3 var(--font-head)}
+.gallery-image-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:var(--s3)}
+.gallery-image-fields label,.gallery-image-details>label{display:grid;gap:var(--s1);color:var(--text-strong);font-size:.82rem;font-weight:600}
+.gallery-image-toolbar{display:flex;flex-wrap:wrap;gap:var(--s2);padding:0 var(--s5) var(--s4)}
+.gallery-admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:var(--s4);padding:0 var(--s5) var(--s5)}
+.gallery-image-card{min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface)}
+.gallery-image-card>img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;background:var(--surface-2)}
+.gallery-image-details{display:grid;gap:var(--s2);padding:var(--s3)}
+.gallery-image-status{min-height:1.4em;margin:0;color:var(--muted);font-size:.82rem}
+.gallery-image-actions{display:flex;flex-wrap:wrap;gap:var(--s2)}
+.gallery-image-pick{cursor:pointer}
+.gallery-image-pick:focus-within{outline:none;box-shadow:var(--focus)}
+.gallery-image-pick input:focus-visible{outline:none}
 .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,340px);gap:var(--s5);align-items:start}
 .split>.panel{margin-bottom:0}
 .split-form{gap:0;align-items:stretch}
@@ -142,5 +161,6 @@ html[data-motion="on"] .console-nav a[aria-current="page"]{background:transparen
   .data-table tr.detail-row>td::before{content:none}
   .application-facts{grid-template-columns:1fr;gap:0}
   .application-facts dd{margin-bottom:var(--s2)}
+  .gallery-admin-grid{padding-right:var(--s4);padding-left:var(--s4)}
 }
 @media (max-width:420px){.field-pair{grid-template-columns:1fr}}

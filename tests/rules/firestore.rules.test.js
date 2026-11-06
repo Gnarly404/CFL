@@ -124,6 +124,19 @@ describe('catalogue and curriculum', () => {
     await assertFails(setDoc(doc(as.instructor(), 'programmes/open'), { active: true }));
   });
 
+  describe('public gallery', () => {
+    it('allows public reads and restricts gallery edits to admins', async () => {
+      await assertSucceeds(getDoc(doc(as.anon(), 'siteContent/gallery')));
+      await assertFails(setDoc(doc(as.student(), 'siteContent/gallery'), { initialized: true }));
+      await assertSucceeds(setDoc(doc(as.admin(), 'siteContent/gallery'), { initialized: true }));
+      await assertSucceeds(setDoc(doc(as.admin(), 'galleryImages/photo1'), {
+        title: 'Welcome', caption: 'Our reception', position: 0, category: 'facilities', path: null, src: '/images/reception.jpg',
+      }));
+      await assertSucceeds(getDocs(collection(as.anon(), 'galleryImages')));
+      await assertFails(deleteDoc(doc(as.student(), 'galleryImages/photo1')));
+    });
+  });
+
   it('keeps preset tombstones public-read-only and practice content signed-in-read-only', async () => {
     await assertSucceeds(getDoc(doc(as.anon(), 'catalogMeta/programmes')));
     await assertFails(setDoc(doc(as.admin(), 'catalogMeta/programmes'), { deletedIds: [] }));

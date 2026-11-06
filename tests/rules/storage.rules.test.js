@@ -38,6 +38,13 @@ describe('storage rules', () => {
     await assertSucceeds(uploadBytes(ref(as.admin(), 'public/x.png'), bytes(10), png));
   });
 
+  it('gallery images are public and admin-managed with image-only uploads', async () => {
+    await assertSucceeds(uploadBytes(ref(as.admin(), 'public/gallery/welcome-center'), bytes(10), png));
+    await assertSucceeds(getBytes(ref(as.anon(), 'public/gallery/welcome-center')));
+    await assertFails(uploadBytes(ref(as.student(), 'public/gallery/student-life'), bytes(10), png));
+    await assertFails(uploadBytes(ref(as.admin(), 'public/gallery/not-an-image'), bytes(10), { contentType: 'application/pdf' }));
+  });
+
   it('avatars: owner uploads small images only', async () => {
     await assertSucceeds(uploadBytes(ref(as.student('stu1'), 'users/stu1/avatar/me.png'), bytes(100), png));
     await assertFails(uploadBytes(ref(as.student('stu1'), 'users/stu2/avatar/me.png'), bytes(100), png));

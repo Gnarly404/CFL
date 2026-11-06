@@ -14,6 +14,7 @@ export const WORKSPACES = Object.freeze({
   academics: { title: 'Academics', blurb: 'The programme catalogue and its teaching staff.', sections: ['programmes', 'programme-staff'] },
   students: { title: 'Students', blurb: 'Every student\'s details and fees. Open a record to edit it.', sections: ['student-records'] },
   payments: { title: 'Payments', blurb: 'Record payments, import a bank or M-Pesa statement, and see who has paid.', sections: ['payments-ledger', 'payment-imports'] },
+  gallery: { title: 'Gallery', blurb: 'Update the images shown on the public gallery page.', sections: ['gallery-images'] },
 });
 const FALLBACK = 'admissions';
 const REST = 'translate3d(0, 0, 0)';

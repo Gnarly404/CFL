@@ -86,6 +86,16 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    match /siteContent/{pageId} {
+      allow read: if pageId == 'gallery';
+      allow write: if pageId == 'gallery' && isAdmin();
+    }
+
+    match /galleryImages/{imageId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Which instructors teach a programme. Written only by the adminAssignProgramme callable.
     match /programmeStaff/{programmeId} {
       allow read: if isAdmin() || (isInstructor() && request.auth.uid in resource.data.get('instructorIds', []));

@@ -1,6 +1,9 @@
 // gallery.js
 // Scroll reveals, the hero parallax, the count-up statistics and the brochure tilt now come from the shared
 // motion engine (src/js/motion) through data attributes in gallery.html.
+import { getDownloadURL, ref } from 'firebase/storage';
+import { loadGalleryImages } from '@/services/gallery-service.js';
+import { storageService } from '@/services/firebase-storage.js';
 
 // Wait for DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -12,7 +15,46 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ====== Gallery Functions ======
-function initializeGallery() {
+async function initializeGallery() {
+    const grid = document.querySelector('.gallery-grid');
+    if (!grid) return;
+    try {
+        const images = await loadGalleryImages();
+        const storage = storageService();
+        const cards = await Promise.all(images.map(async (image, index) => {
+            let src = image.src;
+            if (image.path) {
+                try {
+                    src = await getDownloadURL(ref(storage, image.path));
+                } catch (error) {
+                    console.warn(`Could not load gallery image "${image.id}"`, error.code ?? error);
+                    if (!src) return null;
+                }
+            }
+            if (!src) return null;
+
+            const item = document.createElement('div');
+            item.className = `gallery-item${index === 0 ? ' large' : ''}`;
+            item.dataset.category = image.category;
+            item.dataset.reveal = '';
+            const photo = document.createElement('img');
+            photo.src = src;
+            photo.alt = `${image.title}: ${image.caption}`;
+            const overlay = document.createElement('div');
+            overlay.className = 'gallery-overlay';
+            const title = document.createElement('h3');
+            title.textContent = image.title;
+            const caption = document.createElement('p');
+            caption.textContent = image.caption;
+            overlay.append(title, caption);
+            item.append(photo, overlay);
+            return item;
+        }));
+        grid.replaceChildren(...cards.filter(Boolean));
+    } catch (error) {
+        console.warn('Could not load the saved gallery; showing the original gallery instead.', error.code ?? error);
+    }
+
     const galleryItems = document.querySelectorAll('.gallery-item');
     
     galleryItems.forEach(item => {

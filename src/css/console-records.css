@@ -37,6 +37,9 @@
 .badge-pending{background:var(--warn-bg);color:var(--warn)}
 
 .import-stage{display:grid;gap:var(--s4)}
+.import-dropzone{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:var(--s2);padding:var(--s4);border:2px dashed var(--line-strong);border-radius:var(--radius);background:var(--surface-2);transition:border-color .15s,background-color .15s}
+.import-dropzone p{margin:0}
+.import-dropzone.is-dragging{border-color:var(--info);background:var(--info-bg)}
 .import-mapping summary{cursor:pointer;font-weight:700}
 .import-mapping .form-grid{margin-top:var(--s3)}
 .import-chips,.import-filters{display:flex;flex-wrap:wrap;gap:var(--s2)}

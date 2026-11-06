@@ -46,6 +46,8 @@ export function initPaymentImport({
   const pick = el('input', { type: 'file', id: 'importFile', class: 'visually-hidden', accept: '.csv,.tsv,.txt,.xlsx' });
   const message = el('p', { class: 'form-alert', role: 'alert', 'data-kind': 'error', hidden: true });
   const stage = el('div', { class: 'import-stage' });
+  let dragDepth = 0;
+  const dropzone = el('div', { class: 'import-dropzone' });
   const importButton = el('button', { type: 'button', class: 'btn btn-primary', disabled: true }, 'Import');
   const closeButton = el('button', { type: 'button', class: 'btn btn-outline-secondary' }, 'Cancel');
   footer.append(closeButton, importButton);
@@ -53,6 +55,23 @@ export function initPaymentImport({
   closeButton.addEventListener('click', () => { if (state.done || !state.rows.length || window.confirm('Leave without importing? Nothing has been saved yet.')) { state.done = true; dialogApi.close(); } });
 
   const fail = (text) => { message.textContent = text ?? ''; message.hidden = !text; };
+  dropzone.addEventListener('dragenter', (event) => {
+    event.preventDefault();
+    dragDepth += 1;
+    dropzone.classList.add('is-dragging');
+  });
+  dropzone.addEventListener('dragover', (event) => event.preventDefault());
+  dropzone.addEventListener('dragleave', (event) => {
+    event.preventDefault();
+    dragDepth = Math.max(0, dragDepth - 1);
+    if (!dragDepth) dropzone.classList.remove('is-dragging');
+  });
+  dropzone.addEventListener('drop', (event) => {
+    event.preventDefault();
+    dragDepth = 0;
+    dropzone.classList.remove('is-dragging');
+    readFile(event.dataTransfer?.files?.[0]);
+  });
   const selectFrom = (values, labels, current, blank) => {
     const node = el('select', { class: 'form-select form-select-sm' }, blank ? el('option', { value: '' }, blank) : null,
       ...values.map((value) => el('option', { value }, labels[value])));
@@ -67,22 +86,21 @@ export function initPaymentImport({
     closeButton.textContent = 'Cancel';
     fail('');
     const label = el('label', { for: 'importFile', class: 'btn btn-primary' }, 'Choose a file');
+    dropzone.replaceChildren(label, el('p', { class: 'muted' }, 'or drag and drop a statement here'), pick);
     stage.replaceChildren(
       el('p', {}, 'Choose an Excel (.xlsx) or CSV statement. The columns are recognised from their headings, and you can correct them on the next screen.'),
       el('p', { class: 'muted' }, `Up to ${Math.round(MAX_FILE_BYTES / 1024 / 1024)} MB. Old .xls files must be saved as .xlsx or CSV first. Rows already in the ledger are recognised and skipped.`),
-      label, pick);
+      dropzone);
   }
 
-  pick.addEventListener('change', async () => {
-    const [file] = pick.files;
-    pick.value = '';
+  async function readFile(file) {
     if (!file) return;
     fail('');
     stage.replaceChildren(el('p', { class: 'muted' }, `Reading ${file.name}…`));
     try {
       const data = await readSpreadsheetFile(file);
       state.file = file;
-      state.table = toTable(data);
+      state.table = toTable(data.data);
       state.mapping = autoMap(state.table.headers);
       state.method = ''; state.purpose = 'tuition'; state.filter = 'all'; state.shown = SHOWN;
       rebuild();
@@ -90,6 +108,12 @@ export function initPaymentImport({
       showPicker();
       fail(error instanceof ImportFileError ? error.message : 'That file could not be read. Check that it is a spreadsheet and try again.');
     }
+  }
+
+  pick.addEventListener('change', () => {
+    const [file] = pick.files;
+    pick.value = '';
+    readFile(file);
   });
 
   /* ------------------------------------------------------------ step 2: review */
