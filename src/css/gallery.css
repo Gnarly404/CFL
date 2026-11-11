@@ -345,12 +345,15 @@ body {
 .gallery-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: clamp(12rem, 16vw, 16rem);
+    grid-auto-flow: row dense;
     gap: 1.5rem;
     margin-top: 3rem;
 }
 
 .gallery-item {
     position: relative;
+    min-height: 0;
     overflow: hidden;
     border-radius: 10px;
     cursor: pointer;
@@ -399,6 +402,7 @@ body {
     
     .gallery-grid {
         grid-template-columns: repeat(2, 1fr);
+        grid-auto-rows: clamp(12rem, 24vw, 18rem);
     }
 }
 
@@ -409,6 +413,7 @@ body {
     
     .gallery-grid {
         grid-template-columns: 1fr;
+        grid-auto-rows: clamp(14rem, 56vw, 24rem);
     }
     
     .gallery-item.large {
