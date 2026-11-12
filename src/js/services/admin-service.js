@@ -19,9 +19,17 @@ export function rowsFromSnapshot(snapshot) {
 
 export async function listApplications({ status = null, max = 100 } = {}) {
   const base = collection(dbService(), 'applications');
-  const q = status
-    ? query(base, where('status', '==', status), orderBy('createdAt', 'desc'), limit(max))
-    : query(base, orderBy('createdAt', 'desc'), limit(max));
+  const statusFilter = status === 'open'
+    ? where('status', 'in', OPEN_STATUSES)
+    : status
+      ? where('status', '==', status)
+      : null;
+  const q = query(
+    base,
+    ...(statusFilter ? [statusFilter] : []),
+    orderBy('createdAt', 'desc'),
+    limit(max),
+  );
   return rowsFromSnapshot(await getDocs(q));
 }
 
