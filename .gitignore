@@ -22,3 +22,6 @@ serviceAccount*.json
 
 # Saved local emulator data
 emulator-data/
+
+# Local test logins; never commit
+.test-accounts.local.json

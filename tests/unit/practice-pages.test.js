@@ -1,15 +1,27 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import grammar from '../../src/data/practice/grammar.json';
+import listening from '../../src/data/practice/listening.json';
+import reading from '../../src/data/practice/reading.json';
+import speaking from '../../src/data/practice/speaking.json';
+import vocabulary from '../../src/data/practice/vocabulary.json';
+import writing from '../../src/data/practice/writing.json';
 import { loadPage, tick } from '../helpers.js';
 
 const loadMistakes = vi.fn();
 const loadLessonProgress = vi.fn();
 const loadSessions = vi.fn();
 const loadWordProgress = vi.fn();
+const getSkillContent = vi.fn();
 vi.mock('@/practice/content.js', async (importOriginal) => ({
   ...await importOriginal(),
+  getSkillContent: (...args) => getSkillContent(...args),
   loadPracticeContent: vi.fn().mockResolvedValue({}),
+  practiceContentLoadError: () => null,
+  questionIndex: () => Object.fromEntries(Object.entries({
+    grammar, vocabulary, reading, listening, speaking, writing,
+  }).flatMap(([skillId, content]) => content.lessons.flatMap((lesson) => (lesson.questions ?? [])
+    .map((question) => [question.id, { skillId, lessonId: lesson.id, question }])))),
 }));
 vi.mock('@/ui/notification-badge.js', () => ({ mountNotificationBadge: vi.fn() }));
 vi.mock('@/auth/guards.js', () => ({ guardPage: vi.fn().mockResolvedValue({ user: { uid: 'u1' } }) }));
@@ -31,6 +43,9 @@ async function open(path, script) {
 
 describe('practice hub page', () => {
   beforeEach(() => {
+    getSkillContent.mockImplementation((skill) => ({
+      grammar, vocabulary, reading, listening, speaking, writing,
+    }[skill] ?? { lessons: [] }));
     loadWordProgress.mockReset().mockResolvedValue({});
     loadMistakes.mockReset().mockResolvedValue({});
     loadLessonProgress.mockReset().mockResolvedValue({});

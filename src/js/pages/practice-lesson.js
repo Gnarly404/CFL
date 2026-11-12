@@ -1,6 +1,6 @@
 import { guardPage } from '@/auth/guards.js';
 import { ROUTES } from '@/core/routes.js';
-import { getSkillContent, lessonUrl, loadPracticeContent, questionIndex } from '@/practice/content.js';
+import { getSkillContent, lessonUrl, loadPracticeContent, practiceContentLoadError, questionIndex } from '@/practice/content.js';
 import { dueMistakes, scoreAttempt, updateMistake } from '@/practice/engine.js';
 import { SKILLS } from '@/practice/skills.js';
 import { loadLessonProgress, loadMistakes, saveLessonResult, saveMistakes } from '@/services/practice-service.js';
@@ -16,6 +16,7 @@ import { mountNotificationBadge } from '@/ui/notification-badge.js';
 mountPortalShell('practice');
 const session = await guardPage({ roles: ['student'] });
 await loadPracticeContent();
+const contentError = practiceContentLoadError?.();
 mountNotificationBadge(session.user.uid);
 
 const params = new URLSearchParams(window.location.search);
@@ -46,8 +47,8 @@ document.getElementById('crumbs').replaceChildren(
 
 if (!lesson) {
   stage.replaceChildren(
-    h('h1', {}, isReview ? 'Nothing to review right now' : 'Lesson not found'),
-    h('p', { class: 'muted' }, isReview ? 'No mistakes are due. Keep practising and come back later.' : 'This lesson does not exist.'),
+    h('h1', {}, contentError ? 'Practice content unavailable' : isReview ? 'Nothing to review right now' : 'Lesson not found'),
+    h('p', { class: 'muted' }, contentError ? 'Practice lessons could not be loaded from Firestore. Check your connection and reload.' : isReview ? 'No mistakes are due. Keep practising and come back later.' : 'This lesson does not exist.'),
     h('a', { class: 'btn btn-primary', href: isReview ? ROUTES.practiceMistakes : ROUTES.practice }, isReview ? 'Back to My mistakes' : 'Back to English Practice'),
   );
 } else {

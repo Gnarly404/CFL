@@ -15,7 +15,7 @@ import { skillCard } from '@/ui/skill-card.js';
 mountPortalShell('practice');
 const session = await guardPage({ roles: ['student'] });
 mountNotificationBadge(session.user.uid);
-const { entries, failed } = await loadOverview(session.user.uid);
+const { entries, failed, contentFailed } = await loadOverview(session.user.uid);
 let mistakeList = [];
 try { mistakeList = Object.values(await loadMistakes(session.user.uid)).filter((m) => m.status === 'open'); } catch (error) { console.warn('Could not load mistakes', error?.code ?? error); }
 const dueCount = dueMistakes(mistakeList).length;
@@ -41,7 +41,9 @@ await mountToday(document.getElementById('todayCard'), { uid: session.user.uid, 
 if (failed) {
   const note = document.getElementById('hubNote');
   note.hidden = false;
-  note.textContent = 'Some saved progress could not be loaded. You can still practise, and results are saved when the connection returns.';
+  note.textContent = contentFailed
+    ? 'Practice lessons could not be loaded from Firestore. Check your connection and reload.'
+    : 'Some saved progress could not be loaded. You can still practise, and results are saved when the connection returns.';
 }
 
 document.getElementById('skillSections').replaceChildren(

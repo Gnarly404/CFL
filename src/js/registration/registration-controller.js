@@ -1,6 +1,5 @@
 import { applicantIsUnder18, STEP_FIELDS } from '@/utils/application-schema.js';
 import { submitApplication } from '@/services/application-service.js';
-import fallbackProgrammes from '../../data/programmes.json';
 import { sendVerificationCode } from '@/services/email.js';
 import {
   debounce, el, setBusy, setFieldError, showMessage,
@@ -72,7 +71,7 @@ export function initRegistration({
   verifySession = verifyOtp,
   canResend = canResendOtp,
   refreshSession = refreshOtpSession,
-  programmes = fallbackProgrammes,
+  programmes = [],
 } = {}) {
   const form = root.querySelector('#registrationForm');
   if (!form) return null;

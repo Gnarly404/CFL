@@ -3,6 +3,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import writing from '../../src/data/practice/writing.json';
 import { loadPage, tick } from '../helpers.js';
 
+vi.mock('@/practice/content.js', () => ({
+  getSkillContent: () => writing,
+  loadPracticeContent: vi.fn().mockResolvedValue({}),
+}));
+
 const listAssignedStudents = vi.fn();
 const loadSubmittedWork = vi.fn();
 const loadMyFeedback = vi.fn();

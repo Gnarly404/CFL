@@ -1,13 +1,17 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import vocabulary from '../../src/data/practice/vocabulary.json';
 import { loadPage, tick } from '../helpers.js';
 
 const loadWordProgress = vi.fn();
 const saveWordProgress = vi.fn();
 const recordSession = vi.fn();
+const getSkillContent = vi.fn();
 vi.mock('@/practice/content.js', async (importOriginal) => ({
   ...await importOriginal(),
+  getSkillContent: (...args) => getSkillContent(...args),
   loadPracticeContent: vi.fn().mockResolvedValue({}),
+  practiceContentLoadError: () => null,
 }));
 vi.mock('@/auth/guards.js', () => ({ guardPage: vi.fn().mockResolvedValue({ user: { uid: 'u1' } }) }));
 vi.mock('@/ui/notification-badge.js', () => ({ mountNotificationBadge: vi.fn() }));
@@ -29,6 +33,7 @@ async function open() {
 
 describe('flashcards page', () => {
   beforeEach(() => {
+    getSkillContent.mockImplementation((skill) => (skill === 'vocabulary' ? vocabulary : { lessons: [] }));
     loadWordProgress.mockReset().mockResolvedValue({});
     saveWordProgress.mockReset().mockResolvedValue();
     recordSession.mockReset().mockResolvedValue();

@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import programmeCatalogue from '../../src/data/programmes.json';
 import { initRegistration } from '@/registration/registration-controller.js';
 import { fill, loadPage, tick } from '../helpers.js';
 
@@ -33,7 +34,7 @@ function setup({
   verifySession = vi.fn(() => ({ success: true })),
   canResend = vi.fn(() => true),
   refreshSession = vi.fn((session) => ({ ...session, code: '999999', resendAvailableAt: NOW.getTime() + 60 * 1000 })),
-  programmes,
+  programmes = programmeCatalogue,
 } = {}) {
   loadPage('register.html');
   const controller = initRegistration({

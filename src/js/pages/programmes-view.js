@@ -96,7 +96,7 @@ function card(p, openDetails) {
   return article;
 }
 
-/** Renders the public programme cards. `load` returns the catalogue (Firestore, with a static fallback). */
+/** Renders the public programme cards. `load` returns the Firestore catalogue. */
 export function initProgrammesPage({ root = document, load } = {}) {
   const grid = root.getElementById?.('programmeGrid') ?? root.querySelector('#programmeGrid');
   const dialog = root.getElementById?.('programmeDialog') ?? root.querySelector('#programmeDialog');

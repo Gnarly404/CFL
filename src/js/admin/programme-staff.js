@@ -1,4 +1,3 @@
-import fallbackProgrammes from '../../data/programmes.json';
 import { el } from '@/utils/dom.js';
 import { assignProgramme, listProgrammeStaff } from '@/services/admin-service.js';
 import { listCatalog } from '@/services/programme-service.js';
@@ -36,7 +35,7 @@ export function initProgrammeStaff({ root = document, say, getUsers }) {
     const users = getUsers();
     const byId = new Map(users.map((u) => [u.uid, u]));
     const instructors = users.filter((u) => u.role === 'instructor' && u.status !== 'disabled');
-    let programmes = fallbackProgrammes;
+    let programmes = [];
     try {
       programmes = await listCatalog();
     } catch (error) {

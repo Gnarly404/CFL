@@ -1,4 +1,4 @@
-import { getSkillContent, loadPracticeContent } from '@/practice/content.js';
+import { getSkillContent, loadPracticeContent, practiceContentLoadError } from '@/practice/content.js';
 import { savePracticeContent } from '@/services/instructor-service.js';
 import { icon } from '@/ui/icons.js';
 import { el, setBusy, showMessage } from '@/utils/dom.js';
@@ -389,5 +389,11 @@ export function initPracticeContentEditor({ root = document } = {}) {
 
   buildTabs();
   syncTabs();
-  loadPracticeContent().then(loadSkill);
+  loadPracticeContent().then(() => {
+    if (practiceContentLoadError?.()) {
+      show('The Firestore curriculum could not be loaded. Check your connection and reload.', 'error');
+      return;
+    }
+    loadSkill();
+  });
 }

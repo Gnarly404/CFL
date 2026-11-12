@@ -1,5 +1,10 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import vocabulary from '../../src/data/practice/vocabulary.json';
 import { allWords, buildDeck, deckCounts, reviewCard } from '@/practice/flashcards.js';
+
+vi.mock('@/practice/content.js', () => ({
+  getSkillContent: () => vocabulary,
+}));
 
 const now = new Date('2026-10-10T08:00:00.000Z');
 const days = (n) => new Date(now.getTime() + n * 86400000).toISOString();

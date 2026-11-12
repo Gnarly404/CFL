@@ -1,6 +1,6 @@
 import { guardPage } from '@/auth/guards.js';
 import { ROUTES } from '@/core/routes.js';
-import { loadPracticeContent } from '@/practice/content.js';
+import { loadPracticeContent, practiceContentLoadError } from '@/practice/content.js';
 import { buildDeck, deckCounts, reviewCard } from '@/practice/flashcards.js';
 import { startTracker } from '@/practice/session-tracker.js';
 import { loadWordProgress, saveWordProgress } from '@/services/practice-service.js';
@@ -12,22 +12,30 @@ import { speak, speechSupported } from '@/ui/speech.js';
 mountPortalShell('practice');
 const session = await guardPage({ roles: ['student'] });
 await loadPracticeContent();
+const contentError = practiceContentLoadError?.();
 mountNotificationBadge(session.user.uid);
 const uid = session.user.uid;
 const stage = document.getElementById('stage');
 const show = (...nodes) => { stage.replaceChildren(...nodes); document.getElementById('stageHeading')?.focus(); };
 const back = () => h('a', { class: 'btn', href: ROUTES.practice }, 'Back to English Practice');
 
-let progress;
-try {
-  progress = await loadWordProgress(uid);
-} catch (error) {
-  console.warn('Could not load word progress', error?.code ?? error);
-  show(h('h1', { id: 'stageHeading', tabindex: '-1' }, 'Flashcards'),
-    h('p', { class: 'form-note', role: 'alert' }, 'Your saved words could not be loaded, so flashcards are turned off to protect your progress. Check your connection and reload.'),
+let progress = null;
+if (contentError) {
+  show(h('h1', { id: 'stageHeading', tabindex: '-1' }, 'Flashcards unavailable'),
+    h('p', { class: 'form-note', role: 'alert' }, 'Practice lessons could not be loaded from Firestore. Check your connection and reload.'),
     h('div', { class: 'actions' }, h('button', { class: 'btn btn-primary', type: 'button', id: 'reload' }, 'Reload'), back()));
   document.getElementById('reload').addEventListener('click', () => window.location.reload());
-  progress = null;
+} else {
+  try {
+    progress = await loadWordProgress(uid);
+  } catch (error) {
+    console.warn('Could not load word progress', error?.code ?? error);
+    show(h('h1', { id: 'stageHeading', tabindex: '-1' }, 'Flashcards'),
+      h('p', { class: 'form-note', role: 'alert' }, 'Your saved words could not be loaded, so flashcards are turned off to protect your progress. Check your connection and reload.'),
+      h('div', { class: 'actions' }, h('button', { class: 'btn btn-primary', type: 'button', id: 'reload' }, 'Reload'), back()));
+    document.getElementById('reload').addEventListener('click', () => window.location.reload());
+    progress = null;
+  }
 }
 
 if (progress) run();

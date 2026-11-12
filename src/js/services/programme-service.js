@@ -4,8 +4,6 @@ import {
 import { call } from './callable.js';
 import { AppError } from './errors.js';
 import { dbService } from './firebase-db.js';
-import fallbackProgrammes from '../../data/programmes.json';
-import { mergeCatalog } from '@/utils/programme-schema.js';
 
 function rows(snapshot) {
   if (snapshot.metadata?.fromCache) {
@@ -42,7 +40,7 @@ export async function listPublicProgrammes({ max = 200 } = {}) {
     catalogueMeta(db),
   ]);
   const hidden = [...new Set([...meta.deletedIds, ...meta.inactiveIds])];
-  return mergeCatalog(rows(snapshot), fallbackProgrammes, hidden).filter((programme) => programme.active !== false);
+  return rows(snapshot).filter((programme) => programme.active !== false && !hidden.includes(programme.id));
 }
 
 /** Every non-deleted programme, including inactive ones, for staff. */
@@ -52,7 +50,7 @@ export async function listCatalog({ max = 200 } = {}) {
     getDocs(query(collection(db, 'programmes'), limit(max))),
     catalogueMeta(db),
   ]);
-  return mergeCatalog(rows(snapshot), fallbackProgrammes, meta.deletedIds);
+  return rows(snapshot).filter((programme) => !meta.deletedIds.includes(programme.id));
 }
 
 export const saveProgramme = (data) => call('adminSaveProgramme', data);

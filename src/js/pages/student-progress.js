@@ -103,7 +103,7 @@ async function refresh() {
   drawSkills();
   notice.hidden = !hasFailure;
   notice.textContent = hasFailure
-    ? 'Some saved progress could not be retrieved. Check your connection and refresh to try again.'
+    ? 'Practice content or saved progress could not be retrieved. Check your connection and refresh to try again.'
     : 'Progress updated from your saved practice results.';
   refreshButton.disabled = false;
   refreshButton.textContent = 'Refresh progress';

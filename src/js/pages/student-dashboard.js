@@ -13,7 +13,6 @@ import { loadMyClasses } from '@/services/schedule-service.js';
 import { storageService } from '@/services/firebase-storage.js';
 import { requestPasswordReset } from '@/services/password-service.js';
 import { listPublicProgrammes } from '@/services/programme-service.js';
-import fallbackProgrammes from '../../data/programmes.json';
 import { PROGRAMME_GROUP_LABELS } from '@/utils/programme-schema.js';
 import { enrollmentStatusLabel, legalName, missingRequiredProfileFields } from '@/student/dashboard.js';
 import { STATUS_LABELS } from '@/utils/application-status.js';
@@ -526,7 +525,7 @@ if (application) {
   applicationReferenceEl.textContent = application.reference ? `Application reference ${application.reference}` : '';
 }
 
-let programmes = fallbackProgrammes;
+let programmes = [];
 try { programmes = await listPublicProgrammes(); } catch (error) { console.warn('Could not load programme names', error?.code ?? error); }
 const programmeById = new Map(programmes.map((programme) => [programme.id, programme]));
 const orderedEnrolments = [...enrolments].sort((left, right) => {

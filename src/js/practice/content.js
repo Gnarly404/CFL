@@ -1,36 +1,43 @@
-import grammar from '../../data/practice/grammar.json';
-import listening from '../../data/practice/listening.json';
-import reading from '../../data/practice/reading.json';
-import speaking from '../../data/practice/speaking.json';
-import writing from '../../data/practice/writing.json';
-import vocabulary from '../../data/practice/vocabulary.json';
-import { ROUTES } from '@/core/routes.js';
 import { collection, getDocs } from 'firebase/firestore';
+import { ROUTES } from '@/core/routes.js';
 import { dbService } from '@/services/firebase-db.js';
 
-const CONTENT = { grammar, vocabulary, reading, listening, speaking, writing };
+const SKILLS = ['grammar', 'vocabulary', 'reading', 'listening', 'speaking', 'writing'];
+const emptyContent = () => Object.fromEntries(SKILLS.map((skill) => [skill, { skill, lessons: [] }]));
+let CONTENT = emptyContent();
 let loadPromise = null;
+let loadError = null;
 
-/** Load instructor-managed curriculum, retaining bundled lessons when a document is absent or unavailable. */
+/** Load curriculum from Firestore. There is no bundled runtime fallback. */
 export function loadPracticeContent() {
   if (loadPromise) return loadPromise;
   loadPromise = (async () => {
     try {
       const snapshot = await getDocs(collection(dbService(), 'practiceContent'));
+      const loaded = emptyContent();
       for (const document of snapshot.docs) {
-        const skillId = document.id;
+        if (!Object.hasOwn(loaded, document.id)) continue;
         const data = document.data();
-        if (Object.hasOwn(CONTENT, skillId) && Array.isArray(data.lessons)) {
-          CONTENT[skillId] = { skill: skillId, lessons: data.lessons };
-        }
+        if (!Array.isArray(data.lessons)) throw new Error(`Invalid curriculum document: ${document.id}`);
+        loaded[document.id] = { skill: document.id, lessons: data.lessons };
       }
+      const missing = SKILLS.filter((skill) => !snapshot.docs.some((document) => document.id === skill));
+      if (missing.length) throw new Error(`Curriculum is missing Firestore documents: ${missing.join(', ')}`);
+      CONTENT = loaded;
+      loadError = null;
     } catch (error) {
-      console.warn('Could not load instructor-managed practice content', error?.code ?? error);
+      loadError = error;
+      CONTENT = emptyContent();
+      console.warn('Could not load curriculum from Firestore', error?.code ?? error);
     }
     cached = null;
     return CONTENT;
   })();
   return loadPromise;
+}
+
+export function practiceContentLoadError() {
+  return loadError;
 }
 
 export function getSkillContent(skillId) {

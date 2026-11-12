@@ -30,9 +30,21 @@ npm run seed           # terminal 2: demo accounts and sample applications
 npm run dev            # terminal 3: the site at http://localhost:5173
 ```
 
-Demo accounts (password `Passw0rd!demo`): `admin@cfl.test`, `instructor@cfl.test`, `student@cfl.test`.
-Emails are not sent locally: activation links appear in the emulator's functions log, and in the admin console
-when you create an account.
+Local test account credentials are kept in the git-ignored `.test-accounts.local.json`. `npm run seed` uses only
+its emulator passwords and writes those accounts to the local Firebase emulators. The `@cfl.test` addresses are
+for testing; they cannot receive email.
+
+To create the matching live test logins in the production Firebase project, run this once from your machine after
+`gcloud auth application-default login`:
+
+```powershell
+npm run provision:test-accounts -- --project centre-of-foreign-learni-82491 --apply
+```
+
+The script reads each `productionPassword` from `.test-accounts.local.json`, creates the password in Firebase
+Authentication, and writes the role claims and profile documents to Firestore. It refuses to alter an existing
+account unless that account is already marked as a matching test account by this script. Passwords are never
+stored in Firestore or checked into the repository. Keep the ignored local credentials file private.
 
 Try the whole admissions loop: open `/register`, submit an application, sign in as the admin, approve it, copy the
 activation link from the functions log, open it, choose a password, sign in as the new student.
@@ -49,6 +61,15 @@ activation link from the functions log, open it, choose a password, sign in as t
 | `npm run check:routes` | Verifies every link and asset in the built site, hosting redirects, file naming and page guards |
 | `npm run sync:shared` | Copies the shared validators from `src/js/utils` into `functions/src/lib/shared` |
 | `npm run bootstrap-admin` | Creates or promotes the first administrator (see below) |
+| `npm run migrate:content -- --project <id>` | Dry-runs the production programme and practice-content import; add `--apply` to create missing Firestore docs |
+| `npm run provision:test-accounts -- --project <id>` | Dry-runs test account setup; add `--apply` to create marked production Auth accounts and Firestore profiles |
+
+The content migration reads the checked-in catalogue and lesson JSON files, then creates only missing `programmes/{id}` and `practiceContent/{skill}` documents. It never overwrites existing content or imports emulator demo accounts/applications. It requires Application Default Credentials with Firestore write access to the production project in `.env.production`. First inspect the dry-run list, then apply with:
+
+```sh
+npm run migrate:content -- --project <production-project-id> --apply
+```
+
 
 ## Project layout
 

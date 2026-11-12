@@ -1,6 +1,6 @@
 import { guardPage } from '@/auth/guards.js';
 import { ROUTES } from '@/core/routes.js';
-import { loadPracticeContent, questionIndex } from '@/practice/content.js';
+import { loadPracticeContent, practiceContentLoadError, questionIndex } from '@/practice/content.js';
 import { dueMistakes } from '@/practice/engine.js';
 import { SKILLS } from '@/practice/skills.js';
 import { loadMistakes } from '@/services/practice-service.js';
@@ -11,6 +11,7 @@ import { mountNotificationBadge } from '@/ui/notification-badge.js';
 mountPortalShell('practice');
 const session = await guardPage({ roles: ['student'] });
 await loadPracticeContent();
+const contentError = practiceContentLoadError?.();
 mountNotificationBadge(session.user.uid);
 
 let mistakes = {};
@@ -29,9 +30,11 @@ const open = Object.values(mistakes).filter((m) => m.status === 'open' && index[
 const due = dueMistakes(open, now);
 const dueLabel = (m) => (!m.dueAt || new Date(m.dueAt) <= now ? 'Due now' : `Next review ${new Date(m.dueAt).toLocaleDateString('en-KE')}`);
 
-document.getElementById('mistakesSummary').textContent = open.length
-  ? `${open.length} to review · ${due.length} due now`
-  : 'No mistakes to review. Questions you get wrong in lessons will appear here.';
+document.getElementById('mistakesSummary').textContent = contentError
+  ? 'Practice lessons could not be loaded from Firestore. Check your connection and reload.'
+  : open.length
+    ? `${open.length} to review · ${due.length} due now`
+    : 'No mistakes to review. Questions you get wrong in lessons will appear here.';
 
 document.getElementById('mistakesActions').replaceChildren(
   due.length ? h('a', { class: 'btn btn-primary', href: `${ROUTES.practiceLesson}?skill=review` }, `Practise ${Math.min(due.length, 10)} due now`) : '',

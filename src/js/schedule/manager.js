@@ -1,4 +1,3 @@
-import fallbackProgrammes from '../../data/programmes.json';
 import { el } from '@/utils/dom.js';
 import { describeWhen, formatDay, modeLabel } from './state.js';
 import { buildClass } from './validate.js';
@@ -14,7 +13,7 @@ export function initSchedule({ root = document, say, instructor }) {
   const empty = (text) => el('tr', {}, el('td', { colspan: 4, class: 'empty' }, text));
   const programmeSelect = field('classProgramme');
   const instructors = [{ uid: instructor.uid, displayName: instructor.displayName }];
-  let catalogue = fallbackProgrammes;
+  let catalogue = [];
   const programmeName = (id) => catalogue.find((p) => p.id === id)?.name ?? id;
 
   const submitButton = form.querySelector('button[type="submit"]');
@@ -33,7 +32,7 @@ export function initSchedule({ root = document, say, instructor }) {
       catalogue = await listCatalog();
     } catch (error) {
       console.warn('Could not load the programme catalogue', error?.code ?? error);
-      catalogue = fallbackProgrammes;
+      catalogue = [];
     }
     const byId = new Map(catalogue.map((p) => [p.id, p]));
     const mine = ids.map((id) => byId.get(id) ?? { id, name: id });

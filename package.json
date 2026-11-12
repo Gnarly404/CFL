@@ -21,9 +21,11 @@
     "emulators:keep": "node scripts/run-emulators.mjs",
     "seed": "node scripts/run-seed-local.mjs",
     "bootstrap-admin": "node scripts/bootstrap-admin.mjs",
+    "provision:test-accounts": "node scripts/provision-test-accounts.mjs",
     "sync:shared": "node scripts/sync-shared.mjs",
     "check:shared": "node scripts/sync-shared.mjs --check",
-    "voice": "python scripts/build-voice.py"
+    "voice": "python scripts/build-voice.py",
+    "migrate:content": "node scripts/migrate-content-to-firestore.mjs"
   },
   "dependencies": {
     "@emailjs/browser": "^5.0.2",

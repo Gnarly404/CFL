@@ -9,6 +9,7 @@ const savePracticeContent = vi.fn();
 vi.mock('@/practice/content.js', () => ({
   getSkillContent: (...args) => getSkillContent(...args),
   loadPracticeContent: (...args) => loadPracticeContent(...args),
+  practiceContentLoadError: () => null,
 }));
 vi.mock('@/services/instructor-service.js', () => ({ savePracticeContent: (...args) => savePracticeContent(...args) }));
 

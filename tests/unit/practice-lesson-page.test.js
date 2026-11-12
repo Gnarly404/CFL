@@ -9,9 +9,16 @@ import vocabulary from '../../src/data/practice/vocabulary.json';
 import { loadPage, tick } from '../helpers.js';
 
 const save = vi.fn();
+const getSkillContent = vi.fn();
 vi.mock('@/practice/content.js', async (importOriginal) => ({
   ...await importOriginal(),
+  getSkillContent: (...args) => getSkillContent(...args),
   loadPracticeContent: vi.fn().mockResolvedValue({}),
+  practiceContentLoadError: () => null,
+  questionIndex: () => Object.fromEntries(Object.entries({
+    grammar, vocabulary, reading, listening, speaking, writing,
+  }).flatMap(([skillId, content]) => content.lessons.flatMap((lesson) => (lesson.questions ?? [])
+    .map((question) => [question.id, { skillId, lessonId: lesson.id, question }])))),
 }));
 vi.mock('@/auth/guards.js', () => ({ guardPage: vi.fn().mockResolvedValue({ user: { uid: 'u1' } }) }));
 vi.mock('@/ui/notification-badge.js', () => ({ mountNotificationBadge: vi.fn() }));
@@ -56,6 +63,9 @@ async function answer(optionIndex) {
 
 describe('practice lesson page', () => {
   beforeEach(() => {
+    getSkillContent.mockImplementation((skill) => ({
+      grammar, listening, reading, speaking, writing, vocabulary,
+    }[skill] ?? { lessons: [] }));
     saveMistakes.mockReset().mockResolvedValue();
     loadFeedback.mockReset().mockResolvedValue(null);
     recordSession.mockReset().mockResolvedValue();

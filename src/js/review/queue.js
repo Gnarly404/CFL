@@ -1,11 +1,12 @@
-import writing from '../../data/practice/writing.json';
+import { getSkillContent, loadPracticeContent } from '@/practice/content.js';
 import { listAssignedStudents, loadMyFeedback, loadSubmittedWork } from '@/services/review-service.js';
 
-export const taskFor = (promptId) => writing.lessons.find((l) => l.writing.promptId === promptId)?.writing ?? null;
+export const taskFor = (promptId) => getSkillContent('writing').lessons.find((lesson) => lesson.writing?.promptId === promptId)?.writing ?? null;
 export const studentName = (s) => s?.displayName || s?.profile?.fullName || s?.email || 'Student';
 
 /** Submitted writing from every assigned student, oldest first, each with its feedback if any. `failed` lists students that could not be read. */
 export async function loadQueue(instructorId) {
+  await loadPracticeContent();
   const students = await listAssignedStudents(instructorId);
   const feedback = await loadMyFeedback(instructorId);
   const failed = [];

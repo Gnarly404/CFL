@@ -1,5 +1,4 @@
 import { guardPage } from '@/auth/guards.js';
-import fallbackProgrammes from '../../data/programmes.json';
 import { listPublicProgrammes } from '@/services/programme-service.js';
 import {
   describeWhen, groupByDay, isHappeningNow, modeLabel, nextClass, splitClasses, formatDay,
@@ -13,7 +12,7 @@ mountPortalShell('schedule');
 const session = await guardPage({ roles: ['student'] });
 mountNotificationBadge(session.user.uid);
 const $ = (id) => document.getElementById(id);
-let programmes = fallbackProgrammes;
+let programmes = [];
 try {
   programmes = await listPublicProgrammes();
 } catch (error) {
