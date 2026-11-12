@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const { currentSession, signOutUser } = vi.hoisted(() => ({ currentSession: vi.fn(), signOutUser: vi.fn() }));
 vi.mock('@/auth/session.js', () => ({ currentSession, signOutUser }));
 
-const account = { user: { uid: 'stu1', displayName: 'Amina K', email: 'amina@example.test' }, role: 'student' };
+const account = { user: { uid: 'stu1', displayName: 'Amina K', email: 'amina@example.test', emailVerified: true }, role: 'student' };
 
 describe('protected page history restore', () => {
   beforeEach(() => {

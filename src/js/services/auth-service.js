@@ -1,5 +1,5 @@
 import {
-  browserLocalPersistence, browserSessionPersistence, setPersistence, signInWithEmailAndPassword, signOut,
+  browserSessionPersistence, reload, sendEmailVerification, setPersistence, signInWithEmailAndPassword, signOut,
 } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
@@ -26,21 +26,32 @@ async function activateIfNeeded(user) {
 }
 
 /**
- * Signs in. "Remember me" keeps the session across browser restarts; otherwise it ends with the tab.
+ * Signs in with tab-scoped persistence. A copied URL never carries authentication to another tab or browser.
  * @returns {Promise<{ user: object, role: string }>}
  */
-export async function signIn({ email, password, remember }) {
+export async function signIn({ email, password }) {
   const auth = authService();
-  await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+  await setPersistence(auth, browserSessionPersistence);
   const { user } = await signInWithEmailAndPassword(auth, email, password);
 
-  const { claims } = await user.getIdTokenResult();
-  const role = normaliseRole(claims.role);
-  if (!role) {
-    await signOut(auth);
-    throw new AppError('account-not-ready', "Your account isn't set up yet. Contact admissions for help.");
+  try {
+    await activateIfNeeded(user);
+    await reload(user);
+    const { claims } = await user.getIdTokenResult(true);
+    const role = normaliseRole(claims.role);
+    if (!role) throw new AppError('account-not-ready', "Your account isn't set up yet. Contact admissions for help.");
+    if (!user.emailVerified || claims.email_verified !== true) {
+      try {
+        await sendEmailVerification(user);
+      } catch (error) {
+        throw new AppError('email-verification-failed', 'We could not send a verification email. Check your connection and try again.', { cause: error });
+      }
+      throw new AppError('email-not-verified', 'We sent a verification link to your email. Open it, then sign in again.');
+    }
+    return { user, role };
+  } catch (error) {
+    if (auth.currentUser?.uid === user.uid) await signOut(auth);
+    throw error;
   }
-  await activateIfNeeded(user);
-  return { user, role };
 }
 

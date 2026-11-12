@@ -10,6 +10,7 @@ import { initInstructorSettings } from '@/instructor/settings.js';
 import { dbService } from '@/services/firebase-db.js';
 import { requestPasswordReset } from '@/services/password-service.js';
 import { doc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { trackPendingSave } from '@/utils/pending-saves.js';
 
 const session = await guardPage({ roles: ['instructor', 'admin'] });
 mountInstructorShell('dashboard', session.role);
@@ -35,7 +36,7 @@ try {
 const settings = initInstructorSettings({
   profile: session.role === 'instructor' ? instructorProfile : null,
   email: session.user.email,
-  saveProfile: (changes) => updateDoc(doc(dbService(), 'instructors', session.user.uid), { ...changes, updatedAt: serverTimestamp() }),
+  saveProfile: (changes) => trackPendingSave(() => updateDoc(doc(dbService(), 'instructors', session.user.uid), { ...changes, updatedAt: serverTimestamp() })),
   sendReset: requestPasswordReset,
   onBio: (text) => { $('instructorBio').textContent = text || 'No biography has been added yet.'; },
 });

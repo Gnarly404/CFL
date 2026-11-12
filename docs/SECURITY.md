@@ -30,17 +30,25 @@
 
 - **Roles** (`student`, `instructor`, `admin`) are custom claims set only by Cloud Functions. Browsers cannot change them.
 - **Firestore rules** read the claim from the token. Identity, admissions, enrolments, payments, certificates, audit logs
-  and counters are server-written only. Students write only their own learning state.
+  and counters are server-written only. Rules require Firebase's `email_verified` claim for all signed-in data access.
+  Firebase has Firestore/Storage Security Rules rather than SQL row-level security (RLS); these rules enforce access
+  for each document and object.
 - **Privileged functions** (`decideApplication`, `adminCreateUser`, `adminSetUserStatus`, `adminSetUserRole`,
   `adminResendInvite`, `adminAssignProgramme`, `adminSaveProgramme`) look the caller up in Firebase Auth on every call, so demoting or disabling someone takes effect
-  immediately, not when their token expires. Disabling an account also revokes its sessions.
+  immediately, not when their token expires. They also reject accounts without a verified email. Disabling an account also revokes its sessions.
 - **Public functions** (`submitApplication`, `getApplicationStatus`) validate input on the server, rate-limit by hashed
   IP and by email or reference, ignore a hidden honeypot field, and never reveal whether an email or reference exists.
 - **All callable functions** require App Check, and share hashed IP (300 calls/hour) and authenticated-account (600 calls/hour) limits. Endpoint-specific limits remain in place. Password-reset emails are generated server-side, limited to one per email every 15 minutes and five per email per day, and the response does not reveal whether the account exists.
 - **Network edge limits** are not configurable for Firebase Hosting or callable function URLs in this repository. These server limits run after a request reaches the Firebase function platform; App Check rejects unattested clients before handler code but is not a volumetric DDoS control. True edge rate limiting requires an external HTTPS Load Balancer with Cloud Armor and a backend topology that prevents clients from bypassing the protected load balancer. Treat that as a separate infrastructure change before claiming edge-level protection.
 - **Sign-in** gives the same message for unknown email and wrong password, and `?next=` can only point at the same site.
+- **Email verification** is required before any protected portal access. Sign-in sends a verification link to unverified accounts and requires them to sign in again after confirming it. Invited accounts are verified by the one-time invitation link during activation.
+- **Browser sessions** use Firebase's tab-scoped session persistence, expire after 45 minutes without user activity, and are cleared when the browser session closes. Firebase ID tokens remain in the Auth SDK and are never added to page URLs; copying a protected link to another tab or browser does not transfer a sign-in. Before sign-out, the app waits for tracked saves and stores supported form drafts in tab-scoped storage, keyed by account and page.
 - **Passwords** are never handled by CFL code: Firebase Authentication owns them. New accounts get a random password the
   nobody knows and must use the emailed one-time link.
+
+Firebase Hosting serves static page files and does not authenticate the `/admin` HTML response. The page guard prevents
+the admin interface from running for other roles, while Firestore/Storage rules and live-role Cloud Function checks
+protect admin data and actions. Making the HTML itself return 401/403 requires moving it behind an authenticated server proxy.
 
 ## Known limitations (tracked in docs/PROGRESS.md)
 
@@ -49,7 +57,7 @@
 - Instructor access to student data is scoped to assignment. An instructor can read a student's **submitted** writing (never drafts) only when listed in that student's `instructorIds`, and can create or edit `feedback` only on submitted work of such a student. Instructors still cannot read lesson progress, mistakes, practice sessions or any other learning data, and can never write to `submissions`. Feedback is a separate document, so a student's text is never altered.
 - Instructors can schedule classes only under their own `instructorId`, read only their assigned classes, and change only a class's scheduled/cancelled status. Students see only classes for programmes in which they are enrolled; admins can manage all schedules.
 - Messages are created only by the `sendMessage` function. A student may message only a teacher listed in their `instructorIds`, and a teacher only students who list them; both accounts must exist and be active, text is plain (cleaned, 2000 characters, shown as text never markup), and each sender is limited to 30 messages an hour. Each message lists both people in `participants`; only they can read it. Admins cannot read conversations. Browsers can only mark a message they received as read.
-- A signed-in token stays valid up to an hour. Role changes and disabling revoke refresh tokens, and privileged functions
+- A signed-in ID token can stay valid up to an hour, but the client signs out after 45 minutes of inactivity. Role changes and disabling revoke refresh tokens, and privileged functions
   re-check the live role, but Firestore rules read the token. Keep that in mind for anything highly sensitive.
 - No Content-Security-Policy yet: the pages still load Bootstrap, Font Awesome and fonts from CDNs. The design-system
   session self-hosts them and adds a strict policy.

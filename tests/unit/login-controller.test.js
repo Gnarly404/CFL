@@ -32,10 +32,10 @@ describe('sign-in page', () => {
 
   it('signs in and opens the right portal', async () => {
     const { form, signInFn, navigate } = setup();
-    fill(form, { email: ' student@example.com ', password: 'Secret-123', rememberMe: true });
+    fill(form, { email: ' student@example.com ', password: 'Secret-123' });
     submitForm(form);
     await vi.waitFor(() => expect(navigate).toHaveBeenCalledWith('/student/dashboard'));
-    expect(signInFn).toHaveBeenCalledWith({ email: 'student@example.com', password: 'Secret-123', remember: true });
+    expect(signInFn).toHaveBeenCalledWith({ email: 'student@example.com', password: 'Secret-123' });
   });
 
   it('returns to the page that asked for sign-in when the role allows it', async () => {
@@ -87,7 +87,7 @@ describe('sign-in page', () => {
   });
 
   it('moves people who are already signed in straight to their portal', async () => {
-    const { navigate } = setup({ getSession: async () => ({ user: { uid: 'u' }, role: 'admin' }) });
+    const { navigate } = setup({ getSession: async () => ({ user: { uid: 'u', emailVerified: true }, role: 'admin' }) });
     await vi.waitFor(() => expect(navigate).toHaveBeenCalledWith('/admin/dashboard'));
   });
 });

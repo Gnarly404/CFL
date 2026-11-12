@@ -9,7 +9,7 @@ service cloud.firestore {
 
     // ---------- helpers ----------
     function signedIn() {
-      return request.auth != null;
+      return request.auth != null && request.auth.token.email_verified == true;
     }
     function role() {
       return (signedIn() && ('role' in request.auth.token)) ? request.auth.token.role : null;

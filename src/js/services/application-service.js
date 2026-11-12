@@ -4,4 +4,4 @@ import { call } from './callable.js';
 export const submitApplication = (payload) => call('submitApplication', payload);
 
 /** Looks up progress with the reference and the email used to apply. */
-export const getApplicationStatus = ({ reference, email }) => call('getApplicationStatus', { reference, email });
+export const getApplicationStatus = ({ reference, email }) => call('getApplicationStatus', { reference, email }, { trackSave: false });

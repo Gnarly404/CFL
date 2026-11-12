@@ -1,5 +1,6 @@
 import { loginUrl, ROUTES, homeFor } from '@/core/routes.js';
 import { currentSession, signOutUser } from './session.js';
+import { mountPortalState, signOutThroughPortal } from '@/ui/portal-state.js';
 
 /**
  * Pure access decision, kept separate from the browser so it can be unit-tested.
@@ -7,6 +8,9 @@ import { currentSession, signOutUser } from './session.js';
  */
 export function evaluateAccess(session, allowedRoles, here = '/') {
   if (!session?.user) return { allow: false, redirect: loginUrl(here) };
+  if (session.user.emailVerified !== true) {
+    return { allow: false, signOut: true, redirect: `${ROUTES.login}?reason=email-not-verified` };
+  }
   if (!session.role) return { allow: false, signOut: true, redirect: `${ROUTES.login}?reason=no-role` };
   if (!allowedRoles.includes(session.role)) return { allow: false, redirect: homeFor(session.role) };
   return { allow: true };
@@ -57,7 +61,8 @@ export async function guardPage({ roles, navigate = (url) => window.location.rep
     return new Promise(() => {});
   }
   showSignedInUser(session.user);
-  wireSignOut(); // wire controls before the page becomes visible, so an early click is never lost
+  mountPortalState({ uid: session.user.uid, navigate });
+  wireSignOut(document, navigate); // wire controls before the page becomes visible, so an early click is never lost
   guardHistoryRestore(session, roles, navigate);
   document.documentElement.removeAttribute('data-auth');
   return session;
@@ -68,6 +73,11 @@ export function wireSignOut(root = document, navigate = (url) => (window.cflNavi
   root.querySelectorAll('[data-action="sign-out"]').forEach((control) => {
     control.addEventListener('click', async (event) => {
       event.preventDefault();
+      const portalSignOut = signOutThroughPortal();
+      if (portalSignOut) {
+        await portalSignOut;
+        return;
+      }
       await signOutUser();
       navigate(`${ROUTES.login}?reason=signed-out`);
     });

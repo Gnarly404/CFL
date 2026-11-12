@@ -14,10 +14,11 @@ let env;
 
 const as = {
   anon: () => env.unauthenticatedContext().firestore(),
-  student: (uid = 'stu1') => env.authenticatedContext(uid, { role: 'student' }).firestore(),
-  instructor: (uid = 'ins1') => env.authenticatedContext(uid, { role: 'instructor' }).firestore(),
-  admin: (uid = 'adm1') => env.authenticatedContext(uid, { role: 'admin' }).firestore(),
-  noRole: (uid = 'nor1') => env.authenticatedContext(uid, {}).firestore(),
+  student: (uid = 'stu1') => env.authenticatedContext(uid, { role: 'student', email_verified: true }).firestore(),
+  instructor: (uid = 'ins1') => env.authenticatedContext(uid, { role: 'instructor', email_verified: true }).firestore(),
+  admin: (uid = 'adm1') => env.authenticatedContext(uid, { role: 'admin', email_verified: true }).firestore(),
+  unverifiedAdmin: (uid = 'unverified') => env.authenticatedContext(uid, { role: 'admin', email_verified: false }).firestore(),
+  noRole: (uid = 'nor1') => env.authenticatedContext(uid, { email_verified: true }).firestore(),
 };
 
 beforeAll(async () => {
@@ -70,6 +71,11 @@ describe('identity documents', () => {
     await assertSucceeds(getDoc(doc(as.admin(), 'users/stu1')));
     await assertFails(setDoc(doc(as.student('stu1'), 'users/stu1'), { role: 'admin' }));
     await assertFails(updateDoc(doc(as.admin(), 'users/stu1'), { role: 'admin' }));
+  });
+
+  it('blocks unverified users from reading private records, including admin records', async () => {
+    await assertFails(getDoc(doc(as.unverifiedAdmin(), 'applications/app1')));
+    await assertFails(getDoc(doc(as.unverifiedAdmin(), 'users/stu1')));
   });
 
   it('students edit their profile and preferences but not who teaches them', async () => {

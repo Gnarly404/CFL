@@ -17,6 +17,7 @@ export async function requireRole(request, allowedRoles, { auth }) {
     throw new HttpsError('unauthenticated', 'Sign in again to continue.');
   }
   if (record.disabled) throw new HttpsError('permission-denied', 'This account is disabled.');
+  if (!record.emailVerified) throw new HttpsError('permission-denied', 'Verify your email address before continuing.');
 
   const role = record.customClaims?.role ?? null;
   if (!allowedRoles.includes(role)) {

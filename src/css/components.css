@@ -128,6 +128,17 @@ input[type="checkbox"],input[type="radio"]{accent-color:var(--navy)}
 /* ---------- Empty states ---------- */
 .empty-state{display:grid;justify-items:center;gap:var(--s2);padding:var(--s7) var(--s4);border:1px dashed var(--line-strong);border-radius:var(--radius);color:var(--muted);text-align:center}
 
+/* Shared portal status: loading placeholders appear immediately without delaying requests. */
+[data-state="loading"]{min-height:1.2em;border-radius:4px;background:linear-gradient(100deg,var(--surface-2) 25%,var(--navy-100) 45%,var(--surface-2) 65%);background-size:220% 100%;color:transparent!important;animation:cfl-skeleton 1.3s ease-in-out infinite}
+@keyframes cfl-skeleton{to{background-position-x:-220%}}
+.portal-state-notice{position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:center;gap:var(--s3);padding:var(--s2) var(--s4);border-bottom:1px solid var(--line);background:var(--info-bg);color:var(--info);font-size:.9rem}
+.portal-state-notice p{margin:0}
+.portal-state-notice button{min-height:36px;padding:0 var(--s3);border:1px solid currentColor;border-radius:var(--radius-sm);background:transparent;color:inherit;font:600 .85rem var(--font-body);cursor:pointer}
+.portal-state-notice--offline,.portal-state-notice--error{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad)}
+.portal-state-notice--warning{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.portal-state-notice[hidden]{display:none}
+@media(prefers-reduced-motion:reduce){[data-state="loading"]{animation:none}}
+
 @media (prefers-reduced-motion:reduce){
   .btn:active{transform:none}
   .btn[aria-busy="true"]::before{animation-duration:2s}

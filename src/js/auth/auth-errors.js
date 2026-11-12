@@ -14,6 +14,8 @@ const MESSAGES = {
   'auth/weak-password': 'Choose a stronger password.',
   'account-not-ready': "Your account isn't set up yet. Contact admissions for help.",
   'account-disabled': 'This account has been disabled. Contact admissions for help.',
+  'email-not-verified': 'We sent a verification link to your email. Open it, then sign in again.',
+  'email-verification-failed': 'We could not send a verification email. Check your connection and try again.',
 };
 
 const FALLBACK = 'Something went wrong. Please try again.';

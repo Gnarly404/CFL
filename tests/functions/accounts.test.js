@@ -112,17 +112,21 @@ describe('requireRole', () => {
     await expect(requireRole(request(null), ['admin'], { auth: fakeAuth() })).rejects.toMatchObject({ code: 'unauthenticated' });
   });
   it('uses the live role, not the possibly stale token', async () => {
-    const auth = fakeAuth([{ uid: 'u1', email: 'a@b.co', customClaims: { role: 'student' } }]);
+    const auth = fakeAuth([{ uid: 'u1', email: 'a@b.co', emailVerified: true, customClaims: { role: 'student' } }]);
     await expect(requireRole(request('u1'), ['admin'], { auth })).rejects.toMatchObject({ code: 'permission-denied' });
   });
   it('rejects disabled accounts and accounts that no longer exist', async () => {
-    const auth = fakeAuth([{ uid: 'u1', customClaims: { role: 'admin' }, disabled: true }]);
+    const auth = fakeAuth([{ uid: 'u1', emailVerified: true, customClaims: { role: 'admin' }, disabled: true }]);
     await expect(requireRole(request('u1'), ['admin'], { auth })).rejects.toMatchObject({ code: 'permission-denied' });
     await expect(requireRole(request('ghost'), ['admin'], { auth })).rejects.toMatchObject({ code: 'unauthenticated' });
   });
   it('returns the caller when the role matches', async () => {
-    const auth = fakeAuth([{ uid: 'u1', email: 'a@b.co', customClaims: { role: 'admin' } }]);
+    const auth = fakeAuth([{ uid: 'u1', email: 'a@b.co', emailVerified: true, customClaims: { role: 'admin' } }]);
     await expect(requireRole(request('u1'), ['admin', 'instructor'], { auth })).resolves.toEqual({ uid: 'u1', role: 'admin', email: 'a@b.co' });
+  });
+  it('rejects unverified accounts even when their live role is allowed', async () => {
+    const auth = fakeAuth([{ uid: 'u1', email: 'a@b.co', emailVerified: false, customClaims: { role: 'admin' } }]);
+    await expect(requireRole(request('u1'), ['admin'], { auth })).rejects.toMatchObject({ code: 'permission-denied' });
   });
 });
 

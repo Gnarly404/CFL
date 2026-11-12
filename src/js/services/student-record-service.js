@@ -5,6 +5,6 @@ import { call } from './callable.js';
  * records collection directly: the server assembles each record from the application, the account and the
  * administrator's saved edits, and keeps identification numbers out of the list.
  */
-export const listStudentRecords = () => call('adminListStudentRecords', {});
-export const getStudentRecord = (uid) => call('adminGetStudentRecord', { uid });
+export const listStudentRecords = () => call('adminListStudentRecords', {}, { trackSave: false });
+export const getStudentRecord = (uid) => call('adminGetStudentRecord', { uid }, { trackSave: false });
 export const saveStudentRecord = ({ uid, record }) => call('adminSaveStudentRecord', { uid, record });

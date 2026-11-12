@@ -9,7 +9,9 @@ import { describeAuthError } from './auth-errors.js';
 const NOTICES = {
   'signed-out': 'You have been signed out.',
   'no-role': "Your account isn't set up yet. Contact admissions for help.",
-  'session-expired': 'Your session ended. Sign in again to continue.',
+  'session-expired': 'Your session expired after 45 minutes of inactivity. Sign in again to continue.',
+  'session-save-warning': 'Your session ended. Some changes could not sync, but a draft was saved in this browser tab. Reconnect and sign in again to continue.',
+  'email-not-verified': 'Verify your email before using the portal. Sign in again and we will send a verification link.',
   activated: 'Your password is saved. Sign in to continue.',
 };
 
@@ -28,7 +30,6 @@ export function initLogin({
   if (!form) return;
   const emailInput = form.querySelector('#email');
   const passwordInput = form.querySelector('#password');
-  const remember = form.querySelector('#rememberMe');
   const submit = form.querySelector('button[type="submit"]');
   const notice = root.querySelector('#loginNotice');
   const alert = root.querySelector('#loginError');
@@ -43,7 +44,7 @@ export function initLogin({
 
   // Someone who is already signed in goes straight to their portal.
   getSession().then((session) => {
-    if (session.user && session.role) navigate(postLoginDestination(session.role, next));
+    if (session.user && session.role && session.user.emailVerified) navigate(postLoginDestination(session.role, next));
   }).catch(() => {});
 
   form.addEventListener('submit', async (event) => {
@@ -65,7 +66,6 @@ export function initLogin({
       const { role } = await signInFn({
         email: emailInput.value.trim(),
         password: passwordInput.value,
-        remember: remember.checked,
       });
       navigate(postLoginDestination(role, next));
     } catch (error) {

@@ -28,6 +28,7 @@ import { mountGreeting } from '@/ui/greeting.js';
 import { initServiceRequests } from '@/student/service-requests.js';
 import { buildFeesView, renderFees } from '@/student/fees.js';
 import { listMyPrivacyRequests, submitPrivacyRequest } from '@/services/privacy-request-service.js';
+import { trackPendingSave } from '@/utils/pending-saves.js';
 
 mountPortalShell('dashboard');
 const session = await guardPage({ roles: ['student'] });
@@ -222,10 +223,10 @@ avatarUploadEl?.addEventListener('change', async () => {
   accountNote('Uploading profile photo…');
   try {
     const destination = storageRef(storageService(), `users/${session.user.uid}/avatar/profile`);
-    const uploaded = await uploadBytes(destination, file, { contentType: file.type });
+    const uploaded = await trackPendingSave(() => uploadBytes(destination, file, { contentType: file.type }));
     const photoURL = await getDownloadURL(uploaded.ref);
     const nextProfile = { ...studentRecord.profile, photoURL };
-    await updateDoc(doc(dbService(), 'students', session.user.uid), { profile: nextProfile, updatedAt: serverTimestamp() });
+    await trackPendingSave(() => updateDoc(doc(dbService(), 'students', session.user.uid), { profile: nextProfile, updatedAt: serverTimestamp() }));
     studentRecord = { ...studentRecord, profile: nextProfile };
     setAvatar(photoURL);
     accountNote('Profile photo updated.', 'success');
@@ -249,9 +250,9 @@ removeAvatarButtonEl?.addEventListener('click', async () => {
   delete nextProfile.photoURL;
   let objectDeleted = false;
   try {
-    await deleteObject(storageRef(storageService(), `users/${session.user.uid}/avatar/profile`));
+    await trackPendingSave(() => deleteObject(storageRef(storageService(), `users/${session.user.uid}/avatar/profile`)));
     objectDeleted = true;
-    await updateDoc(doc(dbService(), 'students', session.user.uid), { profile: nextProfile, updatedAt: serverTimestamp() });
+    await trackPendingSave(() => updateDoc(doc(dbService(), 'students', session.user.uid), { profile: nextProfile, updatedAt: serverTimestamp() }));
     studentRecord = { ...studentRecord, profile: nextProfile };
     setAvatar('');
     accountNote('Profile photo removed.', 'success');
@@ -348,7 +349,7 @@ preferencesForm?.addEventListener('submit', async (event) => {
     interfaceSounds: soundSetting.value(),
   };
   try {
-    await updateDoc(doc(dbService(), 'students', session.user.uid), { preferences, updatedAt: serverTimestamp() });
+    await trackPendingSave(() => updateDoc(doc(dbService(), 'students', session.user.uid), { preferences, updatedAt: serverTimestamp() }));
     studentRecord = { ...studentRecord, preferences };
     setReduceMotionPreference(preferences.reduceMotion);
     voiceSetting.apply();

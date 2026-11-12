@@ -2,6 +2,7 @@ import {
   collection, doc, getDocs, limit, onSnapshot, orderBy, query, serverTimestamp, updateDoc, where, writeBatch,
 } from 'firebase/firestore';
 import { dbService } from './firebase-db.js';
+import { trackPendingSave } from '@/utils/pending-saves.js';
 
 const MAX = 100;
 
@@ -43,12 +44,12 @@ export function watchUnreadNotifications(uid, onCount, onError) {
 
 const ref = (id) => doc(dbService(), 'notifications', id);
 
-export const markRead = (id) => updateDoc(ref(id), { readAt: serverTimestamp() });
+export const markRead = (id) => trackPendingSave(() => updateDoc(ref(id), { readAt: serverTimestamp() }));
 /** Archiving also marks it read, so it cannot linger in the unread count. */
-export const archive = (id) => updateDoc(ref(id), { readAt: serverTimestamp(), archivedAt: serverTimestamp() });
+export const archive = (id) => trackPendingSave(() => updateDoc(ref(id), { readAt: serverTimestamp(), archivedAt: serverTimestamp() }));
 
 export async function markAllRead(ids) {
   const batch = writeBatch(dbService());
   ids.forEach((id) => batch.update(ref(id), { readAt: serverTimestamp() }));
-  await batch.commit();
+  await trackPendingSave(() => batch.commit());
 }

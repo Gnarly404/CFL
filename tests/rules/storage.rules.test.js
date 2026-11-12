@@ -12,9 +12,10 @@ const bytes = (n) => new Uint8Array(n);
 
 const as = {
   anon: () => env.unauthenticatedContext().storage(),
-  student: (uid = 'stu1') => env.authenticatedContext(uid, { role: 'student' }).storage(),
-  instructor: (uid = 'ins1') => env.authenticatedContext(uid, { role: 'instructor' }).storage(),
-  admin: (uid = 'adm1') => env.authenticatedContext(uid, { role: 'admin' }).storage(),
+  student: (uid = 'stu1') => env.authenticatedContext(uid, { role: 'student', email_verified: true }).storage(),
+  instructor: (uid = 'ins1') => env.authenticatedContext(uid, { role: 'instructor', email_verified: true }).storage(),
+  admin: (uid = 'adm1') => env.authenticatedContext(uid, { role: 'admin', email_verified: true }).storage(),
+  unverifiedAdmin: (uid = 'unverified') => env.authenticatedContext(uid, { role: 'admin', email_verified: false }).storage(),
 };
 
 beforeAll(async () => {
@@ -32,6 +33,10 @@ beforeAll(async () => {
 afterAll(async () => { await env?.cleanup(); });
 
 describe('storage rules', () => {
+  it('blocks unverified users from protected content, including admins', async () => {
+    await assertFails(getBytes(ref(as.unverifiedAdmin(), 'content/lesson1.mp3')));
+  });
+
   it('public files are world-readable but only admins can upload', async () => {
     await assertSucceeds(getBytes(ref(as.anon(), 'public/brochure.pdf')));
     await assertFails(uploadBytes(ref(as.student(), 'public/x.png'), bytes(10), png));

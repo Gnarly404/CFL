@@ -100,17 +100,6 @@ body {
     background-color: green;
 }
 
-.remember-me {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    margin-bottom: 15px;
-}
-
-.remember-me input {
-    margin-right: 10px;
-}
-
 .login-button, .activate-button {
     width: 100%;
     padding: 12px;
@@ -158,8 +147,6 @@ body { background: #f5f7fa; color: var(--text-color); }
 .login-button:focus-visible, .activate-button:focus-visible { outline: 3px solid #56ccf2; outline-offset: 3px; }
 .login-links .link-button, .login-help a { color: #1e3a5f; font-weight: 600; }
 .login-help { font-size: 0.88rem; color: #566677; margin-top: 18px; }
-.remember-me input { width: 18px; height: 18px; accent-color: #1e3a5f; }
-
 /* Split layout on the sign-in page: brand panel left, form right */
 .login-shell { display: grid; grid-template-columns: minmax(280px, 5fr) minmax(360px, 6fr); width: 100%; min-height: 100vh; }
 .login-shell .login-container { align-self: center; justify-self: center; max-width: 460px; }

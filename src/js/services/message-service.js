@@ -3,6 +3,7 @@ import {
 } from 'firebase/firestore';
 import { call } from './callable.js';
 import { dbService } from './firebase-db.js';
+import { trackPendingSave } from '@/utils/pending-saves.js';
 import { normaliseMessage } from '@/messages/state.js';
 
 /** Every message the person is in, newest first. Rules need the query to name them via `participants`. */
@@ -19,13 +20,13 @@ export async function markMessagesRead(ids) {
   for (let i = 0; i < ids.length; i += 400) {
     const batch = writeBatch(dbService());
     ids.slice(i, i + 400).forEach((id) => batch.update(doc(dbService(), 'messages', id), { readAt: serverTimestamp() }));
-    await batch.commit();
+    await trackPendingSave(() => batch.commit());
   }
 }
 
 export const sendMessage = (recipientId, body) => call('sendMessage', { recipientId, body });
 
 export async function loadContacts() {
-  const data = await call('messageContacts', {});
+  const data = await call('messageContacts', {}, { trackSave: false });
   return Array.isArray(data?.contacts) ? data.contacts : [];
 }

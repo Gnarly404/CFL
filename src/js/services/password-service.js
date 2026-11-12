@@ -6,7 +6,7 @@ import { call } from './callable.js';
 
 /** Requests a quota-limited reset email without disclosing whether the address has an account. */
 export async function requestPasswordReset(email) {
-  return call('requestPasswordReset', { email });
+  return call('requestPasswordReset', { email }, { trackSave: false });
 }
 
 /** Checks a reset or invitation code and returns the email it belongs to. */
